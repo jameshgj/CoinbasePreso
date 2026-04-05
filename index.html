@@ -3185,10 +3185,12 @@
             slideChannel.postMessage({ slide: currentSlide });
             slides.forEach((slide, idx) => {
                 slide.classList.remove('active', 'prev');
+                slide.style.transition = 'none';
             });
-            // Force reflow so transitions trigger correctly when jumping slides
+            // Force reflow then restore transitions so opacity animates correctly when jumping slides
             void document.body.offsetHeight;
             slides.forEach((slide, idx) => {
+                slide.style.transition = '';
                 if (idx === currentSlide) {
                     slide.classList.add('active');
                     // Reset counter animations so they replay on revisit
