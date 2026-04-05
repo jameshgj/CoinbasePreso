@@ -2513,56 +2513,55 @@
             <!-- SLIDE 10: User Empathy & How It Works (Combined) -->
             <div class="slide zoom-enter" data-slide="7" data-section="Product">
                 <div class="slide-content" style="height: 100%; display: flex; flex-direction: column;">
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Parent Block Control — Demo</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; margin-bottom: 12px;">Interactive walkthrough of the parent and teen experience</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">User Empathy I Considered to Inform Design</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; margin-bottom: 8px;">Key considerations to create a great experience — with the product flows that brought them to life</div>
 
-                    <div style="flex: 1; display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center; min-height: 0; margin-top: 12px;">
+                    <div style="flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: stretch; min-height: 0;">
                         <!-- Left: Screenshot carousel -->
-                        <div style="display: flex; flex-direction: column; align-items: center;">
-                            <div id="demo-carousel" style="overflow: hidden; border: 1px solid rgba(0,82,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-                                <img id="demo-carousel-img" src="screenshots/nav-0.0.png" style="max-height: 340px; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
+                        <div style="display: flex; flex-direction: column; align-items: center; min-height: 0;">
+                            <div id="demo-carousel" style="flex: 1; overflow: hidden; border-radius: 20px; border: 1px solid rgba(0,82,255,0.08); box-shadow: 0 4px 24px rgba(0,0,0,0.08); background: #000; display: flex; align-items: center; justify-content: center; min-height: 0;">
+                                <img id="demo-carousel-img" src="screenshots/nav-0.0.png" style="height: 100%; max-height: 100%; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
                             </div>
-                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
-                                <button onclick="demoPrev()" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                                    <svg width="12" height="12" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-shrink: 0;">
+                                <button onclick="demoPrev()" style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                    <svg width="10" height="10" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
-                                <div id="demo-carousel-label" style="font-size: 0.72em; font-weight: 600; color: #0052FF;">Nav: TikTok Splash</div>
-                                <div id="demo-carousel-counter" style="font-size: 0.65em; color: rgba(26,26,46,0.3); font-weight: 500;">1 / 24</div>
-                                <button onclick="demoNext()" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                                    <svg width="12" height="12" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div id="demo-carousel-label" style="font-size: 0.68em; font-weight: 600; color: #0052FF;">Nav: TikTok Splash</div>
+                                <div id="demo-carousel-counter" style="font-size: 0.62em; color: rgba(26,26,46,0.3); font-weight: 500;">1 / 27</div>
+                                <button onclick="demoNext()" style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                    <svg width="10" height="10" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Right: Design choices -->
-                        <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 8px;">
-                            <div class="animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0052FF" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                    <div style="font-weight: 700; font-size: 0.85em; color: #0052FF;">Proactive Protection</div>
+                        <!-- Right: Design considerations -->
+                        <div style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                            <div class="animate-stagger" style="animation-delay: 0.2s; padding: 16px 18px; background: rgba(240,165,0,0.03); border: 1px solid rgba(240,165,0,0.12); border-radius: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(240,165,0,0.1); border: 1.5px solid rgba(240,165,0,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    </div>
+                                    <div style="font-weight: 700; font-size: 0.9em; color: #f0a500;">Clear, simple control for parents</div>
                                 </div>
-                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Parents block assets and features <em>before</em> teens encounter them — not after. Prevents exposure rather than reacting to it.</div>
+                                <div style="font-size: 0.78em; opacity: 0.6; line-height: 1.5; padding-left: 42px;">Intuitive design — meets compliance without overwhelming parents</div>
                             </div>
-                            <div class="animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; background: rgba(240,165,0,0.03); border: 1px solid rgba(240,165,0,0.15); border-radius: 10px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                    <div style="font-weight: 700; font-size: 0.85em; color: #f0a500;">Teen Agency</div>
+                            <div class="animate-stagger" style="animation-delay: 0.3s; padding: 16px 18px; background: rgba(46,204,113,0.03); border: 1px solid rgba(46,204,113,0.12); border-radius: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(46,204,113,0.1); border: 1.5px solid rgba(46,204,113,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                    </div>
+                                    <div style="font-weight: 700; font-size: 0.9em; color: #2ecc71;">Balancing control with autonomy</div>
                                 </div>
-                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Teens can request unblocks with context — fostering financial dialogue rather than silent restriction. Both sides see real-time status.</div>
+                                <div style="font-size: 0.78em; opacity: 0.6; line-height: 1.5; padding-left: 42px;">Teen-initiated unblock requests ensure teens retain agency</div>
                             </div>
-                            <div class="animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; background: rgba(46,204,113,0.03); border: 1px solid rgba(46,204,113,0.15); border-radius: 10px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                                    <div style="font-weight: 700; font-size: 0.85em; color: #2ecc71;">Full Lifecycle</div>
-                                </div>
-                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Block → Notify → Request → Review → Resolve. Complete flow for both parent and teen with in-app messaging throughout.</div>
+
+                            <div class="animate-stagger" style="animation-delay: 0.4s; font-size: 0.65em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(26,26,46,0.35); margin-top: 4px;">Additional Considerations</div>
+
+                            <div class="animate-stagger" style="animation-delay: 0.45s; padding: 12px 16px; background: rgba(0,82,255,0.02); border: 1px solid rgba(0,82,255,0.08); border-left: 3px solid #3498db; border-radius: 0 10px 10px 0;">
+                                <div style="font-size: 0.82em; line-height: 1.5;"><strong style="color: #3498db;">48-hour block handover</strong> <span style="opacity: 0.55;">— blocks remain if teen unlinks</span></div>
                             </div>
-                            <div class="animate-stagger" style="animation-delay: 0.5s; padding: 14px 16px; background: rgba(155,89,182,0.03); border: 1px solid rgba(155,89,182,0.12); border-radius: 10px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                                    <div style="font-weight: 700; font-size: 0.85em; color: #9b59b6;">Patent-Pending UX</div>
-                                </div>
-                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">First parental control system designed for crypto — filed patent for the dual-party block/unblock interaction model.</div>
+                            <div class="animate-stagger" style="animation-delay: 0.5s; padding: 12px 16px; background: rgba(232,68,90,0.02); border: 1px solid rgba(232,68,90,0.08); border-left: 3px solid #e8445a; border-radius: 0 10px 10px 0;">
+                                <div style="font-size: 0.82em; line-height: 1.5;"><strong style="color: #e8445a;">Could parents weaponize blocking?</strong> <span style="opacity: 0.55;">— no misuse found post-launch</span></div>
                             </div>
                         </div>
                     </div>
@@ -3008,7 +3007,7 @@
 
             <!-- DEMO SLIDE 2: Why Now -->
             <div class="slide fade-enter" data-slide="14" data-section="Demo">
-                <div class="slide-content">
+                <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
                     <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.82em;">Three tailwinds converging to create a narrow window</div>
@@ -3045,7 +3044,7 @@
 
             <!-- DEMO SLIDE 3: The Strategy -->
             <div class="slide fade-enter" data-slide="15" data-section="Demo">
-                <div class="slide-content">
+                <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;" class="animate-stagger">The Strategy</div>
                     <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Reactivate → Engage → Convert</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.82em;">A four-phase funnel from dormant account to retained crypto user</div>
