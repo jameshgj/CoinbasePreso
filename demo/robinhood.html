@@ -494,24 +494,16 @@
                     <!-- SAVINGS (combines Yields + What If) -->
                     <div class="tab-content hidden" id="savings-content">
                         <div id="savings-balance-area" style="margin-bottom:12px;"></div>
-                        <div id="savings-apy-area" style="margin-bottom:12px;"></div>
-                        <div style="display:flex; gap:6px; margin-bottom:12px;">
-                            <button onclick="app.setPreset('safe')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #d1fae5; background:#f0fdf4; font-size:11px; font-weight:600; color:#065f46; cursor:pointer;">Safe Saver</button>
-                            <button onclick="app.setPreset('balanced')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; font-size:11px; font-weight:600; color:#1e40af; cursor:pointer;">Balanced</button>
-                            <button onclick="app.setPreset('growth')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #fed7aa; background:#fff7ed; font-size:11px; font-weight:600; color:#9a3412; cursor:pointer;">Growth</button>
-                        </div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADJUST YOUR SAVINGS MIX</div>
+                        <div id="savings-strategies" style="margin-bottom:12px;"></div>
+                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADJUST YOUR MIX</div>
                         <div id="savings-sliders"></div>
-                        <div id="savings-yield-promo" style="margin-top:16px; margin-bottom:12px;"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADDITIONAL STRATEGIES</div>
+                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-top:16px; margin-bottom:10px;">PROJECTED GROWTH</div>
                         <div style="display:flex; gap:8px; margin-bottom:12px;">
                             <button class="time-pill" data-wperiod="1">1 Year</button>
                             <button class="time-pill active" data-wperiod="3">3 Years</button>
                             <button class="time-pill" data-wperiod="5">5 Years</button>
                         </div>
                         <div id="savings-comparison"></div>
-                        <div class="callout" id="savings-callout"></div>
-                        <button class="cta-btn primary" onclick="app.switchFeatureTab('rules')" style="margin-top:8px;">Set up auto-sweep now</button>
                     </div>
 
                     <!-- RULES -->
@@ -575,7 +567,7 @@ const app = {
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
         breakdownOpen: false,
-            allocations: { safe: 55, moderate: 30, growth: 15 },
+            allocations: { safe: 85, moderate: 0, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
             { name: 'Groceries',     color: '#00C805', amount: 520, count: 18, change: -5 },
@@ -767,8 +759,8 @@ const app = {
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const a = this.state.allocations;
-            const pctTotal = a.safe + a.moderate + a.growth;
-            const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
+            const pctTotal = a.safe + a.growth;
+            const annualYield = (a.safe * RATES.usdc) + (a.growth * RATES.btc);
             const blendedRate = pctTotal > 0 ? annualYield / pctTotal : 0;
             const monthlyContrib = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
             let proj = EXISTING_SAVINGS;
@@ -1062,16 +1054,15 @@ const app = {
         svg.innerHTML = '';
 
         const a = this.state.allocations;
-        const pctTotal = a.safe + a.moderate + a.growth;
+        const pctTotal = a.safe + a.growth;
         const monthly = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
         if (monthly === 0) { this.state.chartPoints = []; document.getElementById('chartLegend').innerHTML = ''; return; }
 
         const years = 5, months = years * 12;
         // Individual tier lines for stacked colored areas
         const tiers = [
-            { key: 'safe',     amount: Math.round(MONTHLY_SAVINGS * a.safe / 100),     rate: RATES.usdc, color: '#00C805', label: 'Safe (USDC)' },
-            { key: 'moderate', amount: Math.round(MONTHLY_SAVINGS * a.moderate / 100),  rate: RATES.defi, color: '#f59e0b', label: 'Moderate (DeFi)' },
-            { key: 'growth',   amount: Math.round(MONTHLY_SAVINGS * a.growth / 100),    rate: RATES.btc,  color: '#f97316', label: 'Growth (BTC/ETH)' }
+            { key: 'safe',     amount: Math.round(MONTHLY_SAVINGS * a.safe / 100),     rate: RATES.usdc, color: '#00C805', label: 'USDC Savings' },
+            { key: 'growth',   amount: Math.round(MONTHLY_SAVINGS * a.growth / 100),    rate: RATES.btc,  color: '#f97316', label: 'BTC Recurring' }
         ].filter(t => t.amount > 0);
 
         // Bank baseline
@@ -1517,12 +1508,12 @@ const app = {
         const cashback = Math.round(monthlySpend * 0.03);
         const totalInflow = MONTHLY_SAVINGS + cashback + MONTHLY_ROUNDUPS;
         const a = this.state.allocations;
-        const pctTotal = a.safe + a.moderate + a.growth;
-        const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
+        const pctTotal = a.safe + a.growth;
+        const annualYield = (a.safe * RATES.usdc) + (a.growth * RATES.btc);
         const blendedRate = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
         const allocDollar = (pct) => Math.round(MONTHLY_SAVINGS * pct / 100);
 
-        // Unified balance + inflow area
+        // Balance + inflow card
         const inflowRow = (label, amount, color) =>
             '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(0,0,0,0.05);">' +
                 '<span style="font-size:11px; color:#374151;">'+label+'</span>' +
@@ -1540,59 +1531,44 @@ const app = {
                     '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Monthly Inflow</div>' +
                     '<div style="font-size:14px; font-weight:700; color:#166534;">$'+totalInflow+'/mo</div>' +
                 '</div>' +
-                inflowRow('Auto-transfer (savings account)', MONTHLY_SAVINGS, '#166534') +
-                inflowRow('Gold Card cashback', cashback, '#1d4ed8') +
+                inflowRow('Auto-transfer (savings)', MONTHLY_SAVINGS, '#166534') +
+                inflowRow('Gold Card 3% cashback', cashback, '#1d4ed8') +
                 inflowRow('Round-ups', MONTHLY_ROUNDUPS, '#9a3412') +
             '</div>';
 
-        // Blended APY display
-        document.getElementById('savings-apy-area').innerHTML =
-            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-                    '<div>' +
-                        '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Blended APY</div>' +
-                        '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">'+pctTotal+'% allocated · $'+allocDollar(pctTotal)+'/mo across '+[a.safe>0,a.moderate>0,a.growth>0].filter(Boolean).length+' tiers</div>' +
-                    '</div>' +
-                    '<div style="font-size:26px; font-weight:700; color:#2563eb;">'+blendedRate+'%</div>' +
+        // Three strategy cards
+        const stratCard = (bg, border, icon, title, subtitle, detail, color) =>
+            '<div style="background:'+bg+'; border:1px solid '+border+'; border-radius:10px; padding:12px; margin-bottom:8px;">' +
+                '<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">' +
+                    '<span style="font-size:16px;">'+icon+'</span>' +
+                    '<div><div style="font-size:12px; font-weight:700; color:'+color+';">'+title+'</div>' +
+                    '<div style="font-size:10px; color:#6b7280;">'+subtitle+'</div></div>' +
                 '</div>' +
+                '<div style="font-size:10px; color:#374151; line-height:1.4;">'+detail+'</div>' +
             '</div>';
 
-        // Allocation sliders with save button
+        document.getElementById('savings-strategies').innerHTML =
+            stratCard('#f0fdf4', '#bbf7d0', '💵', 'Save with USDC — '+(RATES.usdc*100).toFixed(1)+'% APY',
+                'Move checking → USDC for 10.5x more yield',
+                'Your bank pays 0.39%. USDC earns '+(RATES.usdc*100).toFixed(1)+'% on every dollar — same stability as cash. Auto-sweep surplus from spending to USDC.',
+                '#166534') +
+            stratCard('#eff6ff', '#bfdbfe', '💳', 'Gold Card — 3% cashback on everything',
+                '$'+cashback+'/mo in rewards auto-invested',
+                'Every purchase earns 3% back, automatically swept into your USDC savings. That\'s $'+Math.round(cashback*12)+'/yr in free money working for you.',
+                '#1e40af') +
+            stratCard('#fff7ed', '#fed7aa', '₿', 'BTC Recurring Buy — ~'+(RATES.btc*100)+'% historical avg',
+                'Dollar cost average into Bitcoin weekly',
+                'Set up a recurring BTC purchase to build long-term growth. Smooth out volatility by buying the same amount every week. Currently $'+allocDollar(a.growth)+'/mo allocated.',
+                '#9a3412');
+
+        // Allocation sliders (just USDC + BTC)
         const sliderVal = (pct) => pct + '% ($' + allocDollar(pct) + '/mo)';
         document.getElementById('savings-sliders').innerHTML =
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">Safe (USDC · '+(RATES.usdc*100).toFixed(1)+'%)</div><div class="slider-value" id="safe-value">'+sliderVal(a.safe)+'</div></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">USDC Savings · '+(RATES.usdc*100).toFixed(1)+'% APY</div><div class="slider-value" id="safe-value">'+sliderVal(a.safe)+'</div></div>' +
             '<input type="range" min="0" max="100" step="5" value="'+a.safe+'" oninput="app.updateSavingsSlider(\'safe\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f59e0b;">Moderate (DeFi · '+(RATES.defi*100).toFixed(1)+'%)</div><div class="slider-value" id="moderate-value">'+sliderVal(a.moderate)+'</div></div>' +
-            '<input type="range" min="0" max="100" step="5" value="'+a.moderate+'" oninput="app.updateSavingsSlider(\'moderate\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH · ~'+(RATES.btc*100)+'%)</div><div class="slider-value" id="growth-value">'+sliderVal(a.growth)+'</div></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">BTC Recurring Buy · ~'+(RATES.btc*100)+'% avg</div><div class="slider-value" id="growth-value">'+sliderVal(a.growth)+'</div></div>' +
             '<input type="range" min="0" max="100" step="5" value="'+a.growth+'" oninput="app.updateSavingsSlider(\'growth\',this.value)"></div>' +
             '<button class="cta-btn primary" onclick="alert(\'Allocation saved!\')" style="margin-top:8px; padding:10px; font-size:12px;">Save allocation</button>';
-
-        // Yield promo card
-        document.getElementById('savings-yield-promo').innerHTML =
-            '<div style="background:linear-gradient(90deg, #fef2f2, #f0fdf4); border:1px solid #d1e3f8; border-radius:10px; padding:12px;">' +
-                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">MOVE YOUR CHECKING BALANCE TO USDC</div>' +
-                '<div style="display:flex; gap:8px;">' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(220,38,38,0.05); border-radius:8px;">' +
-                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Checking</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#dc2626;">'+(RATES.bank*100).toFixed(2)+'%</div>' +
-                        '<div style="font-size:9px; color:#9ca3af;">$'+Math.round(EXISTING_SAVINGS * RATES.bank)+'/yr</div>' +
-                    '</div>' +
-                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(0,200,5,0.05); border-radius:8px; border:1px solid #bbf7d0;">' +
-                        '<div style="font-size:9px; color:#166534; font-weight:600;">USDC</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#166534;">'+(RATES.usdc*100).toFixed(1)+'%</div>' +
-                        '<div style="font-size:9px; color:#166534;">$'+Math.round(EXISTING_SAVINGS * RATES.usdc)+'/yr</div>' +
-                    '</div>' +
-                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(249,115,22,0.05); border-radius:8px;">' +
-                        '<div style="font-size:9px; color:#9a3412; font-weight:600;">Blended</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#f97316;">'+blendedRate+'%</div>' +
-                        '<div style="font-size:9px; color:#9ca3af;">Your mix</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> — move your Chase checking to USDC</span></div>' +
-            '</div>';
 
         this.updateSavingsProjections();
     },
@@ -1607,9 +1583,9 @@ const app = {
 
     setPreset(preset) {
         const presets = {
-            safe:     { safe: 80, moderate: 15, growth: 5 },
-            balanced: { safe: 55, moderate: 30, growth: 15 },
-            growth:   { safe: 15, moderate: 25, growth: 60 }
+            safe:     { safe: 95, moderate: 0, growth: 5 },
+            balanced: { safe: 85, moderate: 0, growth: 15 },
+            growth:   { safe: 40, moderate: 0, growth: 60 }
         };
         this.state.allocations = { ...(presets[preset] || presets.balanced) };
         this.renderSavingsTab();
@@ -1618,30 +1594,9 @@ const app = {
 
     updateSavingsProjections() {
         const a = this.state.allocations;
-        const pctTotal = a.safe + a.moderate + a.growth;
-        const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
-        const blended = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
+        const pctTotal = a.safe + a.growth;
+        const annualYield = (a.safe * RATES.usdc) + (a.growth * RATES.btc);
         const monthlyContrib = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
-
-        // 5yr projection with existing balance
-        let proj = EXISTING_SAVINGS, bank = EXISTING_SAVINGS;
-        for (let i = 0; i < 60; i++) {
-            proj = proj * (1 + (pctTotal > 0 ? annualYield/pctTotal/12 : 0)) + monthlyContrib;
-            bank = bank * (1 + RATES.bank/12) + monthlyContrib;
-        }
-        const adv = Math.round(proj - bank);
-
-        document.getElementById('savings-apy-area').innerHTML =
-            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-                    '<div>' +
-                        '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Blended APY</div>' +
-                        '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">'+pctTotal+'% allocated · $'+monthlyContrib+'/mo contributions</div>' +
-                    '</div>' +
-                    '<div style="font-size:26px; font-weight:700; color:#2563eb;">'+blended+'%</div>' +
-                '</div>' +
-                '<div style="margin-top:8px; font-size:11px; color:#047857;">5yr: <strong>$'+Math.round(proj).toLocaleString()+'</strong> vs $'+Math.round(bank).toLocaleString()+' at bank · <strong>+$'+adv.toLocaleString()+' more</strong></div>' +
-            '</div>';
 
         // What-if comparison cards
         const monthlySpend = this.getMonthlyRate();
@@ -1659,33 +1614,22 @@ const app = {
         const usdcG = usdcVal - savingsVal, cardG = cardVal - savingsVal, btcG = btcVal - savingsVal;
         const monthlyRewards = Math.round(monthlySpend * 0.03);
 
-        const moreInfoBtn = (label, msg) =>
-            '<button onclick="alert(\''+msg.replace(/'/g,"\\'")+'\')" style="margin-top:8px; width:100%; padding:6px 0; border-radius:8px; border:1px solid #d1d5db; background:#fff; font-size:11px; font-weight:600; color:#0052ff; cursor:pointer;">More info</button>';
-
         document.getElementById('savings-comparison').innerHTML =
-            '<div class="result-card gray"><div class="result-card-title">Bank · '+(RATES.bank*100).toFixed(2)+'% APY</div>' +
+            '<div class="result-card gray"><div class="result-card-title">Bank checking · '+(RATES.bank*100).toFixed(2)+'% APY</div>' +
             '<div class="result-amount">$'+Math.round(savingsVal).toLocaleString()+'</div>' +
-            '<div style="font-size:12px; color:#6b7280;">$'+EXISTING_SAVINGS.toLocaleString()+' + $'+monthlySavings+'/mo for '+years+'yr</div>' +
-            moreInfoBtn('Bank','Your current bank savings account earns just '+(RATES.bank*100).toFixed(2)+'% APY. This is the baseline — you can do much better.') + '</div>' +
+            '<div style="font-size:12px; color:#6b7280;">$'+EXISTING_SAVINGS.toLocaleString()+' + $'+monthlySavings+'/mo for '+years+'yr</div></div>' +
 
-            '<div class="result-card green"><div class="result-card-title">USDC · '+(RATES.usdc*100).toFixed(1)+'% APY</div>' +
+            '<div class="result-card green"><div class="result-card-title">USDC savings · '+(RATES.usdc*100).toFixed(1)+'% APY</div>' +
             '<div class="result-amount">$'+Math.round(usdcVal).toLocaleString()+'</div>' +
-            '<div class="result-benefit">+$'+Math.round(usdcG).toLocaleString()+' more — same stability, 10x yield</div>' +
-            moreInfoBtn('USDC','Enable auto-sweep in the Rules tab to automatically convert under-budget savings to USDC and earn '+(RATES.usdc*100).toFixed(1)+'% APY. USDC is a dollar-pegged stablecoin — same stability as cash.') + '</div>' +
+            '<div class="result-benefit">+$'+Math.round(usdcG).toLocaleString()+' more — same stability, 10x yield</div></div>' +
 
-            '<div class="result-card blue"><div class="result-card-title">Gold Card + USDC sweep</div>' +
+            '<div class="result-card blue"><div class="result-card-title">USDC + Gold Card 3% cashback</div>' +
             '<div class="result-amount">$'+Math.round(cardVal).toLocaleString()+'</div>' +
-            '<div class="result-benefit">+$'+Math.round(cardG).toLocaleString()+' more — $'+monthlyRewards+'/mo cashback</div>' +
-            moreInfoBtn('Gold Card','Apply for the Robinhood Gold Card to earn 3% cashback on all purchases. Pair it with USDC auto-sweep to invest your rewards at '+(RATES.usdc*100).toFixed(1)+'% APY. Go to Settings → Gold Card to apply.') + '</div>' +
+            '<div class="result-benefit">+$'+Math.round(cardG).toLocaleString()+' more — $'+monthlyRewards+'/mo cashback reinvested</div></div>' +
 
-            '<div class="result-card orange"><div class="result-card-title">BTC DCA · ~'+(RATES.btc*100)+'% avg</div>' +
+            '<div class="result-card orange"><div class="result-card-title">BTC recurring buy · ~'+(RATES.btc*100)+'% historical avg</div>' +
             '<div class="result-amount">$'+Math.round(btcVal).toLocaleString()+'</div>' +
-            '<div class="result-benefit">+$'+Math.round(btcG).toLocaleString()+' more — with volatility</div>' +
-            moreInfoBtn('BTC DCA','Set up a recurring Bitcoin purchase (Dollar Cost Averaging) in the Rules tab. Allocate a portion of your growth bucket to BTC for long-term upside. Note: higher volatility than stablecoins.') + '</div>';
-
-        document.getElementById('savings-callout').innerHTML =
-            '<strong>You\'re leaving $'+Math.round(usdcG).toLocaleString()+' on the table</strong> over '+years+'yr. ' +
-            'With Gold Card: <strong>+$'+Math.round(cardG).toLocaleString()+'</strong>.';
+            '<div class="result-benefit">+$'+Math.round(btcG).toLocaleString()+' more — higher growth, higher volatility</div></div>';
 
         this.drawSavingsChart();
     },
