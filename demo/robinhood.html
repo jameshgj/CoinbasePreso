@@ -1583,7 +1583,7 @@ const app = {
                     '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Projected Value</div>' +
                     '<div style="font-size:28px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
                 '</div>' +
-                projRow('Starting balance', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
+                projRow('Starting balance ($'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+CHECKING_BALANCE.toLocaleString()+' checking)', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
                 projRow('Savings deposits ($'+MONTHLY_SAVINGS+'/mo × '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
                 projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
                 projRow('Checking yield at '+(s.checkingToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.checking*100).toFixed(2))+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) +
