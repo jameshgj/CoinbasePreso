@@ -483,11 +483,11 @@
 
                     <!-- (What If merged into Savings) -->
 
-                    <!-- SAVE -->
+                    <!-- GOALS -->
                     <div class="tab-content hidden" id="budget-content">
-                        <div id="budget-goal"></div>
-                        <div id="budget-summary-area"></div>
-                        <div id="budget-save-ideas"></div>
+                        <div id="budget-hero-cards"></div>
+                        <div id="budget-spending-link"></div>
+                        <div id="budget-yield-compare"></div>
                         <div id="budget-col-ai"></div>
                     </div>
 
@@ -515,11 +515,8 @@
 
                     <!-- RULES -->
                     <div class="tab-content hidden" id="rules-content">
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:12px;">AUTO-SWEEP</div>
-                        <div id="rules-sweeps"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:12px;">ACTIVE RULES</div>
+                        <div id="rules-suggested"></div>
                         <div id="rules-active"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:12px;">TEMPLATES</div>
                         <div id="rules-templates"></div>
                         <div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:12px;">RECENT ACTIVITY</div>
                         <div class="activity-log" id="rules-activity"></div>
@@ -760,8 +757,10 @@ const app = {
                 changeEl.className = dn ? 'amount-change' : 'amount-change negative';
             }
         } else if (tab === 'budget') {
-            mainEl.textContent = '$1,200';
-            changeEl.textContent = 'vacation fund · 40% of $3,000 goal';
+            mainEl.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
+            const vacTarget = this.state.vacationTarget || 3000;
+            const vacPct = Math.round((1200 / vacTarget) * 100);
+            changeEl.textContent = 'total savings · vacation ' + vacPct + '% of $' + vacTarget.toLocaleString();
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const a = this.state.allocations;
@@ -967,53 +966,71 @@ const app = {
         const { svg, p, gw, gh } = this.dim();
         svg.innerHTML = '';
 
-        // Derive budget limit from actual category budget data
-        const baseBudgets = [250, 600, 300, 150, 250, 200]; // Dining, Groceries, Shopping, Subs, Transport, Utilities
-        const period = this.state.activePeriod;
-        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 };
-        const ps = periodScale[period] || 1;
-        const budgetLimit = Math.round(baseBudgets.reduce((s,b) => s + b, 0) * ps);
-        const maxVal = Math.round(budgetLimit * 1.3);
-        const daysCfg = { '1w': 7, '1m': 30, '3m': 90, 'ytd': 90, '1y': 52, 'all': 60 };
-        const seedCfg = { '1w': 11, '1m': 99, '3m': 55, 'ytd': 65, '1y': 80, 'all': 42 };
-        const unitCfg = { '1w': 'Day', '1m': 'Day', '3m': 'Day', 'ytd': 'Day', '1y': 'Wk', 'all': 'Mo' };
-        const days = daysCfg[period] || 30, rng = seededRandom(seedCfg[period] || 99);
-        const unitLabel = unitCfg[period] || 'Day';
+        // Savings trajectory over 12 months
+        const monthlyNet = MONTHLY_SAVINGS + 15; // auto-transfer + avg surplus
+        const vacationTarget = this.state.vacationTarget || 3000;
+        const savingsGoal = this.state.savingsGoal || 300;
+        const months = 12;
+        const bankRate = RATES.bank, usdcRate = RATES.usdc;
 
-        const ds = [];
-        const dailyAvg = budgetLimit / days;
-        for (let i = 0; i < days; i++) ds.push(rng() > 0.3 ? dailyAvg * (0.5 + rng() * 0.8) : 0);
-
-        let cum = 0;
-        const pts = [];
-        this.state.chartPoints = [];
-        for (let i = 0; i <= days; i++) {
-            if (i > 0) cum += ds[i-1];
-            const x = p + (i/days)*gw, y = p + gh - (cum/maxVal)*gh;
-            pts.push([x, y]);
-            this.state.chartPoints.push({ x, y, label: unitLabel+' '+i+': $'+Math.round(cum).toLocaleString() });
+        // Compute bank vs USDC savings growth
+        const bankPts = [], usdcPts = [];
+        let bankV = EXISTING_SAVINGS, usdcV = EXISTING_SAVINGS;
+        for (let i = 0; i <= months; i++) {
+            bankPts.push(bankV);
+            usdcPts.push(usdcV);
+            bankV = bankV * (1 + bankRate/12) + monthlyNet;
+            usdcV = usdcV * (1 + usdcRate/12) + monthlyNet;
         }
 
+        const maxVal = Math.max(vacationTarget, usdcPts[months]) * 1.1;
         this.addYAxis(svg, p, gh, maxVal, 4);
+        this.state.chartPoints = [];
 
-        // Budget limit line — green if under, red if over
-        const finalSpend = cum;
-        const underBudget = finalSpend <= budgetLimit;
-        const limitColor = underBudget ? '#00C805' : '#ff5000';
-        const budgetY = p + gh - (budgetLimit/maxVal)*gh;
-        svg.appendChild(svgEl('line', { x1:p, y1:budgetY, x2:p+gw, y2:budgetY, stroke:limitColor, 'stroke-width':'1.5', 'stroke-dasharray':'6 4' }));
-        const bl = svgEl('text', { x:p+gw-2, y:budgetY-5, fill:limitColor, 'font-size':'9', 'font-weight':'500', 'text-anchor':'end', 'font-family':'Inter,sans-serif' });
-        bl.textContent = 'Budget $'+budgetLimit.toLocaleString();
-        svg.appendChild(bl);
+        // Vacation goal line
+        const goalY = p + gh - (vacationTarget / maxVal) * gh;
+        svg.appendChild(svgEl('line', { x1: p, y1: goalY, x2: p+gw, y2: goalY, stroke: '#f59e0b', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
+        const gl = svgEl('text', { x: p+gw-2, y: goalY-4, fill: '#f59e0b', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        gl.textContent = 'Vacation $'+vacationTarget.toLocaleString();
+        svg.appendChild(gl);
 
-        const lineColor = underBudget ? '#00C805' : '#f97316';
-        let ad = smoothPath(pts) + ' L '+pts[pts.length-1][0]+' '+(p+gh)+' L '+pts[0][0]+' '+(p+gh)+' Z';
-        svg.appendChild(svgEl('path', { d: ad, fill: lineColor, opacity: '0.12' }));
-        svg.appendChild(svgEl('path', { d: smoothPath(pts), stroke: lineColor, fill: 'none', 'stroke-width': '2' }));
+        // Bank savings line (dashed gray)
+        const bankChartPts = bankPts.map((v, i) => [p + (i/months)*gw, p + gh - (v/maxVal)*gh]);
+        const bankLine = svgEl('path', { d: smoothPath(bankChartPts), stroke: '#9ca3af', fill: 'none', 'stroke-width': '1.5' });
+        bankLine.setAttribute('stroke-dasharray', '6 4');
+        svg.appendChild(bankLine);
+
+        // USDC savings line (solid green, filled)
+        const usdcChartPts = usdcPts.map((v, i) => {
+            const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
+            this.state.chartPoints.push({ x, y, label: 'Mo '+i+': $'+Math.round(v).toLocaleString() });
+            return [x, y];
+        });
+        let ad = smoothPath(usdcChartPts) + ' L '+usdcChartPts[usdcChartPts.length-1][0]+' '+(p+gh)+' L '+usdcChartPts[0][0]+' '+(p+gh)+' Z';
+        svg.appendChild(svgEl('path', { d: ad, fill: '#00C805', opacity: '0.12' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(usdcChartPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
+
+        // "Now" marker
+        const nowX = p + (YTD_MONTHS / months) * gw;
+        svg.appendChild(svgEl('line', { x1: nowX, y1: p, x2: nowX, y2: p + gh, stroke: '#ef4444', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.5' }));
+        const nl = svgEl('text', { x: nowX + 3, y: p + 10, fill: '#ef4444', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
+        nl.textContent = 'Now';
+        svg.appendChild(nl);
+
+        // End labels
+        const lastUsdc = usdcChartPts[usdcChartPts.length-1];
+        const lbl1 = svgEl('text', { x: lastUsdc[0]-4, y: Math.max(lastUsdc[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        lbl1.textContent = '$'+Math.round(usdcPts[months]).toLocaleString();
+        svg.appendChild(lbl1);
+        const lastBank = bankChartPts[bankChartPts.length-1];
+        const lbl2 = svgEl('text', { x: lastBank[0]-4, y: Math.min(lastBank[1]+12, p+gh-4), fill: '#9ca3af', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        lbl2.textContent = '$'+Math.round(bankPts[months]).toLocaleString();
+        svg.appendChild(lbl2);
 
         document.getElementById('chartLegend').innerHTML =
-            '<div class="legend-item"><div class="legend-dot" style="background:'+lineColor+'"></div>Spending</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:'+limitColor+'"></div>Budget limit</div>';
+            '<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>With USDC yield</div>' +
+            '<div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Bank (0.39%)</div>' +
+            '<div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Vacation goal</div>';
     },
 
     drawSavingsChart() {
@@ -1305,8 +1322,6 @@ const app = {
     renderBudgetTab() {
         const period = this.state.activePeriod;
         const ps = ({ '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 })[period] || 1;
-        const periodNames = { '1w': 'This Week', '1m': 'This Month', '3m': 'This Quarter', 'ytd': 'Year to Date', '1y': 'This Year', 'all': 'All Time' };
-        const pn = periodNames[period] || 'This Month';
         const budgets = this.getBudgetData();
         const totalSpent = budgets.reduce((s,b) => s + b.spent, 0);
         const totalBudget = budgets.reduce((s,b) => s + b.limit, 0);
@@ -1315,58 +1330,98 @@ const app = {
 
         const forecastSavings = ({ '1w': Math.round(MONTHLY_SAVINGS/4.33), '1m': MONTHLY_SAVINGS, '3m': MONTHLY_SAVINGS*3, 'ytd': MONTHLY_SAVINGS*YTD_MONTHS, '1y': MONTHLY_SAVINGS*12, 'all': MONTHLY_SAVINGS*60 })[period] || MONTHLY_SAVINGS;
         const underBudgetSavings = underBudget ? netDiff : 0;
-        const totalSavings = forecastSavings + underBudgetSavings;
+        const spendingSurplus = underBudgetSavings;
+        const totalMonthlySaving = MONTHLY_SAVINGS + Math.round(underBudgetSavings / Math.max(ps,1));
 
-        // Vacation fund goal
-        const goalSaved = 1200, goalTarget = 3000;
-        const monthlyToGoal = totalSavings > 0 ? Math.round(totalSavings / Math.max(ps,1)) : MONTHLY_SAVINGS;
-        const monthsToGo = Math.ceil((goalTarget - goalSaved) / monthlyToGoal);
-        let yieldBal = goalSaved, yieldMonths = 0;
-        while (yieldBal < goalTarget && yieldMonths < 60) { yieldBal = yieldBal * (1 + RATES.usdc/12) + monthlyToGoal; yieldMonths++; }
-        const goalPct = Math.round((goalSaved / goalTarget) * 100);
-        const dashLen = (goalPct / 100) * 157.08;
+        // Goal data
+        const savingsGoal = this.state.savingsGoal || 300;
+        const vacationSaved = 1200, vacationTarget = this.state.vacationTarget || 3000;
+        const vacationPct = Math.round((vacationSaved / vacationTarget) * 100);
+        const monthsToVacation = Math.ceil((vacationTarget - vacationSaved) / totalMonthlySaving);
+        const dashLen = (vacationPct / 100) * 157.08;
 
-        document.getElementById('budget-goal').innerHTML =
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px; margin-bottom:10px;">' +
+        // Three editable hero cards
+        document.getElementById('budget-hero-cards').innerHTML =
+            '<div style="display:flex; gap:8px; margin-bottom:12px;">' +
+                // Total Savings
+                '<div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px; text-align:center; cursor:pointer;" onclick="app.editGoalField(\'savings\')">' +
+                    '<div style="font-size:9px; color:#166534; font-weight:600; text-transform:uppercase;">Total Savings</div>' +
+                    '<div style="font-size:18px; font-weight:700; color:#166534; margin:2px 0;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:#059669;">+$'+totalMonthlySaving+'/mo</div>' +
+                '</div>' +
+                // Spending Goal
+                '<div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; text-align:center; cursor:pointer;" onclick="app.editGoalField(\'spending\')">' +
+                    '<div style="font-size:9px; color:#1e40af; font-weight:600; text-transform:uppercase;">Savings Goal</div>' +
+                    '<div style="font-size:18px; font-weight:700; color:'+(totalMonthlySaving >= savingsGoal ? '#166534' : '#f59e0b')+'; margin:2px 0;">$'+savingsGoal+'<span style="font-size:10px; font-weight:400;">/mo</span></div>' +
+                    '<div style="font-size:9px; color:'+(totalMonthlySaving >= savingsGoal ? '#059669' : '#d97706')+';">'+(totalMonthlySaving >= savingsGoal ? 'On track' : '$'+(savingsGoal - totalMonthlySaving)+' gap')+'</div>' +
+                '</div>' +
+            '</div>' +
+            // Vacation Fund row
+            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px; margin-bottom:12px; cursor:pointer;" onclick="app.editGoalField(\'vacation\')">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                     '<div>' +
                         '<div style="font-size:11px; font-weight:700; color:#166534;">Vacation Fund</div>' +
-                        '<div style="font-size:18px; font-weight:700; color:#111; margin:2px 0;">$'+goalSaved.toLocaleString()+' <span style="font-size:12px; font-weight:400; color:#6b7280;">/ $'+goalTarget.toLocaleString()+'</span></div>' +
-                        '<div style="font-size:10px; color:#166534;">'+monthsToGo+' months to go · With USDC yield: '+yieldMonths+' months</div>' +
-                        '<div style="font-size:10px; color:#9ca3af; margin-top:2px;">Saving ~$'+monthlyToGoal+'/mo toward goal</div>' +
+                        '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+vacationSaved.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
+                        '<div style="font-size:10px; color:#166534;">'+monthsToVacation+' months to go at current rate</div>' +
                     '</div>' +
-                    '<svg viewBox="0 0 60 60" style="width:50px; height:50px;">' +
+                    '<svg viewBox="0 0 60 60" style="width:46px; height:46px;">' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#00C805" stroke-width="3" stroke-dasharray="'+dashLen.toFixed(1)+' 157.08" transform="rotate(-90 30 30)"/>' +
-                        '<text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">'+goalPct+'%</text>' +
+                        '<text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">'+vacationPct+'%</text>' +
                     '</svg>' +
                 '</div>' +
             '</div>';
 
-        // Savings summary + how to save more
+        // Spending → Savings connection
         const overBudgetCats = budgets.filter(b => b.spent > b.limit);
-        const potentialSavings = overBudgetCats.reduce((s,b) => s + (b.spent - b.limit), 0);
-        document.getElementById('budget-summary-area').innerHTML =
-            '<div style="display:flex; gap:8px; margin-bottom:10px;">' +
-                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:center;">' +
-                    '<div style="font-size:9px; color:#6b7280; font-weight:600; text-transform:uppercase;">Saved '+pn.toLowerCase()+'</div>' +
-                    '<div style="font-size:16px; font-weight:700; color:#166534; margin-top:2px;">$'+totalSavings.toLocaleString()+'</div>' +
-                    '<div style="font-size:9px; color:#9ca3af;">$'+forecastSavings.toLocaleString()+' auto'+(underBudgetSavings > 0 ? ' + $'+underBudgetSavings.toLocaleString()+' surplus' : '')+'</div>' +
-                '</div>' +
-                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:center;">' +
-                    '<div style="font-size:9px; color:#6b7280; font-weight:600; text-transform:uppercase;">Goal: $300/mo</div>' +
-                    '<div style="font-size:16px; font-weight:700; color:'+(totalSavings >= 300*ps ? '#166534' : '#f59e0b')+';">'+Math.round((totalSavings/(300*ps))*100)+'%</div>' +
-                    '<div style="font-size:9px; color:#9ca3af;">$'+(Math.round(300*ps - totalSavings) > 0 ? Math.round(300*ps - totalSavings).toLocaleString()+' gap' : 'on track')+'</div>' +
-                '</div>' +
-            '</div>';
+        const overspendTotal = overBudgetCats.reduce((s,b) => s + (b.spent - b.limit), 0);
 
-        // How to save more ideas
-        document.getElementById('budget-save-ideas').innerHTML =
-            '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">How to Save More</div>' +
-            (potentialSavings > 0 ? '<div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:10px; margin-bottom:6px; font-size:11px; color:#9a3412;"><strong>Fix overspends: +$'+potentialSavings+'/mo</strong> — '+overBudgetCats.map(b=>b.name).join(' & ')+' over budget. <span onclick="app.switchFeatureTab(\'overview\')" style="color:#0052ff; cursor:pointer; text-decoration:underline;">View spending →</span></div>' : '') +
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px; margin-bottom:6px; font-size:11px; color:#166534;"><strong>Auto-sweep surplus → USDC</strong> — earn '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings. <span onclick="app.switchFeatureTab(\'rules\')" style="color:#0052ff; cursor:pointer; text-decoration:underline;">Set up →</span></div>' +
-            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; margin-bottom:6px; font-size:11px; color:#1e40af;"><strong>Gold Card cashback</strong> — 3% back on all spending → auto-invest. <span onclick="alert(\'Apply for Gold Card in Settings\')" style="color:#0052ff; cursor:pointer; text-decoration:underline;">Learn more →</span></div>' +
-            '<div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-bottom:6px; font-size:11px; color:#374151;"><strong>Increase auto-transfer</strong> — boost from $'+MONTHLY_SAVINGS+'/mo to $200/mo for faster goal progress. <span onclick="alert(\'Updated auto-transfer to $200/mo\')" style="color:#0052ff; cursor:pointer; text-decoration:underline;">Update →</span></div>';
+        document.getElementById('budget-spending-link').innerHTML =
+            '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">How Spending Feeds Your Goals</div>' +
+            '<div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin-bottom:6px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                    '<span style="font-size:11px; font-weight:600; color:#374151;">Auto-transfer</span>' +
+                    '<span style="font-size:11px; font-weight:600; color:#166534;">+$'+MONTHLY_SAVINGS+'/mo</span>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                    '<span style="font-size:11px; font-weight:600; color:#374151;">Under-budget surplus</span>' +
+                    '<span style="font-size:11px; font-weight:600; color:'+(spendingSurplus > 0 ? '#166534' : '#9ca3af')+';">'+(spendingSurplus > 0 ? '+$'+spendingSurplus : '$0')+'</span>' +
+                '</div>' +
+                (overspendTotal > 0 ?
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                        '<span style="font-size:11px; font-weight:600; color:#dc2626;">Overspend leak ('+overBudgetCats.map(b=>b.name).join(', ')+')</span>' +
+                        '<span style="font-size:11px; font-weight:600; color:#dc2626;">-$'+overspendTotal+'</span>' +
+                    '</div>' : '') +
+                '<div style="height:1px; background:#e5e7eb; margin:6px 0;"></div>' +
+                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                    '<span style="font-size:11px; font-weight:700; color:#111;">Net to savings</span>' +
+                    '<span style="font-size:12px; font-weight:700; color:#166534;">$'+(forecastSavings + spendingSurplus)+'/mo</span>' +
+                '</div>' +
+            '</div>' +
+            // Bank vs Robinhood yield comparison
+            '<div style="background:linear-gradient(90deg, #fef2f2, #f0fdf4); border:1px solid #d1e3f8; border-radius:10px; padding:12px; margin-bottom:12px;">' +
+                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">WHERE YOUR SAVINGS COULD GROW</div>' +
+                '<div style="display:flex; gap:8px;">' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(220,38,38,0.05); border-radius:8px;">' +
+                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Bank</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#dc2626;">'+(RATES.bank*100).toFixed(2)+'%</div>' +
+                        '<div style="font-size:9px; color:#9ca3af;">$'+Math.round(EXISTING_SAVINGS * RATES.bank)+'/yr</div>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(0,200,5,0.05); border-radius:8px; border:1px solid #bbf7d0;">' +
+                        '<div style="font-size:9px; color:#166534; font-weight:600;">USDC</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#166534;">'+(RATES.usdc*100).toFixed(1)+'%</div>' +
+                        '<div style="font-size:9px; color:#166534;">$'+Math.round(EXISTING_SAVINGS * RATES.usdc)+'/yr</div>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(249,115,22,0.05); border-radius:8px;">' +
+                        '<div style="font-size:9px; color:#9a3412; font-weight:600;">Blended</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#f97316;">' + ((function(){ const a=app.state.allocations; const t=a.safe+a.moderate+a.growth; return t>0?(((a.safe*RATES.usdc+a.moderate*RATES.defi+a.growth*RATES.btc)/t)*100).toFixed(1):'0'; })()) + '%</div>' +
+                        '<div style="font-size:9px; color:#9ca3af;">Your mix</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> by moving from bank → USDC</span></div>' +
+            '</div>';
 
         // Cost of Living AI section
         const income = this.state.colIncome || 5500;
@@ -1424,6 +1479,18 @@ const app = {
                 aiBar('Savings', savePct, actualSaving, savingsBudget, true) +
                 '<div style="font-size:10px; margin-top:4px;">'+insight+'</div>' +
             '</div>';
+    },
+
+    editGoalField(field) {
+        if (field === 'savings') {
+            alert('Total savings: $' + EXISTING_SAVINGS.toLocaleString() + '\nLinked from Chase Checking & Amex');
+        } else if (field === 'spending') {
+            const val = prompt('Set monthly savings goal ($):', this.state.savingsGoal || 300);
+            if (val !== null) { this.state.savingsGoal = Math.max(0, parseInt(val) || 300); this.renderBudgetTab(); this.updateAmountDisplay(); }
+        } else if (field === 'vacation') {
+            const val = prompt('Set vacation fund target ($):', this.state.vacationTarget || 3000);
+            if (val !== null) { this.state.vacationTarget = Math.max(0, parseInt(val) || 3000); this.renderBudgetTab(); this.updateAmountDisplay(); }
+        }
     },
 
     editCOLAssumptions() {
@@ -1592,25 +1659,35 @@ const app = {
 
     // ===== RULES =====
     renderRulesTab() {
-        document.getElementById('rules-sweeps').innerHTML =
-            '<div style="background:#f0fdf4; border-radius:10px; padding:14px; margin-bottom:12px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
-                '<div style="font-weight:500; font-size:13px; color:#111;">Auto-sweep savings → USDC</div>' +
-                '<div style="font-size:11px; color:#047857; margin-top:2px;">Earns '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings</div></div>' +
-                '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>' +
-            '<div style="background:#eff6ff; border-radius:10px; padding:14px; margin-bottom:12px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
-                '<div style="font-weight:500; font-size:13px; color:#111;">RH Gold Card rewards → USDC</div>' +
-                '<div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested at '+(RATES.usdc*100).toFixed(1)+'% APY</div></div>' +
-                '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>' +
-            '<div style="background:#fff7ed; border-radius:10px; padding:14px; margin-bottom:12px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
-                '<div style="font-weight:500; font-size:13px; color:#111;">Round-ups → USDC</div>' +
-                '<div style="font-size:11px; color:#9a3412; margin-top:2px;">Round every purchase to nearest $1, invest the spare change</div></div>' +
-                '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>';
+        // Suggested section — actionable save-more ideas
+        const budgets = this.getBudgetData();
+        const overBudgetCats = budgets.filter(b => b.spent > b.limit);
+        const potentialSavings = overBudgetCats.reduce((s,b) => s + (b.spent - b.limit), 0);
 
+        const suggestedCard = (bg, border, color, icon, title, desc, action, actionLabel) =>
+            '<div style="background:'+bg+'; border:1px solid '+border+'; border-radius:10px; padding:10px; margin-bottom:6px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
+                    '<div style="flex:1;"><div style="font-size:11px; color:'+color+';"><strong>'+icon+' '+title+'</strong></div>' +
+                    '<div style="font-size:10px; color:#6b7280; margin-top:2px;">'+desc+'</div></div>' +
+                    '<button onclick="'+action+'" style="flex-shrink:0; margin-left:8px; font-size:10px; color:#0052ff; background:none; border:1px solid #bfdbfe; border-radius:6px; padding:3px 8px; cursor:pointer; font-weight:600;">'+actionLabel+'</button>' +
+                '</div>' +
+            '</div>';
+
+        document.getElementById('rules-suggested').innerHTML =
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SUGGESTED FOR YOU</div>' +
+            (potentialSavings > 0 ? suggestedCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
+            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → USDC', 'Earn '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings instead of 0.39% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
+            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested into USDC.', "alert('Apply for Gold Card in Settings')", 'Apply') +
+            suggestedCard('#f9fafb','#e5e7eb','#374151','↑','Increase auto-transfer to $200/mo', 'Boost from $'+MONTHLY_SAVINGS+'/mo for faster goal progress. Hit vacation goal sooner.', "alert('Updated auto-transfer to $200/mo')", 'Update');
+
+        // Active Rules
         document.getElementById('rules-active').innerHTML =
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change from every purchase → USDC at '+(RATES.usdc*100).toFixed(1)+'%</div></div>' +
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">ACTIVE RULES</div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Auto-sweep savings → USDC</div><div style="font-size:11px; color:#047857; margin-top:2px;">Under-budget savings earn '+(RATES.usdc*100).toFixed(1)+'% APY</div></div>' +
+            '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Gold Card rewards → USDC</div><div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested</div></div>' +
+            '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change from every purchase</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, sweep difference</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
@@ -1619,8 +1696,10 @@ const app = {
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">BTC dip buyer</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If BTC drops 10%+ in a week, buy $100</div></div>' +
             '<button class="toggle" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>';
 
+        // Templates
         document.getElementById('rules-templates').innerHTML =
-            ['Round-ups: invest spare change from every purchase','If dining < $200/mo, sweep difference to USDC','Every Friday, $50 → BTC','If BTC drops 10% in a week, buy $100','If total spending < budget, save extra to goal','Smart Deposit: detect extra cash, auto-invest'].map(t =>
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">TEMPLATES</div>' +
+            ['If total spending < budget, save extra to goal','Smart Deposit: detect extra cash, auto-invest','Paycheck split: 20% of deposit → USDC','Monthly subscription audit alert','If savings goal met, boost vacation fund'].map(t =>
                 '<div class="template-row"><div class="template-text">'+t+'</div><button class="template-add-btn" onclick="this.textContent=\'✓\';this.style.background=\'#065f46\';">+</button></div>'
             ).join('');
 
