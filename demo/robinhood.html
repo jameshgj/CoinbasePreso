@@ -400,7 +400,7 @@
             </div>
             <div class="card" data-tab="savings">
                 <div class="card-title"><span class="card-number">5</span>The Insight</div>
-                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.01% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
+                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.40% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
             </div>
             <div class="card" data-tab="budget">
                 <div class="card-title"><span class="card-number">6</span>The Funnel</div>
@@ -547,9 +547,9 @@ function svgEl(tag, attrs) {
 
 // ===== RATE CONSTANTS =====
 const RATES = {
-    checking: 0.0001, // typical checking APY ~0.01%
-    savings: 0.04,    // high-yield savings ~4%
-    usdc: 0.041,      // USDC yield ~4.1%
+    checking: 0.0007, // national avg checking APY ~0.07%
+    savings: 0.004,   // national avg savings APY ~0.40%
+    usdc: 0.03,       // Robinhood USDC Crypto Earn ~3.00%
     btc: 0.30         // BTC historical avg ~30%
 };
 const MONTHLY_SAVINGS = 95; // actual monthly auto-transfer to savings
@@ -1619,7 +1619,7 @@ const app = {
         document.getElementById('rules-suggested').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SUGGESTED FOR YOU</div>' +
             (potentialSavings > 0 ? suggestedCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
-            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → USDC', 'Earn '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings instead of 0.39% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
+            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → USDC', 'Earn '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
             suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested into USDC.', "alert('Apply for Gold Card in Settings')", 'Apply') +
             suggestedCard('#f9fafb','#e5e7eb','#374151','↑','Increase auto-transfer to $200/mo', 'Boost from $'+MONTHLY_SAVINGS+'/mo for faster goal progress. Hit vacation goal sooner.', "alert('Updated auto-transfer to $200/mo')", 'Update');
 
