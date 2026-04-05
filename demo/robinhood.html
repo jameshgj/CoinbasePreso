@@ -502,7 +502,8 @@
                         </div>
                         <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADJUST YOUR SAVINGS MIX</div>
                         <div id="savings-sliders"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-top:20px; margin-bottom:10px;">ADDITIONAL STRATEGIES</div>
+                        <div id="savings-yield-promo" style="margin-top:16px; margin-bottom:12px;"></div>
+                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADDITIONAL STRATEGIES</div>
                         <div style="display:flex; gap:8px; margin-bottom:12px;">
                             <button class="time-pill" data-wperiod="1">1 Year</button>
                             <button class="time-pill active" data-wperiod="3">3 Years</button>
@@ -757,10 +758,21 @@ const app = {
                 changeEl.className = dn ? 'amount-change' : 'amount-change negative';
             }
         } else if (tab === 'budget') {
-            mainEl.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
+            const period = this.state.activePeriod;
+            const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
+            const forecastMonths = monthsCfg[period] || 12;
+            const monthlyNet = MONTHLY_SAVINGS + 15;
+            let projected = EXISTING_SAVINGS;
+            for (let i = 0; i < forecastMonths; i++) projected = projected * (1 + RATES.usdc/12) + monthlyNet;
+            mainEl.textContent = '$' + Math.round(projected).toLocaleString();
+            const periodLabels = { '1w': '1mo forecast', '1m': '3mo forecast', '3m': '6mo forecast', 'ytd': '6mo forecast', '1y': '1yr forecast', 'all': '5yr forecast' };
             const vacTarget = this.state.vacationTarget || 3000;
-            const vacPct = Math.round((1200 / vacTarget) * 100);
-            changeEl.textContent = 'total savings · vacation ' + vacPct + '% of $' + vacTarget.toLocaleString();
+            let projVac = 1200;
+            const vacContrib = Math.round((MONTHLY_SAVINGS + 15) * 0.3);
+            for (let i = 0; i < forecastMonths; i++) projVac = projVac * (1 + RATES.usdc/12) + vacContrib;
+            projVac = Math.min(Math.round(projVac), vacTarget);
+            const vacPct = Math.round((projVac / vacTarget) * 100);
+            changeEl.textContent = (periodLabels[period] || 'forecast') + ' · vacation ' + vacPct + '% of $' + vacTarget.toLocaleString();
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const a = this.state.allocations;
@@ -966,71 +978,78 @@ const app = {
         const { svg, p, gw, gh } = this.dim();
         svg.innerHTML = '';
 
-        // Savings trajectory over 12 months
-        const monthlyNet = MONTHLY_SAVINGS + 15; // auto-transfer + avg surplus
-        const vacationTarget = this.state.vacationTarget || 3000;
+        const period = this.state.activePeriod;
+        const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
+        const months = monthsCfg[period] || 12;
+        const monthlyNet = MONTHLY_SAVINGS + 15;
         const savingsGoal = this.state.savingsGoal || 300;
-        const months = 12;
-        const bankRate = RATES.bank, usdcRate = RATES.usdc;
+        const vacationTarget = this.state.vacationTarget || 3000;
 
-        // Compute bank vs USDC savings growth
-        const bankPts = [], usdcPts = [];
-        let bankV = EXISTING_SAVINGS, usdcV = EXISTING_SAVINGS;
+        // Compute savings growth over chart period
+        const savingsPts = [], vacationPts = [];
+        let savV = EXISTING_SAVINGS, vacV = 1200; // vacation fund starts at 1200
         for (let i = 0; i <= months; i++) {
-            bankPts.push(bankV);
-            usdcPts.push(usdcV);
-            bankV = bankV * (1 + bankRate/12) + monthlyNet;
-            usdcV = usdcV * (1 + usdcRate/12) + monthlyNet;
+            savingsPts.push(savV);
+            vacationPts.push(Math.min(vacV, vacationTarget)); // cap at target
+            savV = savV * (1 + RATES.usdc/12) + monthlyNet;
+            vacV = vacV * (1 + RATES.usdc/12) + Math.round(monthlyNet * 0.3); // 30% allocated to vacation
         }
 
-        const maxVal = Math.max(vacationTarget, usdcPts[months]) * 1.1;
+        // Savings goal line = monthly target accumulated
+        const goalTotal = savingsGoal * months + EXISTING_SAVINGS;
+        const maxVal = Math.max(goalTotal, savingsPts[months], vacationTarget) * 1.1;
+
         this.addYAxis(svg, p, gh, maxVal, 4);
         this.state.chartPoints = [];
 
-        // Vacation goal line
-        const goalY = p + gh - (vacationTarget / maxVal) * gh;
-        svg.appendChild(svgEl('line', { x1: p, y1: goalY, x2: p+gw, y2: goalY, stroke: '#f59e0b', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
-        const gl = svgEl('text', { x: p+gw-2, y: goalY-4, fill: '#f59e0b', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        gl.textContent = 'Vacation $'+vacationTarget.toLocaleString();
+        // Savings goal target line (top dashed line)
+        const goalY = p + gh - (goalTotal / maxVal) * gh;
+        svg.appendChild(svgEl('line', { x1: p, y1: goalY, x2: p+gw, y2: goalY, stroke: '#2563eb', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
+        const gl = svgEl('text', { x: p+gw-2, y: goalY-4, fill: '#2563eb', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        gl.textContent = 'Goal $'+goalTotal.toLocaleString();
         svg.appendChild(gl);
 
-        // Bank savings line (dashed gray)
-        const bankChartPts = bankPts.map((v, i) => [p + (i/months)*gw, p + gh - (v/maxVal)*gh]);
-        const bankLine = svgEl('path', { d: smoothPath(bankChartPts), stroke: '#9ca3af', fill: 'none', 'stroke-width': '1.5' });
-        bankLine.setAttribute('stroke-dasharray', '6 4');
-        svg.appendChild(bankLine);
+        // Vacation target line
+        const vacGoalY = p + gh - (vacationTarget / maxVal) * gh;
+        svg.appendChild(svgEl('line', { x1: p, y1: vacGoalY, x2: p+gw, y2: vacGoalY, stroke: '#f59e0b', 'stroke-width': '1', 'stroke-dasharray': '4 3', opacity: '0.6' }));
+        const vl = svgEl('text', { x: p+gw-2, y: vacGoalY+10, fill: '#f59e0b', 'font-size': '7', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        vl.textContent = 'Vacation $'+vacationTarget.toLocaleString();
+        svg.appendChild(vl);
 
-        // USDC savings line (solid green, filled)
-        const usdcChartPts = usdcPts.map((v, i) => {
+        // Vacation fund area (orange, behind)
+        const vacChartPts = vacationPts.map((v, i) => [p + (i/months)*gw, p + gh - (v/maxVal)*gh]);
+        let vacArea = smoothPath(vacChartPts) + ' L '+vacChartPts[vacChartPts.length-1][0]+' '+(p+gh)+' L '+vacChartPts[0][0]+' '+(p+gh)+' Z';
+        svg.appendChild(svgEl('path', { d: vacArea, fill: '#f59e0b', opacity: '0.15' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(vacChartPts), stroke: '#f59e0b', fill: 'none', 'stroke-width': '1.5' }));
+
+        // Total savings area (green, on top)
+        const savChartPts = savingsPts.map((v, i) => {
             const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
             this.state.chartPoints.push({ x, y, label: 'Mo '+i+': $'+Math.round(v).toLocaleString() });
             return [x, y];
         });
-        let ad = smoothPath(usdcChartPts) + ' L '+usdcChartPts[usdcChartPts.length-1][0]+' '+(p+gh)+' L '+usdcChartPts[0][0]+' '+(p+gh)+' Z';
-        svg.appendChild(svgEl('path', { d: ad, fill: '#00C805', opacity: '0.12' }));
-        svg.appendChild(svgEl('path', { d: smoothPath(usdcChartPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
+        let savArea = smoothPath(savChartPts) + ' L '+savChartPts[savChartPts.length-1][0]+' '+(p+gh)+' L '+savChartPts[0][0]+' '+(p+gh)+' Z';
+        svg.appendChild(svgEl('path', { d: savArea, fill: '#00C805', opacity: '0.12' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(savChartPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
 
         // "Now" marker
-        const nowX = p + (YTD_MONTHS / months) * gw;
+        const nowMonth = Math.min(YTD_MONTHS, months);
+        const nowX = p + (nowMonth / months) * gw;
         svg.appendChild(svgEl('line', { x1: nowX, y1: p, x2: nowX, y2: p + gh, stroke: '#ef4444', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.5' }));
         const nl = svgEl('text', { x: nowX + 3, y: p + 10, fill: '#ef4444', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
         nl.textContent = 'Now';
         svg.appendChild(nl);
 
         // End labels
-        const lastUsdc = usdcChartPts[usdcChartPts.length-1];
-        const lbl1 = svgEl('text', { x: lastUsdc[0]-4, y: Math.max(lastUsdc[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        lbl1.textContent = '$'+Math.round(usdcPts[months]).toLocaleString();
+        const lastSav = savChartPts[savChartPts.length-1];
+        const lbl1 = svgEl('text', { x: lastSav[0]-4, y: Math.max(lastSav[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
+        lbl1.textContent = '$'+Math.round(savingsPts[months]).toLocaleString();
         svg.appendChild(lbl1);
-        const lastBank = bankChartPts[bankChartPts.length-1];
-        const lbl2 = svgEl('text', { x: lastBank[0]-4, y: Math.min(lastBank[1]+12, p+gh-4), fill: '#9ca3af', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        lbl2.textContent = '$'+Math.round(bankPts[months]).toLocaleString();
-        svg.appendChild(lbl2);
 
         document.getElementById('chartLegend').innerHTML =
-            '<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>With USDC yield</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Bank (0.39%)</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Vacation goal</div>';
+            '<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>Total savings</div>' +
+            '<div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Vacation fund</div>' +
+            '<div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Savings goal</div>';
     },
 
     drawSavingsChart() {
@@ -1336,17 +1355,31 @@ const app = {
         // Goal data
         const savingsGoal = this.state.savingsGoal || 300;
         const vacationSaved = 1200, vacationTarget = this.state.vacationTarget || 3000;
-        const vacationPct = Math.round((vacationSaved / vacationTarget) * 100);
+        // Project vacation fund progress based on period
+        const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
+        const forecastMonths = monthsCfg[period] || 12;
+        let projectedVacation = vacationSaved;
+        const vacMonthlyContrib = Math.round(totalMonthlySaving * 0.3);
+        for (let i = 0; i < forecastMonths; i++) projectedVacation = projectedVacation * (1 + RATES.usdc/12) + vacMonthlyContrib;
+        projectedVacation = Math.min(Math.round(projectedVacation), vacationTarget);
+        const vacationPct = Math.round((projectedVacation / vacationTarget) * 100);
         const monthsToVacation = Math.ceil((vacationTarget - vacationSaved) / totalMonthlySaving);
         const dashLen = (vacationPct / 100) * 157.08;
+        // Project total savings
+        let projectedSavings = EXISTING_SAVINGS;
+        const monthlyNet = totalMonthlySaving;
+        for (let i = 0; i < forecastMonths; i++) projectedSavings = projectedSavings * (1 + RATES.usdc/12) + monthlyNet;
+        projectedSavings = Math.round(projectedSavings);
+        const periodLabels = { '1w': '1mo', '1m': '3mo', '3m': '6mo', 'ytd': '6mo', '1y': '1yr', 'all': '5yr' };
+        const pLabel = periodLabels[period] || '1yr';
 
         // Three editable hero cards
         document.getElementById('budget-hero-cards').innerHTML =
             '<div style="display:flex; gap:8px; margin-bottom:12px;">' +
                 // Total Savings
                 '<div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px; text-align:center; cursor:pointer;" onclick="app.editGoalField(\'savings\')">' +
-                    '<div style="font-size:9px; color:#166534; font-weight:600; text-transform:uppercase;">Total Savings</div>' +
-                    '<div style="font-size:18px; font-weight:700; color:#166534; margin:2px 0;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:#166534; font-weight:600; text-transform:uppercase;">Savings ('+pLabel+')</div>' +
+                    '<div style="font-size:18px; font-weight:700; color:#166534; margin:2px 0;">$'+projectedSavings.toLocaleString()+'</div>' +
                     '<div style="font-size:9px; color:#059669;">+$'+totalMonthlySaving+'/mo</div>' +
                 '</div>' +
                 // Spending Goal
@@ -1360,9 +1393,9 @@ const app = {
             '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px; margin-bottom:12px; cursor:pointer;" onclick="app.editGoalField(\'vacation\')">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                     '<div>' +
-                        '<div style="font-size:11px; font-weight:700; color:#166534;">Vacation Fund</div>' +
-                        '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+vacationSaved.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
-                        '<div style="font-size:10px; color:#166534;">'+monthsToVacation+' months to go at current rate</div>' +
+                        '<div style="font-size:11px; font-weight:700; color:#166534;">Vacation Fund <span style="font-size:9px; font-weight:500; color:#059669;">('+pLabel+' projection)</span></div>' +
+                        '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+projectedVacation.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
+                        '<div style="font-size:10px; color:#166534;">'+(projectedVacation >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go at current rate')+'</div>' +
                     '</div>' +
                     '<svg viewBox="0 0 60 60" style="width:46px; height:46px;">' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
@@ -1397,30 +1430,6 @@ const app = {
                     '<span style="font-size:11px; font-weight:700; color:#111;">Net to savings</span>' +
                     '<span style="font-size:12px; font-weight:700; color:#166534;">$'+(forecastSavings + spendingSurplus)+'/mo</span>' +
                 '</div>' +
-            '</div>' +
-            // Bank vs Robinhood yield comparison
-            '<div style="background:linear-gradient(90deg, #fef2f2, #f0fdf4); border:1px solid #d1e3f8; border-radius:10px; padding:12px; margin-bottom:12px;">' +
-                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">WHERE YOUR SAVINGS COULD GROW</div>' +
-                '<div style="display:flex; gap:8px;">' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(220,38,38,0.05); border-radius:8px;">' +
-                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Bank</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#dc2626;">'+(RATES.bank*100).toFixed(2)+'%</div>' +
-                        '<div style="font-size:9px; color:#9ca3af;">$'+Math.round(EXISTING_SAVINGS * RATES.bank)+'/yr</div>' +
-                    '</div>' +
-                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(0,200,5,0.05); border-radius:8px; border:1px solid #bbf7d0;">' +
-                        '<div style="font-size:9px; color:#166534; font-weight:600;">USDC</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#166534;">'+(RATES.usdc*100).toFixed(1)+'%</div>' +
-                        '<div style="font-size:9px; color:#166534;">$'+Math.round(EXISTING_SAVINGS * RATES.usdc)+'/yr</div>' +
-                    '</div>' +
-                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
-                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(249,115,22,0.05); border-radius:8px;">' +
-                        '<div style="font-size:9px; color:#9a3412; font-weight:600;">Blended</div>' +
-                        '<div style="font-size:14px; font-weight:700; color:#f97316;">' + ((function(){ const a=app.state.allocations; const t=a.safe+a.moderate+a.growth; return t>0?(((a.safe*RATES.usdc+a.moderate*RATES.defi+a.growth*RATES.btc)/t)*100).toFixed(1):'0'; })()) + '%</div>' +
-                        '<div style="font-size:9px; color:#9ca3af;">Your mix</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> by moving from bank → USDC</span></div>' +
             '</div>';
 
         // Cost of Living AI section
@@ -1464,7 +1473,7 @@ const app = {
             '<div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:12px; padding:14px; margin-top:4px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
                     '<div style="display:flex; align-items:center; gap:6px;">' +
-                        '<span style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.5px;">Cost of Living AI</span>' +
+                        '<span style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.5px;">Manage Your Cost of Living</span>' +
                         '<span style="font-size:9px; background:'+(score===3?'#7c3aed':'#ea580c')+'; color:white; padding:1px 6px; border-radius:8px; font-weight:600;">'+score+'/3</span>' +
                     '</div>' +
                     '<button onclick="app.editCOLAssumptions()" style="font-size:9px; color:#7c3aed; background:none; border:1px solid #d8b4fe; border-radius:6px; padding:2px 8px; cursor:pointer; font-weight:500;">Edit</button>' +
@@ -1483,7 +1492,7 @@ const app = {
 
     editGoalField(field) {
         if (field === 'savings') {
-            alert('Total savings: $' + EXISTING_SAVINGS.toLocaleString() + '\nLinked from Chase Checking & Amex');
+            alert('Current balance: $' + EXISTING_SAVINGS.toLocaleString() + '\nLinked from Chase Checking ····4521 & Amex Platinum ····8832\n\nAuto-transfer: $' + MONTHLY_SAVINGS + '/mo');
         } else if (field === 'spending') {
             const val = prompt('Set monthly savings goal ($):', this.state.savingsGoal || 300);
             if (val !== null) { this.state.savingsGoal = Math.max(0, parseInt(val) || 300); this.renderBudgetTab(); this.updateAmountDisplay(); }
@@ -1560,6 +1569,32 @@ const app = {
             '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH · ~'+(RATES.btc*100)+'%)</div><div class="slider-value" id="growth-value">'+sliderVal(a.growth)+'</div></div>' +
             '<input type="range" min="0" max="100" step="5" value="'+a.growth+'" oninput="app.updateSavingsSlider(\'growth\',this.value)"></div>' +
             '<button class="cta-btn primary" onclick="alert(\'Allocation saved!\')" style="margin-top:8px; padding:10px; font-size:12px;">Save allocation</button>';
+
+        // Yield promo card
+        document.getElementById('savings-yield-promo').innerHTML =
+            '<div style="background:linear-gradient(90deg, #fef2f2, #f0fdf4); border:1px solid #d1e3f8; border-radius:10px; padding:12px;">' +
+                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">WHERE YOUR SAVINGS COULD GROW</div>' +
+                '<div style="display:flex; gap:8px;">' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(220,38,38,0.05); border-radius:8px;">' +
+                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Bank</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#dc2626;">'+(RATES.bank*100).toFixed(2)+'%</div>' +
+                        '<div style="font-size:9px; color:#9ca3af;">$'+Math.round(EXISTING_SAVINGS * RATES.bank)+'/yr</div>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(0,200,5,0.05); border-radius:8px; border:1px solid #bbf7d0;">' +
+                        '<div style="font-size:9px; color:#166534; font-weight:600;">USDC</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#166534;">'+(RATES.usdc*100).toFixed(1)+'%</div>' +
+                        '<div style="font-size:9px; color:#166534;">$'+Math.round(EXISTING_SAVINGS * RATES.usdc)+'/yr</div>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; font-size:14px; color:#9ca3af;">→</div>' +
+                    '<div style="flex:1; text-align:center; padding:6px; background:rgba(249,115,22,0.05); border-radius:8px;">' +
+                        '<div style="font-size:9px; color:#9a3412; font-weight:600;">Blended</div>' +
+                        '<div style="font-size:14px; font-weight:700; color:#f97316;">'+blendedRate+'%</div>' +
+                        '<div style="font-size:9px; color:#9ca3af;">Your mix</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> by moving from bank → USDC</span></div>' +
+            '</div>';
 
         this.updateSavingsProjections();
     },
