@@ -383,36 +383,36 @@
     <div class="container">
         <div class="left-panel">
             <div class="card active" data-tab="overview">
-                <div class="card-title"><span class="card-number">1</span>The Problem</div>
-                <div class="card-subtitle">27M accounts but only ~4M trade crypto. 14M+ dormant. No spending insights, no savings tools, no reason to open the app beyond trading</div>
-            </div>
-            <div class="card" data-tab="overview">
-                <div class="card-title"><span class="card-number">2</span>The Gap</div>
-                <div class="card-subtitle">No non-trading reason to be on the platform. Revenue drops 38% in bear markets because users have nothing else to do. Mint is dead, leaving 3.6M users without a home</div>
-            </div>
-            <div class="card" data-tab="savings">
-                <div class="card-title"><span class="card-number">3</span>The Insight</div>
-                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.39% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
-            </div>
-            <div class="card" data-tab="overview">
-                <div class="card-title"><span class="card-number">4</span>The Strategy</div>
+                <div class="card-title"><span class="card-number">1</span>The Strategy</div>
                 <div class="card-subtitle">Give them Mint (see everything) → insights find the money → auto-invest like Acorns → crypto yield (10x). Two plays: spending insights + savings insights</div>
             </div>
-            <div class="card" data-tab="budget">
-                <div class="card-title"><span class="card-number">5</span>The Funnel</div>
-                <div class="card-subtitle">See spending → Spot waste → Set budgets → Round-ups + sweeps → Yield on every dollar</div>
-            </div>
             <div class="card" data-tab="savings">
-                <div class="card-title"><span class="card-number">6</span>10X Math</div>
+                <div class="card-title"><span class="card-number">2</span>The Business Case</div>
                 <div class="card-subtitle">3-5M crypto → 30-50M users. ~$1B → $10B revenue. Subscription + yield margin + card interchange</div>
             </div>
             <div class="card" data-tab="rules">
-                <div class="card-title"><span class="card-number">7</span>Why Now</div>
-                <div class="card-subtitle">Mint dead. Plaid ready. Acorns proved round-ups. Super-app window is open</div>
+                <div class="card-title"><span class="card-number">3</span>Why Now</div>
+                <div class="card-subtitle">Mint dead. Plaid ready. Acorns proved round-ups. No non-trading, non-crypto reason to stay on the platform today. Super-app window is open</div>
             </div>
             <div class="card" data-tab="overview">
-                <div class="card-title"><span class="card-number">8</span>Why Robinhood</div>
+                <div class="card-title"><span class="card-number">4</span>The Gap</div>
+                <div class="card-subtitle">Zero non-trading, non-crypto reason to open the app. 14M+ dormant accounts. Revenue drops 38% in bear markets because users have nothing else to do</div>
+            </div>
+            <div class="card" data-tab="savings">
+                <div class="card-title"><span class="card-number">5</span>The Insight</div>
+                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.01% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
+            </div>
+            <div class="card" data-tab="budget">
+                <div class="card-title"><span class="card-number">6</span>The Funnel</div>
+                <div class="card-subtitle">See spending → Spot waste → Set budgets → Round-ups + sweeps → Yield on every dollar</div>
+            </div>
+            <div class="card" data-tab="overview">
+                <div class="card-title"><span class="card-number">7</span>Why Robinhood</div>
                 <div class="card-subtitle">Only platform with 27M users + crypto + banking rails + Gold Card for the full Mint-to-Acorns pipeline</div>
+            </div>
+            <div class="card" data-tab="overview">
+                <div class="card-title"><span class="card-number">8</span>Summary</div>
+                <div class="card-subtitle">27M accounts, only ~4M trade crypto. No spending insights, no savings tools, no non-trading reason to stay. Give them one — and unlock 10x</div>
             </div>
         </div>
 
@@ -757,19 +757,9 @@ const app = {
             changeEl.textContent = 'Total savings · Spending ' + (onTrack ? '↓'+reduction+'% on track' : '↑ off track');
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
-            const s = this.state.growthStrategies;
-            const monthlySpend = this.getMonthlyRate();
-            const savRate = s.savingsToUsdc ? RATES.usdc : RATES.savings;
-            const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
-            const cashback = s.goldCard ? monthlySpend * 0.03 : 0;
-            let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
-            for (let i = 0; i < 60; i++) {
-                savBal = savBal * (1 + savRate/12) + MONTHLY_SAVINGS + cashback;
-                chkBal = chkBal * (1 + chkRate/12);
-            }
-            mainEl.textContent = '$' + Math.round(savBal + chkBal).toLocaleString();
-            const active = [s.savingsToUsdc && 'USDC', s.checkingToUsdc && 'Checking', s.goldCard && 'Gold Card'].filter(Boolean);
-            changeEl.textContent = '5yr forecast · ' + (active.length ? active.join(' + ') : 'baseline (bank)');
+            const totalMonthly = MONTHLY_SAVINGS + MONTHLY_ROUNDUPS;
+            mainEl.textContent = '$' + totalMonthly.toLocaleString() + '/mo';
+            changeEl.textContent = 'Under-budget savings $' + MONTHLY_SAVINGS + ' · Round-ups $' + MONTHLY_ROUNDUPS;
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
             const cashback = Math.round(this.getMonthlyRate() * 0.03);
@@ -1060,9 +1050,10 @@ const app = {
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.usdc : RATES.savings;
         const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
-        const years = 5, months = years * 12;
+        const years = this.state.whatIfPeriod;
+        const months = years * 12;
 
-        // Baseline (do nothing)
+        // Baseline (do nothing — current bank rates)
         const baselinePts = [];
         let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
         for (let i = 0; i <= months; i++) {
@@ -1084,6 +1075,7 @@ const app = {
             }
         }
 
+        const startVal = EXISTING_SAVINGS + CHECKING_BALANCE;
         const maxVal = Math.max(stratPts[months], baselinePts[months]) * 1.1;
         this.addYAxis(svg, p, gh, maxVal, 4);
         this.state.chartPoints = [];
@@ -1094,7 +1086,8 @@ const app = {
         if (anyActive) {
             const sPts = stratPts.map((v, i) => {
                 const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
-                this.state.chartPoints.push({ x, y, label: 'Mo '+i+': $'+Math.round(v).toLocaleString()+' (+'+'$'+Math.round(v - baselinePts[i]).toLocaleString()+')' });
+                const yr = (i/12).toFixed(1);
+                this.state.chartPoints.push({ x, y, label: yr+'yr: $'+Math.round(v).toLocaleString()+' (+$'+Math.round(v - baselinePts[i]).toLocaleString()+')' });
                 return [x, y];
             });
             let sArea = smoothPath(sPts) + ' L '+sPts[sPts.length-1][0]+' '+(p+gh)+' L '+sPts[0][0]+' '+(p+gh)+' Z';
@@ -1102,14 +1095,15 @@ const app = {
             svg.appendChild(svgEl('path', { d: smoothPath(sPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
             const lastS = sPts[sPts.length-1];
             const sl = svgEl('text', { x: lastS[0]-4, y: Math.max(lastS[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-            sl.textContent = 'With strategies';
+            sl.textContent = '$'+Math.round(stratPts[months]).toLocaleString();
             svg.appendChild(sl);
         }
 
         // Baseline line (gray dashed)
         const bPts = baselinePts.map((v, i) => {
             const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
-            if (!anyActive) this.state.chartPoints.push({ x, y, label: 'Mo '+i+': $'+Math.round(v).toLocaleString() });
+            const yr = (i/12).toFixed(1);
+            if (!anyActive) this.state.chartPoints.push({ x, y, label: yr+'yr: $'+Math.round(v).toLocaleString() });
             return [x, y];
         });
         const bankLine = svgEl('path', { d: smoothPath(bPts), stroke: '#9ca3af', fill: 'none', 'stroke-width': '1.5' });
@@ -1117,19 +1111,19 @@ const app = {
         svg.appendChild(bankLine);
         const lastB = bPts[bPts.length-1];
         const bl = svgEl('text', { x: lastB[0]-4, y: Math.min(lastB[1]+12, p+gh-4), fill: '#9ca3af', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        bl.textContent = 'Baseline';
+        bl.textContent = '$'+Math.round(baselinePts[months]).toLocaleString();
         svg.appendChild(bl);
 
-        // Now marker
-        const ytdX = p + (YTD_MONTHS / months) * gw;
-        svg.appendChild(svgEl('line', { x1: ytdX, y1: p, x2: ytdX, y2: p + gh, stroke: '#ef4444', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.5' }));
-        const ytdLabel = svgEl('text', { x: ytdX + 3, y: p + 10, fill: '#ef4444', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
-        ytdLabel.textContent = 'Now';
-        svg.appendChild(ytdLabel);
+        // Starting point marker
+        const startY = p + gh - (startVal/maxVal)*gh;
+        svg.appendChild(svgEl('circle', { cx: p, cy: startY, r: '3', fill: '#374151' }));
+        const startLabel = svgEl('text', { x: p + 6, y: startY + 3, fill: '#374151', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
+        startLabel.textContent = '$'+startVal.toLocaleString()+' today';
+        svg.appendChild(startLabel);
 
         const legendItems = [];
         if (anyActive) legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>With strategies</div>');
-        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Baseline (bank)</div>');
+        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Current rates</div>');
         document.getElementById('chartLegend').innerHTML = legendItems.join('');
     },
 
@@ -1478,40 +1472,8 @@ const app = {
         this.updateAmountDisplay();
     },
 
-    // ===== SAVINGS (combined Yields + What If) =====
+    // ===== GROW (savings growth strategies) =====
     renderSavingsTab() {
-        const monthlySpend = this.getMonthlyRate();
-        const cashback = Math.round(monthlySpend * 0.03);
-        const totalInflow = MONTHLY_SAVINGS + cashback + MONTHLY_ROUNDUPS;
-        const a = this.state.allocations;
-        const pctTotal = a.safe + a.growth;
-        const annualYield = (a.safe * RATES.usdc) + (a.growth * RATES.btc);
-        const blendedRate = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
-        const allocDollar = (pct) => Math.round(MONTHLY_SAVINGS * pct / 100);
-
-        // Balance + inflow card
-        const inflowRow = (label, amount, color) =>
-            '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(0,0,0,0.05);">' +
-                '<span style="font-size:11px; color:#374151;">'+label+'</span>' +
-                '<span style="font-size:11px; font-weight:600; color:'+color+';">$'+amount+'/mo</span>' +
-            '</div>';
-
-        document.getElementById('savings-balance-area').innerHTML =
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Savings Balance</div>' +
-                    '<div style="font-size:22px; font-weight:700; color:#166534;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
-                '</div>' +
-                '<div style="height:1px; background:#bbf7d0; margin-bottom:10px;"></div>' +
-                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Monthly Inflow</div>' +
-                    '<div style="font-size:14px; font-weight:700; color:#166534;">$'+totalInflow+'/mo</div>' +
-                '</div>' +
-                inflowRow('Auto-transfer (savings)', MONTHLY_SAVINGS, '#166534') +
-                inflowRow('Gold Card 3% cashback', cashback, '#1d4ed8') +
-                inflowRow('Round-ups', MONTHLY_ROUNDUPS, '#9a3412') +
-            '</div>';
-
         this.updateSavingsProjections();
     },
 
@@ -1527,13 +1489,33 @@ const app = {
         const months = years * 12;
         const monthlySpend = this.getMonthlyRate();
 
-        // Baseline: bank checking + bank savings, no strategies
-        let baselineSav = EXISTING_SAVINGS, baselineChk = CHECKING_BALANCE;
-        for (let i = 0; i < months; i++) {
-            baselineSav = baselineSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
-            baselineChk = baselineChk * (1 + RATES.checking/12);
-        }
-        const baseline = Math.round(baselineSav + baselineChk);
+        // Period-adjusted inflow
+        const periodSavings = MONTHLY_SAVINGS * months;
+        const periodRoundups = MONTHLY_ROUNDUPS * months;
+        const periodTotal = periodSavings + periodRoundups;
+        const periodLabel = years + '-Year Inflow';
+
+        const inflowRow = (label, amount, color) =>
+            '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(0,0,0,0.05);">' +
+                '<span style="font-size:11px; color:#374151;">'+label+'</span>' +
+                '<span style="font-size:11px; font-weight:600; color:'+color+';">$'+amount.toLocaleString()+'</span>' +
+            '</div>';
+
+        // Balance + period inflow card
+        document.getElementById('savings-balance-area').innerHTML =
+            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Savings</div>' +
+                    '<div style="font-size:22px; font-weight:700; color:#166534;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
+                '</div>' +
+                '<div style="height:1px; background:#bbf7d0; margin-bottom:10px;"></div>' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">'+periodLabel+'</div>' +
+                    '<div style="font-size:14px; font-weight:700; color:#166534;">$'+periodTotal.toLocaleString()+'</div>' +
+                '</div>' +
+                inflowRow('Under-budget savings ($'+MONTHLY_SAVINGS+'/mo)', periodSavings, '#166534') +
+                inflowRow('Round-ups ($'+MONTHLY_ROUNDUPS+'/mo)', periodRoundups, '#9a3412') +
+            '</div>';
 
         // With strategies applied
         let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
@@ -1545,10 +1527,9 @@ const app = {
             chkBal = chkBal * (1 + chkRate/12);
         }
         const total = Math.round(savBal + chkBal);
-        const gain = total - baseline;
         const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
 
-        // Checkbox UI — use <div> not <label> to prevent double-toggle from native label-checkbox association
+        // Checkbox UI — use <div> not <label> to prevent double-toggle
         const chk = (key, title, desc, checked) =>
             '<div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:'+(checked ? '#f0fdf4' : '#f9fafb')+'; border:1px solid '+(checked ? '#bbf7d0' : '#e5e7eb')+'; border-radius:10px; margin-bottom:6px; cursor:pointer;" onclick="app.toggleGrowthStrategy(\''+key+'\')">' +
                 '<input type="checkbox" '+(checked ? 'checked' : '')+' style="margin-top:2px; accent-color:#00C805; pointer-events:none;" />' +
@@ -1557,31 +1538,23 @@ const app = {
             '</div>';
 
         document.getElementById('savings-model').innerHTML =
-            // Two side-by-side cards: Baseline + Projected
-            '<div style="display:flex; gap:8px; margin-bottom:12px;">' +
-                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px; text-align:center;">' +
-                    '<div style="font-size:9px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px;">Baseline</div>' +
-                    '<div style="font-size:20px; font-weight:700; color:#6b7280; margin:4px 0;">$'+baseline.toLocaleString()+'</div>' +
-                    '<div style="font-size:9px; color:#9ca3af;">Savings '+(RATES.savings*100)+'% · Checking '+(RATES.checking*100)+'%</div>' +
-                '</div>' +
-                '<div style="flex:1; background:'+(anyActive ? 'linear-gradient(135deg, #f0fdf4, #eff6ff)' : '#f9fafb')+'; border:1px solid '+(anyActive ? '#bbf7d0' : '#e5e7eb')+'; border-radius:12px; padding:12px; text-align:center;">' +
-                    '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'yr Projected</div>' +
-                    '<div style="font-size:20px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
-                    (gain > 0 ? '<div style="font-size:9px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' extra</div>' :
-                        '<div style="font-size:9px; color:#9ca3af;">Select strategies below</div>') +
-                '</div>' +
+            // Projection card
+            '<div style="background:'+(anyActive ? 'linear-gradient(135deg, #f0fdf4, #eff6ff)' : '#f9fafb')+'; border:1px solid '+(anyActive ? '#bbf7d0' : '#e5e7eb')+'; border-radius:12px; padding:14px; margin-bottom:12px; text-align:center;">' +
+                '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Projected Value</div>' +
+                '<div style="font-size:28px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
+                '<div style="font-size:10px; color:#6b7280;">Starting from $'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+CHECKING_BALANCE.toLocaleString()+' checking</div>' +
             '</div>' +
 
-            // Strategy checkboxes with clearer labels
+            // Strategy checkboxes
             '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
-            chk('savingsToUsdc', 'USDC Savings — '+(RATES.usdc*100).toFixed(1)+'% APY',
-                'Move your $'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+MONTHLY_SAVINGS+'/mo deposits from your bank ('+(RATES.savings*100)+'%) into USDC for '+(RATES.usdc*100).toFixed(1)+'% yield',
+            chk('savingsToUsdc', 'Convert existing savings to USDC',
+                'Your $'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+MONTHLY_SAVINGS+'/mo deposits earn '+(RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.savings*100)+'% at your bank',
                 s.savingsToUsdc) +
-            chk('checkingToUsdc', 'USDC Checking — '+(RATES.usdc*100).toFixed(1)+'% APY',
-                'Move your $'+CHECKING_BALANCE.toLocaleString()+' checking balance from '+(RATES.checking*100)+'% at your bank into USDC for '+(RATES.usdc*100).toFixed(1)+'% yield',
+            chk('checkingToUsdc', 'Move your checking balance to USDC',
+                'Your $'+CHECKING_BALANCE.toLocaleString()+' checking balance earns '+(RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.checking*100)+'% at your bank',
                 s.checkingToUsdc) +
-            chk('goldCard', 'Gold Card Cashback — 3% on all spending',
-                'Earn $'+Math.round(monthlySpend * 0.03)+'/mo (3% of spending) as cashback, auto-invested into USDC',
+            chk('goldCard', 'Gold Card — 3% cashback on all spending',
+                '$'+Math.round(monthlySpend * 0.03)+'/mo cashback auto-invested into USDC',
                 s.goldCard);
 
         this.drawSavingsChart();
