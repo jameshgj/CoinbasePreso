@@ -547,7 +547,7 @@ function svgEl(tag, attrs) {
 
 // ===== RATE CONSTANTS =====
 const RATES = {
-    checking: 0.01,   // typical checking APY ~0.01%
+    checking: 0.0001, // typical checking APY ~0.01%
     savings: 0.04,    // high-yield savings ~4%
     usdc: 0.041,      // USDC yield ~4.1%
     btc: 0.30         // BTC historical avg ~30%
@@ -1528,13 +1528,12 @@ const app = {
         const monthlySpend = this.getMonthlyRate();
 
         // Baseline: bank checking + bank savings, no strategies
-        let baseline = EXISTING_SAVINGS + CHECKING_BALANCE;
         let baselineSav = EXISTING_SAVINGS, baselineChk = CHECKING_BALANCE;
         for (let i = 0; i < months; i++) {
             baselineSav = baselineSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
             baselineChk = baselineChk * (1 + RATES.checking/12);
         }
-        baseline = Math.round(baselineSav + baselineChk);
+        const baseline = Math.round(baselineSav + baselineChk);
 
         // With strategies applied
         let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
@@ -1549,39 +1548,40 @@ const app = {
         const gain = total - baseline;
         const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
 
-        // Checkbox UI
-        const chk = (key, label, desc, checked) =>
-            '<label style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:'+(checked ? '#f0fdf4' : '#f9fafb')+'; border:1px solid '+(checked ? '#bbf7d0' : '#e5e7eb')+'; border-radius:10px; margin-bottom:6px; cursor:pointer;" onclick="app.toggleGrowthStrategy(\''+key+'\')">' +
+        // Checkbox UI — use <div> not <label> to prevent double-toggle from native label-checkbox association
+        const chk = (key, title, desc, checked) =>
+            '<div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:'+(checked ? '#f0fdf4' : '#f9fafb')+'; border:1px solid '+(checked ? '#bbf7d0' : '#e5e7eb')+'; border-radius:10px; margin-bottom:6px; cursor:pointer;" onclick="app.toggleGrowthStrategy(\''+key+'\')">' +
                 '<input type="checkbox" '+(checked ? 'checked' : '')+' style="margin-top:2px; accent-color:#00C805; pointer-events:none;" />' +
-                '<div><div style="font-size:11px; font-weight:600; color:'+(checked ? '#166534' : '#374151')+';">'+label+'</div>' +
-                '<div style="font-size:10px; color:#6b7280;">'+desc+'</div></div>' +
-            '</label>';
+                '<div><div style="font-size:11px; font-weight:600; color:'+(checked ? '#166534' : '#374151')+';">'+title+'</div>' +
+                '<div style="font-size:10px; color:#6b7280; margin-top:1px;">'+desc+'</div></div>' +
+            '</div>';
 
         document.getElementById('savings-model').innerHTML =
-            // Result card
-            '<div style="background:'+(anyActive ? 'linear-gradient(135deg, #f0fdf4, #eff6ff)' : '#f9fafb')+'; border:1px solid '+(anyActive ? '#bbf7d0' : '#e5e7eb')+'; border-radius:12px; padding:14px; margin-bottom:12px; text-align:center;">' +
-                '<div style="font-size:10px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Projection</div>' +
-                '<div style="font-size:28px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
-                (gain > 0 ? '<div style="font-size:12px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' more than doing nothing</div>' :
-                    '<div style="font-size:12px; color:#6b7280;">Baseline: savings at '+(RATES.savings*100)+'% + checking at '+(RATES.checking*100)+'%</div>') +
+            // Two side-by-side cards: Baseline + Projected
+            '<div style="display:flex; gap:8px; margin-bottom:12px;">' +
+                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px; text-align:center;">' +
+                    '<div style="font-size:9px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px;">Baseline</div>' +
+                    '<div style="font-size:20px; font-weight:700; color:#6b7280; margin:4px 0;">$'+baseline.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:#9ca3af;">Savings '+(RATES.savings*100)+'% · Checking '+(RATES.checking*100)+'%</div>' +
+                '</div>' +
+                '<div style="flex:1; background:'+(anyActive ? 'linear-gradient(135deg, #f0fdf4, #eff6ff)' : '#f9fafb')+'; border:1px solid '+(anyActive ? '#bbf7d0' : '#e5e7eb')+'; border-radius:12px; padding:12px; text-align:center;">' +
+                    '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'yr Projected</div>' +
+                    '<div style="font-size:20px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
+                    (gain > 0 ? '<div style="font-size:9px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' extra</div>' :
+                        '<div style="font-size:9px; color:#9ca3af;">Select strategies below</div>') +
+                '</div>' +
             '</div>' +
 
-            // Baseline reference
-            '<div style="display:flex; justify-content:space-between; padding:8px 12px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:10px;">' +
-                '<div><div style="font-size:10px; font-weight:600; color:#6b7280;">BASELINE (do nothing)</div>' +
-                '<div style="font-size:9px; color:#9ca3af;">Savings $'+EXISTING_SAVINGS.toLocaleString()+' at '+(RATES.savings*100)+'% + Checking $'+CHECKING_BALANCE.toLocaleString()+' at '+(RATES.checking*100)+'%</div></div>' +
-                '<div style="font-size:14px; font-weight:700; color:#6b7280; align-self:center;">$'+baseline.toLocaleString()+'</div>' +
-            '</div>' +
-
-            // Strategy checkboxes
-            chk('savingsToUsdc', 'Move savings → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)',
-                'Earn '+(RATES.usdc*100).toFixed(1)+'% instead of '+(RATES.savings*100)+'% on your $'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+MONTHLY_SAVINGS+'/mo contributions',
+            // Strategy checkboxes with clearer labels
+            '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
+            chk('savingsToUsdc', 'USDC Savings — '+(RATES.usdc*100).toFixed(1)+'% APY',
+                'Move your $'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+MONTHLY_SAVINGS+'/mo deposits from your bank ('+(RATES.savings*100)+'%) into USDC for '+(RATES.usdc*100).toFixed(1)+'% yield',
                 s.savingsToUsdc) +
-            chk('checkingToUsdc', 'Move checking → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)',
-                'Your $'+CHECKING_BALANCE.toLocaleString()+' checking balance earns '+(RATES.usdc*100).toFixed(1)+'% instead of '+(RATES.checking*100)+'%',
+            chk('checkingToUsdc', 'USDC Checking — '+(RATES.usdc*100).toFixed(1)+'% APY',
+                'Move your $'+CHECKING_BALANCE.toLocaleString()+' checking balance from '+(RATES.checking*100)+'% at your bank into USDC for '+(RATES.usdc*100).toFixed(1)+'% yield',
                 s.checkingToUsdc) +
-            chk('goldCard', 'Gold Card — 3% cashback on all spending',
-                '$'+Math.round(monthlySpend * 0.03)+'/mo cashback auto-invested into your savings',
+            chk('goldCard', 'Gold Card Cashback — 3% on all spending',
+                'Earn $'+Math.round(monthlySpend * 0.03)+'/mo (3% of spending) as cashback, auto-invested into USDC',
                 s.goldCard);
 
         this.drawSavingsChart();
