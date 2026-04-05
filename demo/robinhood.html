@@ -441,6 +441,7 @@
                         <div class="chart-container"><svg id="mainChart" width="100%" height="100%"></svg></div>
                         <div class="chart-tooltip" id="chartTooltip"></div>
                         <div class="chart-hover-line" id="chartHoverLine"></div>
+                        <button id="chartModeToggle" onclick="app.toggleChartMode()" style="position:absolute; top:8px; right:12px; font-size:10px; font-weight:600; padding:3px 8px; border-radius:12px; border:1px solid #e5e7eb; background:#f9fafb; color:#6b7280; cursor:pointer; z-index:10; transition:all 0.2s;">Daily</button>
                     </div>
                     <div class="chart-legend" id="chartLegend"></div>
 
@@ -580,6 +581,7 @@ function svgEl(tag, attrs) {
 const app = {
     state: {
         activeTab: 'overview', activePeriod: '1m', whatIfPeriod: 3,
+        chartCumulative: false,
         highlightedCategory: null,
         allocations: { safe: 250, moderate: 150, growth: 100 },
         categories: [
@@ -774,6 +776,8 @@ const app = {
     // ===== CHART ENGINE =====
     drawChart() {
         const t = this.state.activeTab;
+        const toggleBtn = document.getElementById('chartModeToggle');
+        if (toggleBtn) toggleBtn.style.display = (t === 'overview') ? 'block' : 'none';
         if (t === 'overview') this.drawOverviewChart();
         else if (t === 'what-if') this.drawWhatIfChart();
         else if (t === 'budget') this.drawBudgetChart();
@@ -827,32 +831,79 @@ const app = {
             return d;
         });
 
-        const totalMax = cats.reduce((s,c) => s + c.amount, 0);
-        const yS = gh / (totalMax * 1.15);
+        const cumulative = this.state.chartCumulative;
 
-        this.state.chartPoints = [];
-        for (let d = 0; d <= steps; d++) {
-            let total = 0;
-            for (let c = 0; c < cats.length; c++) total += daily[c].slice(0, d + 1).reduce((a,b) => a+b, 0);
-            this.state.chartPoints.push({
-                x: p + (d / steps) * gw,
-                y: p + gh - total * yS,
-                label: cfg.unit + ' ' + d + ': $' + Math.round(total).toLocaleString()
-            });
-        }
+        if (cumulative) {
+            // Cumulative: running totals
+            const totalMax = cats.reduce((s,c) => s + c.amount, 0);
+            const yS = gh / (totalMax * 1.15);
 
-        this.addYAxis(svg, p, gh, totalMax * 1.15, 4);
-
-        for (let ci = cats.length - 1; ci >= 0; ci--) {
-            const top = [], bot = [];
+            this.state.chartPoints = [];
             for (let d = 0; d <= steps; d++) {
-                const x = p + (d / steps) * gw;
-                let lo = 0;
-                for (let c = 0; c < ci; c++) lo += daily[c].slice(0, d+1).reduce((a,b) => a+b, 0);
-                const th = daily[ci].slice(0, d+1).reduce((a,b) => a+b, 0);
-                top.push([x, p + gh - (lo + th) * yS]);
-                bot.push([x, p + gh - lo * yS]);
+                let total = 0;
+                for (let c = 0; c < cats.length; c++) total += daily[c].slice(0, d + 1).reduce((a,b) => a+b, 0);
+                this.state.chartPoints.push({
+                    x: p + (d / steps) * gw,
+                    y: p + gh - total * yS,
+                    label: cfg.unit + ' ' + d + ': $' + Math.round(total).toLocaleString()
+                });
             }
+
+            this.addYAxis(svg, p, gh, totalMax * 1.15, 4);
+
+            for (let ci = cats.length - 1; ci >= 0; ci--) {
+                const top = [], bot = [];
+                for (let d = 0; d <= steps; d++) {
+                    const x = p + (d / steps) * gw;
+                    let lo = 0;
+                    for (let c = 0; c < ci; c++) lo += daily[c].slice(0, d+1).reduce((a,b) => a+b, 0);
+                    const th = daily[ci].slice(0, d+1).reduce((a,b) => a+b, 0);
+                    top.push([x, p + gh - (lo + th) * yS]);
+                    bot.push([x, p + gh - lo * yS]);
+                }
+                let ad = 'M ' + top[0][0] + ' ' + top[0][1];
+                for (let i = 1; i < top.length; i++) { const cx = (top[i-1][0]+top[i][0])/2; ad += ' C '+cx+' '+top[i-1][1]+','+cx+' '+top[i][1]+','+top[i][0]+' '+top[i][1]; }
+                for (let i = bot.length-1; i >= 0; i--) {
+                    if (i === bot.length-1) ad += ' L '+bot[i][0]+' '+bot[i][1];
+                    else { const cx = (bot[i+1][0]+bot[i][0])/2; ad += ' C '+cx+' '+bot[i+1][1]+','+cx+' '+bot[i][1]+','+bot[i][0]+' '+bot[i][1]; }
+                }
+                ad += ' Z';
+                const isHL = hl === cats[ci].name, isDim = hl && !isHL;
+                svg.appendChild(svgEl('path', { d: ad, fill: cats[ci].color, opacity: isDim ? '0.12' : (isHL ? '0.95' : '0.65') }));
+            }
+        } else {
+            // Per-period: daily/weekly/monthly spend
+            let dailyMax = 0;
+            for (let d = 0; d < steps; d++) {
+                let total = 0;
+                for (let c = 0; c < cats.length; c++) total += daily[c][d];
+                if (total > dailyMax) dailyMax = total;
+            }
+            const yS = gh / (dailyMax * 1.15);
+
+            this.state.chartPoints = [];
+            for (let d = 0; d < steps; d++) {
+                let total = 0;
+                for (let c = 0; c < cats.length; c++) total += daily[c][d];
+                this.state.chartPoints.push({
+                    x: p + (d / (steps - 1)) * gw,
+                    y: p + gh - total * yS,
+                    label: cfg.unit + ' ' + (d + 1) + ': $' + Math.round(total).toLocaleString()
+                });
+            }
+
+            this.addYAxis(svg, p, gh, dailyMax * 1.15, 4);
+
+            for (let ci = cats.length - 1; ci >= 0; ci--) {
+                const top = [], bot = [];
+                for (let d = 0; d < steps; d++) {
+                    const x = p + (d / (steps - 1)) * gw;
+                    let lo = 0;
+                    for (let c = 0; c < ci; c++) lo += daily[c][d];
+                    const val = daily[ci][d];
+                    top.push([x, p + gh - (lo + val) * yS]);
+                    bot.push([x, p + gh - lo * yS]);
+                }
             let ad = 'M ' + top[0][0] + ' ' + top[0][1];
             for (let i = 1; i < top.length; i++) { const cx = (top[i-1][0]+top[i][0])/2; ad += ' C '+cx+' '+top[i-1][1]+','+cx+' '+top[i][1]+','+top[i][0]+' '+top[i][1]; }
             for (let i = bot.length-1; i >= 0; i--) {
@@ -862,9 +913,22 @@ const app = {
             ad += ' Z';
             const isHL = hl === cats[ci].name, isDim = hl && !isHL;
             svg.appendChild(svgEl('path', { d: ad, fill: cats[ci].color, opacity: isDim ? '0.12' : (isHL ? '0.95' : '0.65') }));
+            }
         }
 
         document.getElementById('chartLegend').innerHTML = cats.map(c => '<div class="legend-item"><div class="legend-dot" style="background:'+c.color+'"></div>'+c.name+'</div>').join('');
+
+        // Update toggle button label
+        const toggleBtn = document.getElementById('chartModeToggle');
+        if (toggleBtn) {
+            toggleBtn.textContent = this.state.chartCumulative ? 'Cumulative' : 'Daily';
+            toggleBtn.style.display = (this.state.activeTab === 'overview') ? 'block' : 'none';
+        }
+    },
+
+    toggleChartMode() {
+        this.state.chartCumulative = !this.state.chartCumulative;
+        this.drawOverviewChart();
     },
 
     drawWhatIfChart() {
