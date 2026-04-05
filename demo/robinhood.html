@@ -597,7 +597,7 @@ const app = {
         chartCumulative: false,
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
-        allocations: { safe: 50, moderate: 30, growth: 15 },
+        allocations: { safe: 55, moderate: 30, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
             { name: 'Groceries',     color: '#00C805', amount: 520, count: 18, change: -5 },
@@ -792,14 +792,15 @@ const app = {
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const a = this.state.allocations;
-            const total = a.safe + a.moderate + a.growth;
+            const pctTotal = a.safe + a.moderate + a.growth;
             const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
-            const blendedRate = total > 0 ? annualYield / total : 0;
+            const blendedRate = pctTotal > 0 ? annualYield / pctTotal : 0;
+            const monthlyContrib = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
             let proj = EXISTING_SAVINGS;
-            for (let i = 0; i < 60; i++) proj = proj * (1 + blendedRate/12) + total;
+            for (let i = 0; i < 60; i++) proj = proj * (1 + blendedRate/12) + monthlyContrib;
             mainEl.textContent = '$' + Math.round(proj).toLocaleString();
-            const blended = total > 0 ? (blendedRate * 100).toFixed(1) : '0';
-            changeEl.textContent = '5yr forecast · ' + blended + '% blended · $' + total + '/mo';
+            const blended = pctTotal > 0 ? (blendedRate * 100).toFixed(1) : '0';
+            changeEl.textContent = '5yr forecast · ' + blended + '% blended · $' + monthlyContrib + '/mo';
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
             const cashback = Math.round(this.getMonthlyRate() * 0.03);
@@ -1040,15 +1041,16 @@ const app = {
         svg.innerHTML = '';
 
         const a = this.state.allocations;
-        const monthly = a.safe + a.moderate + a.growth;
+        const pctTotal = a.safe + a.moderate + a.growth;
+        const monthly = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
         if (monthly === 0) { this.state.chartPoints = []; document.getElementById('chartLegend').innerHTML = ''; return; }
 
         const years = 5, months = years * 12;
         // Individual tier lines for stacked colored areas
         const tiers = [
-            { key: 'safe',     amount: a.safe,     rate: RATES.usdc, color: '#00C805', label: 'Safe (USDC)' },
-            { key: 'moderate', amount: a.moderate,  rate: RATES.defi, color: '#f59e0b', label: 'Moderate (DeFi)' },
-            { key: 'growth',   amount: a.growth,    rate: RATES.btc,  color: '#f97316', label: 'Growth (BTC/ETH)' }
+            { key: 'safe',     amount: Math.round(MONTHLY_SAVINGS * a.safe / 100),     rate: RATES.usdc, color: '#00C805', label: 'Safe (USDC)' },
+            { key: 'moderate', amount: Math.round(MONTHLY_SAVINGS * a.moderate / 100),  rate: RATES.defi, color: '#f59e0b', label: 'Moderate (DeFi)' },
+            { key: 'growth',   amount: Math.round(MONTHLY_SAVINGS * a.growth / 100),    rate: RATES.btc,  color: '#f97316', label: 'Growth (BTC/ETH)' }
         ].filter(t => t.amount > 0);
 
         // Bank baseline
@@ -1436,9 +1438,10 @@ const app = {
         const cashback = Math.round(monthlySpend * 0.03);
         const totalInflow = MONTHLY_SAVINGS + cashback + MONTHLY_ROUNDUPS;
         const a = this.state.allocations;
-        const total = a.safe + a.moderate + a.growth;
+        const pctTotal = a.safe + a.moderate + a.growth;
         const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
-        const blendedRate = total > 0 ? ((annualYield / total) * 100).toFixed(1) : '0';
+        const blendedRate = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
+        const allocDollar = (pct) => Math.round(MONTHLY_SAVINGS * pct / 100);
 
         // Monthly inflow breakdown with sources
         const inflowRow = (label, amount, color) =>
@@ -1464,20 +1467,21 @@ const app = {
                 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                     '<div>' +
                         '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Blended Rate</div>' +
-                        '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">$'+total+'/mo across '+[a.safe>0,a.moderate>0,a.growth>0].filter(Boolean).length+' tiers</div>' +
+                        '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">'+pctTotal+'% allocated · $'+allocDollar(pctTotal)+'/mo across '+[a.safe>0,a.moderate>0,a.growth>0].filter(Boolean).length+' tiers</div>' +
                     '</div>' +
                     '<div style="font-size:24px; font-weight:700; color:#2563eb;">'+blendedRate+'%</div>' +
                 '</div>' +
             '</div>';
 
         // Allocation sliders with save button
+        const sliderVal = (pct) => pct + '% ($' + allocDollar(pct) + '/mo)';
         document.getElementById('savings-sliders').innerHTML =
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">Safe (USDC · '+(RATES.usdc*100).toFixed(1)+'%)</div><div class="slider-value" id="safe-value">$'+a.safe+'/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="'+a.safe+'" oninput="app.updateSavingsSlider(\'safe\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f59e0b;">Moderate (DeFi · '+(RATES.defi*100).toFixed(1)+'%)</div><div class="slider-value" id="moderate-value">$'+a.moderate+'/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="'+a.moderate+'" oninput="app.updateSavingsSlider(\'moderate\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH · ~'+(RATES.btc*100)+'%)</div><div class="slider-value" id="growth-value">$'+a.growth+'/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="'+a.growth+'" oninput="app.updateSavingsSlider(\'growth\',this.value)"></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">Safe (USDC · '+(RATES.usdc*100).toFixed(1)+'%)</div><div class="slider-value" id="safe-value">'+sliderVal(a.safe)+'</div></div>' +
+            '<input type="range" min="0" max="100" step="5" value="'+a.safe+'" oninput="app.updateSavingsSlider(\'safe\',this.value)"></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f59e0b;">Moderate (DeFi · '+(RATES.defi*100).toFixed(1)+'%)</div><div class="slider-value" id="moderate-value">'+sliderVal(a.moderate)+'</div></div>' +
+            '<input type="range" min="0" max="100" step="5" value="'+a.moderate+'" oninput="app.updateSavingsSlider(\'moderate\',this.value)"></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH · ~'+(RATES.btc*100)+'%)</div><div class="slider-value" id="growth-value">'+sliderVal(a.growth)+'</div></div>' +
+            '<input type="range" min="0" max="100" step="5" value="'+a.growth+'" oninput="app.updateSavingsSlider(\'growth\',this.value)"></div>' +
             '<button class="cta-btn primary" onclick="alert(\'Allocation saved!\')" style="margin-top:8px; padding:10px; font-size:12px;">Save allocation</button>';
 
         this.updateSavingsProjections();
@@ -1486,16 +1490,16 @@ const app = {
     updateSavingsSlider(tier, val) {
         const v = parseInt(val);
         this.state.allocations[tier] = v;
-        document.getElementById(tier + '-value').textContent = '$' + v + '/mo';
+        document.getElementById(tier + '-value').textContent = v + '% ($' + Math.round(MONTHLY_SAVINGS * v / 100) + '/mo)';
         this.updateSavingsProjections();
         this.updateAmountDisplay();
     },
 
     setPreset(preset) {
         const presets = {
-            safe:     { safe: 80, moderate: 15, growth: 0 },
-            balanced: { safe: 50, moderate: 30, growth: 15 },
-            growth:   { safe: 15, moderate: 25, growth: 55 }
+            safe:     { safe: 80, moderate: 15, growth: 5 },
+            balanced: { safe: 55, moderate: 30, growth: 15 },
+            growth:   { safe: 15, moderate: 25, growth: 60 }
         };
         this.state.allocations = { ...(presets[preset] || presets.balanced) };
         this.renderSavingsTab();
@@ -1504,20 +1508,21 @@ const app = {
 
     updateSavingsProjections() {
         const a = this.state.allocations;
-        const total = a.safe + a.moderate + a.growth;
+        const pctTotal = a.safe + a.moderate + a.growth;
         const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
-        const blended = total > 0 ? ((annualYield / total) * 100).toFixed(1) : '0';
+        const blended = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
+        const monthlyContrib = Math.round(MONTHLY_SAVINGS * pctTotal / 100);
 
         // 5yr projection with existing balance
         let proj = EXISTING_SAVINGS, bank = EXISTING_SAVINGS;
         for (let i = 0; i < 60; i++) {
-            proj = proj * (1 + (total > 0 ? annualYield/total/12 : 0)) + total;
-            bank = bank * (1 + RATES.bank/12) + total;
+            proj = proj * (1 + (pctTotal > 0 ? annualYield/pctTotal/12 : 0)) + monthlyContrib;
+            bank = bank * (1 + RATES.bank/12) + monthlyContrib;
         }
         const adv = Math.round(proj - bank);
 
         document.getElementById('savings-projected').innerHTML =
-            'Blended <strong>'+blended+'% APY</strong> · $'+total+'/mo contributions<br>' +
+            'Blended <strong>'+blended+'% APY</strong> · $'+monthlyContrib+'/mo contributions<br>' +
             '<span style="font-size:11px; color:#047857;">5yr: <strong>$'+Math.round(proj).toLocaleString()+'</strong> vs $'+Math.round(bank).toLocaleString()+' at bank · <strong>+$'+adv.toLocaleString()+' more</strong></span>';
 
         // What-if comparison cards
