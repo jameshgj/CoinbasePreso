@@ -366,6 +366,17 @@
         body.embed .phone-status-bar { display: none; }
         body.embed .phone-bottom-nav { display: none; }
         body.embed .phone-content { border-radius: 0; }
+        /* Compact chart in embed so tabs are visible above the fold */
+        body.embed .chart-container { height: 120px; padding: 10px 16px; }
+        body.embed .amount-display { padding: 0 16px 6px; }
+        body.embed .amount-value { font-size: 24px; }
+        body.embed .amount-change { font-size: 11px; margin-top: 2px; }
+        body.embed .time-pills { padding: 8px 16px; }
+        body.embed .chart-legend { padding: 2px 16px 4px; }
+        body.embed .phone-header { padding: 10px 16px; }
+        body.embed .phone-header-title { font-size: 14px; }
+        body.embed .tab-content { padding: 14px 16px; }
+        body.embed .feature-tabs { padding: 0 16px; }
     </style>
 </head>
 <body><script>if(location.search.includes('embed=1'))document.body.classList.add('embed');</script>

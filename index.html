@@ -2516,27 +2516,57 @@
                     <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Parent Block Control — Demo</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; margin-bottom: 12px;">Interactive walkthrough of the parent and teen experience</div>
 
-                    <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 24px; min-height: 0;">
-                        <!-- Prev button -->
-                        <button onclick="demoPrev()" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                            <svg width="16" height="16" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-
-                        <!-- Screenshot display -->
-                        <div style="display: flex; flex-direction: column; align-items: center; max-height: 100%; overflow: hidden;">
-                            <div id="demo-carousel" style="position: relative; overflow: hidden; border: 1px solid rgba(0,82,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-                                <img id="demo-carousel-img" src="screenshots/nav-1.png" style="max-height: 460px; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
+                    <div style="flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; min-height: 0; margin-top: 4px;">
+                        <!-- Left: Screenshot carousel -->
+                        <div style="display: flex; align-items: center; gap: 12px; height: 100%;">
+                            <button onclick="demoPrev()" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                <svg width="14" height="14" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <div id="demo-carousel" style="overflow: hidden; border: 1px solid rgba(0,82,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                                    <img id="demo-carousel-img" src="screenshots/nav-1.png" style="max-height: 400px; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                    <div id="demo-carousel-label" style="font-size: 0.75em; font-weight: 600; color: #0052FF;">Nav: Family Pairing</div>
+                                    <div id="demo-carousel-counter" style="font-size: 0.68em; color: rgba(26,26,46,0.35); font-weight: 500;">1 / 24</div>
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
-                                <div id="demo-carousel-label" style="font-size: 0.82em; font-weight: 600; color: #0052FF; text-align: center;">Nav: Family Pairing</div>
-                                <div id="demo-carousel-counter" style="font-size: 0.72em; color: rgba(26,26,46,0.4); font-weight: 500;">1 / 27</div>
-                            </div>
+                            <button onclick="demoNext()" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                <svg width="14" height="14" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
                         </div>
 
-                        <!-- Next button -->
-                        <button onclick="demoNext()" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                            <svg width="16" height="16" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
+                        <!-- Right: Design choices -->
+                        <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 8px;">
+                            <div class="animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0052FF" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    <div style="font-weight: 700; font-size: 0.85em; color: #0052FF;">Proactive Protection</div>
+                                </div>
+                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Parents block assets and features <em>before</em> teens encounter them — not after. Prevents exposure rather than reacting to it.</div>
+                            </div>
+                            <div class="animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; background: rgba(240,165,0,0.03); border: 1px solid rgba(240,165,0,0.15); border-radius: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    <div style="font-weight: 700; font-size: 0.85em; color: #f0a500;">Teen Agency</div>
+                                </div>
+                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Teens can request unblocks with context — fostering financial dialogue rather than silent restriction. Both sides see real-time status.</div>
+                            </div>
+                            <div class="animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; background: rgba(46,204,113,0.03); border: 1px solid rgba(46,204,113,0.15); border-radius: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                                    <div style="font-weight: 700; font-size: 0.85em; color: #2ecc71;">Full Lifecycle</div>
+                                </div>
+                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Block → Notify → Request → Review → Resolve. Complete flow for both parent and teen with in-app messaging throughout.</div>
+                            </div>
+                            <div class="animate-stagger" style="animation-delay: 0.5s; padding: 14px 16px; background: rgba(155,89,182,0.03); border: 1px solid rgba(155,89,182,0.12); border-radius: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                    <div style="font-weight: 700; font-size: 0.85em; color: #9b59b6;">Patent-Pending UX</div>
+                                </div>
+                                <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">First parental control system designed for crypto — filed patent for the dual-party block/unblock interaction model.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2944,52 +2974,73 @@
             <!-- DEMO SLIDE 1: 10X Idea — Title + Demo -->
             <div class="slide fade-enter" data-slide="13" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div class="animate-stagger" style="font-size: 0.72em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;">Product Strategy — Crypto Growth</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2em; margin-bottom: 8px;">Money Insights as the<br>Reactivation Engine</h1>
-                    <div class="animate-stagger" style="animation-delay: 0.2s; font-size: 0.88em; line-height: 1.6; max-width: 520px; margin-top: 8px;">
-                        <strong style="color: #1a1a2e;">Robinhood doesn't have an acquisition problem. It has an activation problem.</strong>
-                        <span style="opacity: 0.6;"> Give dormant users a reason to come back, show them what their money could be doing, then convert them.</span>
+                    <div class="animate-stagger" style="font-size: 0.68em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;">10X Product Strategy — Crypto Growth</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 1.9em; margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
+                    <div class="animate-stagger" style="animation-delay: 0.15s; font-size: 0.85em; line-height: 1.6; max-width: 520px; margin-bottom: 16px;">
+                        <strong style="color: #1a1a2e;">Robinhood doesn't have an acquisition problem — it has an activation problem.</strong>
+                        <span style="opacity: 0.6;"> 14M funded accounts sit dormant. Spending insights give them a reason to come back.</span>
                     </div>
-                    <div class="animate-stagger" style="animation-delay: 0.3s; margin-top: 20px; font-size: 0.78em; opacity: 0.45; line-height: 1.5;">
-                        ← Explore the interactive prototype to see spending insights in action
+
+                    <!-- Compact problem stats inline -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <div class="animate-stagger" style="animation-delay: 0.25s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #e8445a; background: rgba(232,68,90,0.03); border-radius: 0 8px 8px 0;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #e8445a;">14M</div>
+                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">Dormant funded accounts<br>Half the user base</div>
+                        </div>
+                        <div class="animate-stagger" style="animation-delay: 0.35s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #f0a500; background: rgba(240,165,0,0.03); border-radius: 0 8px 8px 0;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #f0a500;">-13%</div>
+                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">MAU decline YoY<br>The bucket is leaking</div>
+                        </div>
+                        <div class="animate-stagger" style="animation-delay: 0.45s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #0052FF; background: rgba(0,82,255,0.03); border-radius: 0 8px 8px 0;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #0052FF;">3.6M</div>
+                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">Post-Mint users displaced<br>No successor product</div>
+                        </div>
+                    </div>
+
+                    <div class="animate-stagger" style="animation-delay: 0.55s; padding: 10px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 1em; flex-shrink: 0;">🔍</div>
+                        <div style="font-size: 0.75em; line-height: 1.4; opacity: 0.7;"><strong style="opacity: 1;">Insight apps</strong> can't invest. <strong style="opacity: 1;">Brokerages</strong> can't track spending. <strong style="opacity: 1;">No product bridges the gap.</strong></div>
+                    </div>
+
+                    <div class="animate-stagger" style="animation-delay: 0.65s; margin-top: 12px; font-size: 0.72em; opacity: 0.35;">
+                        ← Live demo: spending insights driving the reactivation funnel
                     </div>
                 </div>
             </div>
 
-            <!-- DEMO SLIDE 2: The Problem -->
+            <!-- DEMO SLIDE 2: Why Now -->
             <div class="slide fade-enter" data-slide="14" data-section="Demo">
                 <div class="slide-content">
-                    <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b45309; margin-bottom: 6px;" class="animate-stagger">The Problem</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">The Bucket Is Leaking</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.85em;">Accounts grow, engagement shrinks — half the base isn't coming back for trading</div>
+                    <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.82em;">Three tailwinds converging to create a narrow window</div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; border-left: 3px solid #e8445a; padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2em; font-weight: 700; color: #e8445a; flex-shrink: 0;">14M</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 0.85em;">Dormant funded accounts</div>
-                                <div style="font-size: 0.72em; opacity: 0.5;">27M total accounts, only 13M active monthly</div>
+                        <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; border-left: 4px solid #059669;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">1</div>
+                                <div style="font-weight: 700; font-size: 0.88em;">Mint is Dead</div>
                             </div>
+                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">3.6M users lost their budgeting tool overnight. No clear successor has emerged — the market is wide open for an insight→action product.</div>
                         </div>
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; border-left: 3px solid #f0a500; padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2em; font-weight: 700; color: #f0a500; flex-shrink: 0;">-13%</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 0.85em;">MAU decline year-over-year</div>
-                                <div style="font-size: 0.72em; opacity: 0.5;">Q4 2025 — the bucket is leaking</div>
+                        <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; border-left: 4px solid #3b78dc;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #dbeafe; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">2</div>
+                                <div style="font-weight: 700; font-size: 0.88em;">Plaid Infrastructure Ready</div>
                             </div>
+                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">Open banking APIs make multi-account aggregation trivial. Spending data from any bank, surfaced inside Robinhood — no new KYC needed.</div>
                         </div>
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; border-left: 3px solid #0052FF; padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2em; font-weight: 700; color: #0052FF; flex-shrink: 0;">3.6M</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 0.85em;">Post-Mint users displaced</div>
-                                <div style="font-size: 0.72em; opacity: 0.5;">No insight→action product has filled the vacuum</div>
+                        <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; border-left: 4px solid #f0a500;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">3</div>
+                                <div style="font-weight: 700; font-size: 0.88em;">Super-App Window Is Open</div>
                             </div>
+                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">RH CPO: "next big step is tackling spending." Banking + Gold Card + crypto + insights — only Robinhood has 27M users with all the rails already built.</div>
                         </div>
                     </div>
 
-                    <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 12px; padding: 12px 16px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
-                        <div style="font-size: 1.1em; flex-shrink: 0;">🔍</div>
-                        <div style="font-size: 0.78em; line-height: 1.5; opacity: 0.7;"><strong style="opacity: 1;">Insight apps</strong> can't invest. <strong style="opacity: 1;">Brokerages</strong> can't track spending. No product bridges the gap.</div>
+                    <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 12px; padding: 10px 14px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.15); border-radius: 8px;">
+                        <div style="font-size: 0.75em; line-height: 1.5; opacity: 0.7;"><strong style="color: #059669; opacity: 1;">$0 customer acquisition cost</strong> — 14M funded accounts already exist. Free spending insights is the hook, not paid marketing.</div>
                     </div>
                 </div>
             </div>
@@ -3070,7 +3121,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v1.4</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v1.7</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
@@ -3115,9 +3166,6 @@
         
         // Demo Carousel
         const demoImages = [
-            { src: 'screenshots/nav-0.0.png', label: 'Nav: Overview' },
-            { src: 'screenshots/nav-0.1.png', label: 'Nav: Setup' },
-            { src: 'screenshots/nav-0.2.png', label: 'Nav: Onboarding' },
             { src: 'screenshots/nav-1.png', label: 'Nav: Family Pairing' },
             { src: 'screenshots/nav-2.png', label: 'Nav: Settings' },
             { src: 'screenshots/nav-3.png', label: 'Nav: Controls' },
@@ -3143,7 +3191,7 @@
             { src: 'screenshots/parent-18.jpeg', label: 'Parent: Review' },
             { src: 'screenshots/parent-19.jpeg', label: 'Parent: Complete' }
         ];
-        let demoIdx = 3; // Start at nav-1 (first existing screenshot); nav-0.x entries ready for when files are added
+        let demoIdx = 0;
         let demoInterval = null;
 
         function updateDemoCarousel() {
