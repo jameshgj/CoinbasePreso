@@ -1065,9 +1065,17 @@
         /* Screenshot Lightbox */
         .screenshot-expandable { cursor: zoom-in; transition: transform 0.3s ease; }
         .screenshot-expandable:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 82, 255, 0.4); }
-        .screenshot-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; cursor: zoom-out; justify-content: center; align-items: center; }
+        .screenshot-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; justify-content: center; align-items: center; }
         .screenshot-overlay.active { display: flex; }
-        .screenshot-overlay img { max-height: 90vh; max-width: 90vw; border-radius: 12px; border: 2px solid rgba(0, 82, 255, 0.5); }
+        .screenshot-overlay img { max-height: 85vh; max-width: 70vw; border-radius: 12px; border: 2px solid rgba(0, 82, 255, 0.5); user-select: none; }
+        .overlay-close { position: absolute; top: 20px; right: 24px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 2010; }
+        .overlay-close:hover { background: rgba(255,255,255,0.25); }
+        .overlay-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 2010; }
+        .overlay-nav:hover { background: rgba(255,255,255,0.25); }
+        .overlay-nav.prev { left: 24px; }
+        .overlay-nav.next { right: 24px; }
+        .overlay-counter { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500; z-index: 2010; }
+        .overlay-label { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 600; z-index: 2010; white-space: nowrap; }
         /* Sequential reveal cards */
         .reveal-card .card-inner {
             filter: blur(2px);
@@ -1939,6 +1947,8 @@
         .slide[data-slide="15"] .slide-content,
         .slide[data-slide="16"] .slide-content {
             margin-left: 420px;
+            justify-content: flex-start !important;
+            padding-top: 18vh !important;
         }
         </style>
 </head>
@@ -3138,7 +3148,12 @@
 
     <!-- Screenshot Overlay -->
     <div class="screenshot-overlay" id="screenshot-overlay">
+        <div class="overlay-label" id="overlay-label"></div>
+        <button class="overlay-close" id="overlay-close" onclick="closeScreenshotOverlay()">&times;</button>
+        <button class="overlay-nav prev" id="overlay-prev" onclick="overlayPrev()">&#8249;</button>
         <img id="screenshot-overlay-img" src="" alt="Expanded screenshot">
+        <button class="overlay-nav next" id="overlay-next" onclick="overlayNext()">&#8250;</button>
+        <div class="overlay-counter" id="overlay-counter"></div>
     </div>
 
     <script>
@@ -3214,12 +3229,14 @@
         function startDemoCarousel() { /* no auto-advance */ }
         function stopDemoCarousel() { /* no auto-advance */ }
 
-        // Click on demo image to advance manually
+        // Click on demo carousel image to open fullscreen overlay
         const demoCarouselEl = document.getElementById('demo-carousel');
         if (demoCarouselEl) {
+            demoCarouselEl.style.cursor = 'pointer';
             demoCarouselEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                demoNext();
+                e.preventDefault();
+                openCarouselOverlay();
             });
         }
 
@@ -3417,6 +3434,8 @@
 
             // Keyboard Navigation
             document.addEventListener('keydown', (e) => {
+                // Skip slide navigation when screenshot overlay is open
+                if (document.getElementById('screenshot-overlay').classList.contains('active')) return;
                 if (e.key === 'ArrowRight' || e.key === ' ') {
                     e.preventDefault();
                     nextSlide();
@@ -3433,6 +3452,7 @@
                 if (e.target.closest('a[href]')) return;
                 if (e.target.classList.contains('screenshot-expandable')) return;
                 if (e.target.closest('.screenshot-overlay')) return;
+                if (e.target.closest('#demo-carousel')) return;
                 if (document.getElementById('screenshot-overlay').classList.contains('active')) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 if (e.clientX < rect.width / 3) {
@@ -3829,17 +3849,76 @@
             });
         }
 
-        // Screenshot lightbox
+        // Screenshot lightbox (general expandable screenshots)
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('screenshot-expandable')) {
                 e.stopPropagation();
                 document.getElementById('screenshot-overlay-img').src = e.target.src;
+                document.getElementById('overlay-label').textContent = '';
+                document.getElementById('overlay-counter').textContent = '';
+                document.getElementById('overlay-prev').style.display = 'none';
+                document.getElementById('overlay-next').style.display = 'none';
                 document.getElementById('screenshot-overlay').classList.add('active');
+                document.getElementById('screenshot-overlay')._mode = 'single';
             }
         });
-        document.getElementById('screenshot-overlay').addEventListener('click', (e) => {
-            e.stopPropagation();
+
+        // Carousel fullscreen overlay
+        let overlayOpen = false;
+        let overlayJustOpened = false;
+        function openCarouselOverlay() {
+            overlayOpen = true;
+            overlayJustOpened = true;
+            updateOverlayImage();
+            document.getElementById('overlay-prev').style.display = 'flex';
+            document.getElementById('overlay-next').style.display = 'flex';
+            document.getElementById('screenshot-overlay').classList.add('active');
+            document.getElementById('screenshot-overlay')._mode = 'carousel';
+            setTimeout(() => { overlayJustOpened = false; }, 100);
+        }
+        function updateOverlayImage() {
+            const img = document.getElementById('screenshot-overlay-img');
+            img.src = demoImages[demoIdx].src;
+            document.getElementById('overlay-label').textContent = demoImages[demoIdx].label;
+            document.getElementById('overlay-counter').textContent = (demoIdx + 1) + ' / ' + demoImages.length;
+        }
+        function overlayNext() {
+            event.stopPropagation();
+            demoIdx = (demoIdx + 1) % demoImages.length;
+            updateOverlayImage();
+            updateDemoCarousel();
+        }
+        function overlayPrev() {
+            event.stopPropagation();
+            demoIdx = (demoIdx - 1 + demoImages.length) % demoImages.length;
+            updateOverlayImage();
+            updateDemoCarousel();
+        }
+        function closeScreenshotOverlay() {
+            event.stopPropagation();
+            overlayOpen = false;
             document.getElementById('screenshot-overlay').classList.remove('active');
+        }
+        // Click on overlay backdrop to close (but not the image — clicking image does nothing in carousel mode)
+        document.getElementById('screenshot-overlay').addEventListener('click', (e) => {
+            if (overlayJustOpened) return;
+            if (e.target === document.getElementById('screenshot-overlay')) {
+                e.stopPropagation();
+                overlayOpen = false;
+                document.getElementById('screenshot-overlay').classList.remove('active');
+            }
+        });
+        // Keyboard nav for overlay
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('screenshot-overlay').classList.contains('active')) return;
+            if (document.getElementById('screenshot-overlay')._mode !== 'carousel') {
+                if (e.key === 'Escape') { overlayOpen = false; document.getElementById('screenshot-overlay').classList.remove('active'); e.stopPropagation(); }
+                return;
+            }
+            e.stopPropagation();
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { demoIdx = (demoIdx + 1) % demoImages.length; updateOverlayImage(); updateDemoCarousel(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { demoIdx = (demoIdx - 1 + demoImages.length) % demoImages.length; updateOverlayImage(); updateDemoCarousel(); }
+            else if (e.key === 'Escape') { overlayOpen = false; document.getElementById('screenshot-overlay').classList.remove('active'); }
         });
 
         // Fix squished timeline circles when preserveAspectRatio="none"

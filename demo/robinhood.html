@@ -500,7 +500,7 @@
                         <div id="budget-bars"></div>
                         <div id="budget-alert"></div>
                         <div class="savings-section">
-                            <div class="savings-title">Potential Savings</div>
+                            <div class="savings-title">How to Save More</div>
                             <div id="budget-savings"></div>
                         </div>
                         <div class="goal-card">
@@ -519,17 +519,16 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="cta-btn primary" onclick="app.switchFeatureTab('rules')">Set up auto-sweep to USDC</button>
                         <button class="cta-btn ghost" onclick="alert('Edit budget limits for each category')">Edit budgets</button>
                     </div>
 
                     <!-- YIELDS -->
                     <div class="tab-content hidden" id="yields-content">
-                        <div id="yields-intro" style="font-size:13px; color:#6b7280; margin-bottom:16px; line-height:1.5;"></div>
-                        <div id="yields-tiers"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:12px; margin-top:8px;">YOUR SAVINGS MIX</div>
+                        <div id="yields-intro" style="display:none;"></div>
+                        <div id="yields-tiers" style="display:none;"></div>
+                        <div class="projected-yield" id="yields-projected" style="margin-bottom:12px;"></div>
+                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADJUST YOUR SAVINGS MIX</div>
                         <div id="yields-sliders"></div>
-                        <div class="projected-yield" id="yields-projected"></div>
                         <button class="cta-btn primary" onclick="app.switchFeatureTab('rules')" style="margin-top:16px;">Set up yield rules</button>
                     </div>
 
@@ -810,20 +809,21 @@ const app = {
         const period = this.state.activePeriod;
 
         const periodCfg = {
-            '1w':  { days: 7,   seed: 10, unit: 'Day' },
-            '1m':  { days: 30,  seed: 42, unit: 'Day' },
-            '3m':  { days: 90,  seed: 55, unit: 'Day' },
-            'ytd': { days: 90,  seed: 65, unit: 'Day' },
-            '1y':  { days: 52,  seed: 80, unit: 'Wk' },
-            'all': { days: 24,  seed: 99, unit: 'Mo' }
+            '1w':  { days: 7,   seed: 10, unit: 'Day', spiky: 1.8 },
+            '1m':  { days: 30,  seed: 42, unit: 'Day', spiky: 1.2 },
+            '3m':  { days: 90,  seed: 55, unit: 'Day', spiky: 0.7 },
+            'ytd': { days: 90,  seed: 65, unit: 'Day', spiky: 0.6 },
+            '1y':  { days: 52,  seed: 80, unit: 'Wk',  spiky: 0.4 },
+            'all': { days: 24,  seed: 99, unit: 'Mo',  spiky: 0.25 }
         };
         const cfg = periodCfg[period] || periodCfg['1m'];
         const steps = Math.min(cfg.days, 60);
         const rng = seededRandom(cfg.seed);
+        const spike = cfg.spiky;
 
         const daily = cats.map(c => {
             const d = [], b = c.amount / steps;
-            for (let i = 0; i < steps; i++) d.push(b * (0.6 + rng() * 0.8));
+            for (let i = 0; i < steps; i++) d.push(b * (1 - spike/2 + rng() * spike));
             return d;
         });
 
@@ -1198,29 +1198,27 @@ const app = {
             { name: 'Shopping', spent: 310, limit: 300 },
             { name: 'Subscriptions', spent: 140, limit: 150 },
             { name: 'Transport', spent: 200, limit: 250 },
-            { name: 'Utilities', spent: 185, limit: 200 },
-            { name: 'Savings', spent: 95, limit: 200 }
+            { name: 'Utilities', spent: 185, limit: 200 }
         ];
 
         const totalSpent = budgets.reduce((s,b) => s + b.spent, 0);
         const totalBudget = budgets.reduce((s,b) => s + b.limit, 0);
-        const spendingOnly = budgets.filter(b => b.name !== 'Savings').reduce((s,b) => s + b.spent, 0);
-        const savingsSpent = 95;
-        const spendPct = Math.round((spendingOnly / totalSpent) * 100);
-        const savePct = 100 - spendPct;
+        const totalSavings = 354;
 
         document.getElementById('budget-summary-area').innerHTML =
-            '<div class="budget-summary">' +
-                '<div class="budget-summary-row"><div class="budget-summary-label">Total spent</div><div class="budget-summary-value">$'+totalSpent.toLocaleString()+' / $'+totalBudget.toLocaleString()+'</div></div>' +
-                '<div class="budget-summary-bar">' +
-                    '<div class="budget-summary-fill" style="width:'+spendPct+'%; background:#f97316;"></div>' +
-                    '<div class="budget-summary-fill" style="width:'+savePct+'%; background:#FFD700;"></div>' +
+            '<div style="display:flex; gap:8px; margin-bottom:14px;">' +
+                '<div style="flex:1; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px;">' +
+                    '<div style="font-size:11px; color:#9a3412; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Total Spent</div>' +
+                    '<div style="font-size:22px; font-weight:700; color:#ea580c;">$'+totalSpent.toLocaleString()+'</div>' +
+                    '<div style="font-size:11px; color:#9a3412; opacity:0.7;">of $'+totalBudget.toLocaleString()+' budget</div>' +
                 '</div>' +
-                '<div style="display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:#6b7280;">' +
-                    '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;margin-right:4px;"></span>Spending $'+spendingOnly.toLocaleString()+'</span>' +
-                    '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FFD700;margin-right:4px;"></span>Savings $'+savingsSpent+'</span>' +
+                '<div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px;">' +
+                    '<div style="font-size:11px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Potential Savings</div>' +
+                    '<div style="font-size:22px; font-weight:700; color:#16a34a;">$'+totalSavings+'/mo</div>' +
+                    '<div style="font-size:11px; color:#166534; opacity:0.7;">$'+(totalSavings*12).toLocaleString()+'/yr</div>' +
                 '</div>' +
-            '</div>';
+            '</div>' +
+            '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="margin-bottom:14px; padding:10px; font-size:12px;">⚡ Auto-sweep savings → USDC (4.1% APY)</button>';
 
         const container = document.getElementById('budget-bars');
         container.innerHTML = '';
@@ -1241,8 +1239,7 @@ const app = {
         document.getElementById('budget-savings').innerHTML =
             '<div class="savings-item">Cut food delivery 40% → Save <strong>$112/mo</strong></div>' +
             '<div class="savings-item">Review subscription usage → Save <strong>$42/mo</strong></div>' +
-            '<div class="savings-item">Increase savings auto-transfer → <strong>$200/mo</strong></div>' +
-            '<div class="savings-total">Total potential: $354/mo ($4,248/yr) → sweep to USDC for $174/yr extra yield</div>';
+            '<div class="savings-item">Increase savings auto-transfer → <strong>$200/mo</strong></div>';
     },
 
     // ===== YIELDS =====
