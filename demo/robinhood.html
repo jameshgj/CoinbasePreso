@@ -792,7 +792,7 @@ const app = {
         if (toggleBtn) toggleBtn.style.display = (t === 'overview') ? 'block' : 'none';
         if (t === 'overview') this.drawOverviewChart();
         else if (t === 'budget') this.drawBudgetChart();
-        else if (t === 'savings') this.drawSavingsChart();
+        else if (t === 'savings') this.drawBudgetChart();
         else if (t === 'rules') this.drawRulesChart();
     },
 
@@ -1585,8 +1585,8 @@ const app = {
                 '</div>' +
                 projRow('Starting balance', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
                 projRow('Savings deposits ($'+MONTHLY_SAVINGS+'/mo × '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
-                projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months), '#059669', false) +
-                (s.checkingToUsdc ? projRow('Checking yield at '+(RATES.usdc*100).toFixed(1)+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) : '') +
+                projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
+                projRow('Checking yield at '+(s.checkingToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.checking*100).toFixed(2))+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) +
                 (s.goldCard ? projRow('Gold Card cashback ($'+monthlyCashback+'/mo)', deltaGoldCard, '#1d4ed8', false) : '') +
                 projRow('Total', total, anyActive ? '#166534' : '#374151', true) +
                 (gain > 0 ? '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' more than doing nothing</span></div>' : '') +
@@ -1604,7 +1604,7 @@ const app = {
                 '$'+monthlyCashback+'/mo cashback auto-invested into USDC',
                 deltaGoldCard, s.goldCard);
 
-        this.drawSavingsChart();
+        this.drawBudgetChart();
     },
 
     // ===== RULES =====
