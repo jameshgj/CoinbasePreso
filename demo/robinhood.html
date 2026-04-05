@@ -154,7 +154,7 @@
         .insight-card.info { border-left-color: #3b82f6; background: #eff6ff; }
 
         .linked-accounts {
-            display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9ca3af; margin-bottom: 16px; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 6px; font-size: 11px; color: #9ca3af; margin-bottom: 16px; overflow: hidden; white-space: nowrap;
         }
         .add-account-btn {
             width: 20px; height: 20px; border-radius: 50%; background: #f3f4f6;
@@ -485,37 +485,17 @@
 
                     <!-- BUDGET -->
                     <div class="tab-content hidden" id="budget-content">
+                        <div id="budget-goal"></div>
                         <div id="budget-summary-area"></div>
                         <div id="budget-bars"></div>
-                        <div id="budget-alert"></div>
-                        <div class="savings-section">
-                            <div class="savings-title">How to Save More</div>
-                            <div id="budget-savings"></div>
-                        </div>
-                        <div class="goal-card">
-                            <div class="goal-header">
-                                <div>
-                                    <div class="goal-title">Vacation Fund</div>
-                                    <div class="goal-amount">$1,200 / $3,000</div>
-                                    <div class="goal-timeline">12 months to go · With USDC yield: 11 months</div>
-                                </div>
-                                <div class="goal-progress-container">
-                                    <svg class="goal-progress-svg" viewBox="0 0 60 60">
-                                        <circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>
-                                        <circle cx="30" cy="30" r="25" fill="none" stroke="#00C805" stroke-width="3" stroke-dasharray="62.83 157.08" transform="rotate(-90 30 30)"/>
-                                        <text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">40%</text>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
                         <div id="budget-col-ai"></div>
                         <button class="cta-btn ghost" onclick="alert('Edit budget limits for each category')">Edit budgets</button>
                     </div>
 
                     <!-- SAVINGS (combines Yields + What If) -->
                     <div class="tab-content hidden" id="savings-content">
-                        <div id="savings-summary" style="margin-bottom:12px;"></div>
-                        <div class="projected-yield" id="savings-projected" style="margin-bottom:12px;"></div>
+                        <div id="savings-balance-area" style="margin-bottom:12px;"></div>
+                        <div id="savings-apy-area" style="margin-bottom:12px;"></div>
                         <div style="display:flex; gap:6px; margin-bottom:12px;">
                             <button onclick="app.setPreset('safe')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #d1fae5; background:#f0fdf4; font-size:11px; font-weight:600; color:#065f46; cursor:pointer;">Safe Saver</button>
                             <button onclick="app.setPreset('balanced')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; font-size:11px; font-weight:600; color:#1e40af; cursor:pointer;">Balanced</button>
@@ -597,7 +577,8 @@ const app = {
         chartCumulative: false,
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
-        allocations: { safe: 55, moderate: 30, growth: 15 },
+        breakdownOpen: false,
+            allocations: { safe: 55, moderate: 30, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
             { name: 'Groceries',     color: '#00C805', amount: 520, count: 18, change: -5 },
@@ -1190,49 +1171,60 @@ const app = {
 
     // ===== OVERVIEW =====
     renderOverviewTab() {
-        const container = document.getElementById('overview-categories');
-        container.innerHTML = '';
-        const hl = this.state.highlightedCategory;
         const scaledCats = this.getScaledCategories();
         const period = this.state.activePeriod;
-        const cfg = this.periodScales[period] || this.periodScales['1m'];
-
-        // Scale transaction counts by period
+        const hl = this.state.highlightedCategory;
         const countScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 };
         const cs = countScale[period] || 1;
+        const periodLabel = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' };
+        const pl = periodLabel[period] || 'this month';
 
+        const diningCat = scaledCats.find(c => c.name === 'Dining');
+        const shoppingCat = scaledCats.find(c => c.name === 'Shopping');
+        const transportCat = scaledCats.find(c => c.name === 'Transport');
+        const subsCat = scaledCats.find(c => c.name === 'Subscriptions');
+        const totalSpend = scaledCats.reduce((s, c) => s + c.amount, 0);
+
+        // Insights first (based on actual spend data)
+        document.getElementById('overview-insights').innerHTML =
+            '<div class="section-label">Insights</div>' +
+            (diningCat && diningCat.change > 0 ? '<div class="insight-card warning"><strong>Dining up '+diningCat.change+'%</strong> '+pl+' — $'+Math.round(diningCat.amount)+' across '+Math.max(1,Math.round(diningCat.count*cs))+' transactions. Delivery apps account for ~40%</div>' : '') +
+            (shoppingCat && shoppingCat.change > 0 ? '<div class="insight-card warning"><strong>Shopping up '+shoppingCat.change+'%</strong> '+pl+' — $'+Math.round(shoppingCat.amount)+' across '+Math.max(1,Math.round(shoppingCat.count*cs))+' purchases</div>' : '') +
+            (transportCat && transportCat.change < 0 ? '<div class="insight-card success"><strong>Transport down '+Math.abs(transportCat.change)+'%</strong> '+pl+' — spending $'+Math.round(transportCat.amount)+', well within budget</div>' : '') +
+            '<div class="insight-card info"><strong>Subscriptions: $'+(subsCat ? Math.round(subsCat.amount) : 140)+'</strong> '+pl+' — '+Math.max(1,Math.round((subsCat ? subsCat.count : 8)*cs))+' active services. Review to find savings</div>' +
+            '<div class="insight-card success"><strong>Auto-save on track</strong> — $'+MONTHLY_SAVINGS+'/mo transferring. Round-ups adding ~$'+MONTHLY_ROUNDUPS+'/mo extra</div>' +
+            '<div class="sweep-cta" onclick="app.switchFeatureTab(\'savings\')"><div class="sweep-cta-text">See what your savings could earn →</div><div class="sweep-cta-arrow">→</div></div>';
+
+        // Collapsible spending breakdown
+        const container = document.getElementById('overview-categories');
+        let catRows = '';
         scaledCats.forEach(cat => {
-            const row = document.createElement('div');
-            row.className = 'category-row' + (hl === cat.name ? ' highlighted' : '');
-            row.onclick = () => this.handleCategoryClick(cat.name);
-
             let cc = 'neutral', ct = 'No change';
             if (cat.change < 0) { cc = 'good'; ct = '▼ ' + Math.abs(cat.change) + '%'; }
             else if (cat.change > 0) { cc = 'bad'; ct = '▲ ' + cat.change + '%'; }
-
             const cl = cat.name==='Subscriptions' ? 'services' : (cat.name==='Savings' ? 'transfer' : (cat.name==='Utilities' ? 'bills' : 'transactions'));
             const txnCount = Math.max(1, Math.round(cat.count * cs));
-
-            row.innerHTML =
+            catRows +=
+                '<div class="category-row'+(hl === cat.name ? ' highlighted' : '')+'" onclick="app.handleCategoryClick(\''+cat.name+'\')">' +
                 '<div class="category-left"><div class="category-dot" style="background:'+cat.color+'"></div><div class="category-info"><div class="category-name">'+cat.name+'</div><div class="category-count">'+txnCount+' '+cl+'</div></div></div>' +
-                '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div></div>';
-            container.appendChild(row);
+                '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div></div></div>';
         });
 
-        // Period-aware insights
-        const periodLabel = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' };
-        const pl = periodLabel[period] || 'this month';
-        const diningAmt = scaledCats.find(c => c.name === 'Dining');
-        const transportCat = scaledCats.find(c => c.name === 'Transport');
+        const isOpen = this.state.breakdownOpen;
+        container.innerHTML =
+            '<div onclick="app.toggleBreakdown()" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; cursor:pointer; border-bottom:1px solid #f3f4f6; margin-bottom:'+(isOpen?'8':'0')+'px;">' +
+                '<div style="display:flex; align-items:center; gap:8px;">' +
+                    '<span style="font-size:12px; font-weight:600; color:#374151;">Spending Breakdown</span>' +
+                    '<span style="font-size:11px; color:#9ca3af;">'+scaledCats.length+' categories · $'+Math.round(totalSpend).toLocaleString()+'</span>' +
+                '</div>' +
+                '<span style="font-size:10px; color:#9ca3af; transition:transform 0.2s; transform:rotate('+(isOpen?'180':'0')+'deg);">▼</span>' +
+            '</div>' +
+            '<div style="'+(isOpen ? '' : 'display:none;')+'">'+catRows+'</div>';
+    },
 
-        document.getElementById('overview-insights').innerHTML =
-            '<div class="section-label">Insights</div>' +
-            '<div class="insight-card warning"><strong>Food delivery up '+(diningAmt ? Math.abs(diningAmt.change) : 23)+'%</strong> '+pl+' — $'+Math.round((diningAmt ? diningAmt.amount : 280) * 0.4)+' on DoorDash alone</div>' +
-            '<div class="insight-card warning"><strong>8 active subscriptions</strong> — Hulu, ClassPass, Adobe CC unused 30+ days. Cancel → auto-invest $73/mo in USDC</div>' +
-            '<div class="insight-card success"><strong>Transport down '+(transportCat ? Math.abs(transportCat.change) : 15)+'%</strong> — nice work with the bus pass switch</div>' +
-            '<div class="insight-card info"><strong>Utilities stable</strong> — Electric bill up 3% (seasonal). Water & gas unchanged</div>' +
-            '<div class="insight-card success"><strong>Auto-save on track</strong> — $'+MONTHLY_SAVINGS+'/mo transferring. Round-ups adding ~$18/mo extra</div>' +
-            '<div class="sweep-cta" onclick="app.switchFeatureTab(\'savings\')"><div class="sweep-cta-text">See what your savings could earn →</div><div class="sweep-cta-arrow">→</div></div>';
+    toggleBreakdown() {
+        this.state.breakdownOpen = !this.state.breakdownOpen;
+        this.renderOverviewTab();
     },
 
     handleCategoryClick(name) {
@@ -1278,9 +1270,9 @@ const app = {
         const pn = periodNames[period] || 'This Month';
 
         const baseBudgets = [
-            { name: 'Dining', spent: 280, limit: 250 },
+            { name: 'Dining', spent: 280, limit: 250, insight: 'Delivery apps account for ~40% ($'+Math.round(280*0.4*ps)+'). Cook 2 more meals/wk to save ~$'+Math.round(50*ps) },
             { name: 'Groceries', spent: 520, limit: 600 },
-            { name: 'Shopping', spent: 310, limit: 300 },
+            { name: 'Shopping', spent: 310, limit: 300, insight: 'Up from last period — set a spending alert at $'+Math.round(250*ps)+' to stay on track' },
             { name: 'Subscriptions', spent: 140, limit: 150 },
             { name: 'Transport', spent: 200, limit: 250 },
             { name: 'Utilities', spent: 185, limit: 200 }
@@ -1289,7 +1281,8 @@ const app = {
         const budgets = baseBudgets.map(b => ({
             name: b.name,
             spent: Math.round(b.spent * ps),
-            limit: Math.round(b.limit * ps)
+            limit: Math.round(b.limit * ps),
+            insight: b.insight || null
         }));
 
         const totalSpent = budgets.reduce((s,b) => s + b.spent, 0);
@@ -1297,47 +1290,65 @@ const app = {
         const underBudget = totalSpent <= totalBudget;
         const netDiff = Math.abs(totalBudget - totalSpent);
 
-        // Forecast savings: period-aware projection
+        // Forecast savings
         const forecastMap = {
-            '1w':  { amount: Math.round(MONTHLY_SAVINGS / 4.33), label: '$'+MONTHLY_SAVINGS+'/mo ÷ 4.3 weeks' },
-            '1m':  { amount: MONTHLY_SAVINGS, label: '$'+MONTHLY_SAVINGS+'/mo auto-transfer' },
-            '3m':  { amount: MONTHLY_SAVINGS * 3, label: '$'+MONTHLY_SAVINGS+'/mo × 3 months' },
-            'ytd': { amount: MONTHLY_SAVINGS * YTD_MONTHS, label: '$'+MONTHLY_SAVINGS+'/mo × '+YTD_MONTHS+' months YTD' },
-            '1y':  { amount: MONTHLY_SAVINGS * 12, label: '$'+MONTHLY_SAVINGS+'/mo × 12 months' },
-            'all': { amount: MONTHLY_SAVINGS * 60, label: '$'+MONTHLY_SAVINGS+'/mo × 60 months (5yr)' }
+            '1w':  Math.round(MONTHLY_SAVINGS / 4.33),
+            '1m':  MONTHLY_SAVINGS,
+            '3m':  MONTHLY_SAVINGS * 3,
+            'ytd': MONTHLY_SAVINGS * YTD_MONTHS,
+            '1y':  MONTHLY_SAVINGS * 12,
+            'all': MONTHLY_SAVINGS * 60
         };
-        const fc = forecastMap[period] || forecastMap['1m'];
-        const forecastSavings = fc.amount;
-        const forecastLabel = fc.label;
-
-        // Spending card: green when under budget, orange/red when over
-        const spendBg = underBudget ? '#f0fdf4' : '#fff7ed';
-        const spendBorder = underBudget ? '#bbf7d0' : '#fed7aa';
-        const spendColor = underBudget ? '#166534' : '#ea580c';
-        const spendLabelColor = underBudget ? '#166534' : '#9a3412';
-        const spendNote = underBudget
-            ? '$'+netDiff.toLocaleString()+' under budget'
-            : '$'+netDiff.toLocaleString()+' over $'+totalBudget.toLocaleString()+' budget';
-
-        // Under-budget savings
+        const forecastSavings = forecastMap[period] || MONTHLY_SAVINGS;
         const underBudgetSavings = underBudget ? netDiff : 0;
         const totalSavings = forecastSavings + underBudgetSavings;
 
-        document.getElementById('budget-summary-area').innerHTML =
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px; margin-bottom:8px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Total Savings '+pn.toLowerCase()+'</div>' +
-                    '<div style="font-size:20px; font-weight:700; color:#166534;">$'+totalSavings.toLocaleString()+'</div>' +
+        // Vacation fund goal — pinned at top
+        const goalSaved = 1200;
+        const goalTarget = 3000;
+        const goalRemaining = goalTarget - goalSaved;
+        const monthlyToGoal = totalSavings > 0 ? Math.round(totalSavings / (ps > 0 ? ps : 1)) : MONTHLY_SAVINGS;
+        const monthsToGo = Math.ceil(goalRemaining / monthlyToGoal);
+        // With USDC yield, compound monthly
+        let yieldBal = goalSaved, yieldMonths = 0;
+        while (yieldBal < goalTarget && yieldMonths < 60) { yieldBal = yieldBal * (1 + RATES.usdc/12) + monthlyToGoal; yieldMonths++; }
+        const goalPct = Math.round((goalSaved / goalTarget) * 100);
+        const dashLen = (goalPct / 100) * 157.08;
+
+        document.getElementById('budget-goal').innerHTML =
+            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px; margin-bottom:10px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                    '<div>' +
+                        '<div style="font-size:11px; font-weight:700; color:#166534;">Vacation Fund</div>' +
+                        '<div style="font-size:18px; font-weight:700; color:#111; margin:2px 0;">$'+goalSaved.toLocaleString()+' <span style="font-size:12px; font-weight:400; color:#6b7280;">/ $'+goalTarget.toLocaleString()+'</span></div>' +
+                        '<div style="font-size:10px; color:#166534;">'+monthsToGo+' months to go · With USDC yield: '+yieldMonths+' months</div>' +
+                        '<div style="font-size:10px; color:#9ca3af; margin-top:2px;">Saving ~$'+monthlyToGoal+'/mo toward goal</div>' +
+                    '</div>' +
+                    '<svg viewBox="0 0 60 60" style="width:50px; height:50px;">' +
+                        '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
+                        '<circle cx="30" cy="30" r="25" fill="none" stroke="#00C805" stroke-width="3" stroke-dasharray="'+dashLen.toFixed(1)+' 157.08" transform="rotate(-90 30 30)"/>' +
+                        '<text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">'+goalPct+'%</text>' +
+                    '</svg>' +
                 '</div>' +
-                '<div style="display:flex; gap:12px; font-size:10px; color:#166534; opacity:0.8;">' +
-                    '<span>$'+forecastSavings.toLocaleString()+' auto-transfer</span>' +
-                    (underBudgetSavings > 0 ? '<span>$'+underBudgetSavings.toLocaleString()+' under-budget</span>' : '') +
-                '</div>' +
-            '</div>' +
-            '<div style="display:flex; gap:6px; margin-bottom:10px;">' +
-                '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="flex:1; padding:10px; font-size:11px;">⚡ Auto-sweep → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)</button>' +
             '</div>';
 
+        // Savings summary
+        document.getElementById('budget-summary-area').innerHTML =
+            '<div style="display:flex; gap:8px; margin-bottom:8px;">' +
+                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:center;">' +
+                    '<div style="font-size:9px; color:#6b7280; font-weight:600; text-transform:uppercase;">Saved '+pn.toLowerCase()+'</div>' +
+                    '<div style="font-size:16px; font-weight:700; color:#166534; margin-top:2px;">$'+totalSavings.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:#9ca3af;">$'+forecastSavings.toLocaleString()+' auto'+(underBudgetSavings > 0 ? ' + $'+underBudgetSavings.toLocaleString()+' surplus' : '')+'</div>' +
+                '</div>' +
+                '<div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; text-align:center;">' +
+                    '<div style="font-size:9px; color:#6b7280; font-weight:600; text-transform:uppercase;">Spent '+pn.toLowerCase()+'</div>' +
+                    '<div style="font-size:16px; font-weight:700; color:'+(underBudget ? '#111' : '#ea580c')+';">$'+totalSpent.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:'+(underBudget ? '#9ca3af' : '#ea580c')+';">'+(underBudget ? '$'+netDiff.toLocaleString()+' under budget' : '$'+netDiff.toLocaleString()+' over budget')+'</div>' +
+                '</div>' +
+            '</div>' +
+            '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="width:100%; padding:10px; font-size:11px; margin-bottom:10px;">Auto-sweep savings → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)</button>';
+
+        // Budget bars with inline insights
         const container = document.getElementById('budget-bars');
         container.innerHTML = '';
 
@@ -1348,88 +1359,48 @@ const app = {
             row.innerHTML =
                 '<div class="budget-label"><div class="budget-category">'+b.name+(pct>100?'<span class="budget-over-badge">OVER</span>':'')+'</div>' +
                 '<div class="budget-stats">$'+b.spent.toLocaleString()+' / $'+b.limit.toLocaleString()+'</div></div>' +
-                '<div class="budget-bar"><div class="budget-fill '+cc+'" style="width:'+Math.min(pct,100)+'%"></div></div>';
+                '<div class="budget-bar"><div class="budget-fill '+cc+'" style="width:'+Math.min(pct,100)+'%"></div></div>' +
+                (b.insight && pct > 100 ? '<div style="font-size:10px; color:#ea580c; margin-top:2px; padding-left:2px;">'+b.insight+'</div>' : '');
             container.appendChild(row);
         });
 
-        const overBudget = budgets.filter(b => b.spent > b.limit);
-        document.getElementById('budget-alert').innerHTML = overBudget.length ?
-            '<div class="alert-box">' + overBudget.map(b => '<strong>'+b.name+'</strong> $'+(b.spent-b.limit)+' over').join(' · ') + ' '+pn.toLowerCase()+'</div>' :
-            '<div class="alert-box" style="border-color:#bbf7d0; background:#f0fdf4; color:#166534;">All categories within budget '+pn.toLowerCase()+' — net savings on track</div>';
+        // Goals overview section
+        const goalSavingsTarget = 300; // monthly savings goal
+        const savingsPct = Math.min(100, Math.round((totalSavings / Math.round(goalSavingsTarget * ps)) * 100));
+        const budgetPct = Math.min(100, Math.round(((totalBudget - totalSpent) / totalBudget) * 100));
+        const vacPct = Math.round((1200 / 3000) * 100);
 
-        document.getElementById('budget-savings').innerHTML =
-            '<div class="savings-item">Cut food delivery 40% → Save <strong>$'+Math.round(112*ps)+'/'+pn.toLowerCase()+'</strong></div>' +
-            '<div class="savings-item">Review subscriptions → Save <strong>$'+Math.round(42*ps)+'</strong></div>' +
-            '<div class="savings-item">Increase auto-transfer → <strong>$'+Math.round(200*ps)+'</strong></div>';
-
-        // Cost of Living AI section
-        const income = this.state.colIncome || 5500;
-        const rent = this.state.colRent || 2100;
-        const afterRent = income - rent;
-        const needsBudget = Math.round(afterRent * 0.50 * ps);
-        const wantsBudget = Math.round(afterRent * 0.30 * ps);
-        const savingsBudget = Math.round(afterRent * 0.20 * ps);
-        const actualNeeds = budgets.filter(b => ['Groceries','Transport','Utilities'].includes(b.name)).reduce((s,b)=>s+b.spent,0);
-        const actualWants = budgets.filter(b => ['Dining','Shopping','Subscriptions'].includes(b.name)).reduce((s,b)=>s+b.spent,0);
-        const actualSaving = forecastSavings;
-        const needsPct = needsBudget > 0 ? Math.round((actualNeeds / needsBudget) * 100) : 0;
-        const wantsPct = wantsBudget > 0 ? Math.round((actualWants / wantsBudget) * 100) : 0;
-        const savePct = savingsBudget > 0 ? Math.round((actualSaving / savingsBudget) * 100) : 0;
-        const score = [needsPct <= 100, wantsPct <= 100, savePct >= 100].filter(Boolean).length;
-
-        const aiBar = (label, pct, actual, limit, color, invert) => {
-            const ok = invert ? pct >= 100 : pct <= 100;
-            const barColor = ok ? '#7c3aed' : '#ea580c';
-            const barPct = Math.min(pct, 120);
-            return '<div style="margin-bottom:8px;">' +
+        const goalBar = (label, pct, detail, ok) => {
+            const barColor = ok ? '#00C805' : '#ea580c';
+            return '<div style="margin-bottom:10px;">' +
                 '<div style="display:flex; justify-content:space-between; margin-bottom:3px;">' +
                     '<span style="font-size:10px; font-weight:600; color:#374151;">'+label+'</span>' +
-                    '<span style="font-size:10px; color:'+(ok?'#7c3aed':'#ea580c')+'; font-weight:600;">$'+actual.toLocaleString()+' / $'+limit.toLocaleString()+(ok?' ✓':' ⚠')+'</span>' +
+                    '<span style="font-size:10px; color:'+(ok?'#166534':'#ea580c')+'; font-weight:600;">'+detail+'</span>' +
                 '</div>' +
-                '<div style="height:6px; background:#ede9fe; border-radius:3px; overflow:hidden;">' +
-                    '<div style="height:100%; width:'+Math.min(barPct,100)+'%; background:'+barColor+'; border-radius:3px; transition:width 0.3s;"></div>' +
+                '<div style="height:6px; background:#e5e7eb; border-radius:3px; overflow:hidden;">' +
+                    '<div style="height:100%; width:'+pct+'%; background:'+barColor+'; border-radius:3px; transition:width 0.3s;"></div>' +
                 '</div>' +
             '</div>';
         };
 
-        const insight = score === 3
-            ? '<span style="color:#7c3aed;">On track — spending aligns with your income.</span>'
-            : savePct < 100
-                ? '<span style="color:#ea580c;">Savings gap: increase auto-transfer by <strong>$'+Math.max(0, Math.round((savingsBudget - actualSaving) / Math.max(ps,1)))+'/mo</strong> to hit 20%.</span>'
-                : wantsPct > 100
-                    ? '<span style="color:#ea580c;">Wants over by <strong>$'+(actualWants - wantsBudget).toLocaleString()+'</strong> — try cutting a subscription.</span>'
-                    : '<span style="color:#ea580c;">Needs over by <strong>$'+(actualNeeds - needsBudget).toLocaleString()+'</strong> — review grocery or transport spend.</span>';
-
+        const allOnTrack = underBudget && savingsPct >= 80;
         document.getElementById('budget-col-ai').innerHTML =
-            '<div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:12px; padding:14px; margin-top:10px;">' +
+            '<div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-top:10px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
-                    '<div style="display:flex; align-items:center; gap:6px;">' +
-                        '<span style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.5px;">Cost of Living AI</span>' +
-                        '<span style="font-size:9px; background:'+(score===3?'#7c3aed':'#ea580c')+'; color:white; padding:1px 6px; border-radius:8px; font-weight:600;">'+score+'/3</span>' +
-                    '</div>' +
-                    '<button onclick="app.editCOLAssumptions()" style="font-size:9px; color:#7c3aed; background:none; border:1px solid #d8b4fe; border-radius:6px; padding:2px 8px; cursor:pointer; font-weight:500;">Edit</button>' +
+                    '<span style="font-size:11px; font-weight:700; color:#374151; text-transform:uppercase; letter-spacing:0.5px;">Goals Overview</span>' +
+                    '<span style="font-size:9px; background:'+(allOnTrack?'#00C805':'#f59e0b')+'; color:white; padding:2px 8px; border-radius:8px; font-weight:600;">'+(allOnTrack?'On Track':'Needs Attention')+'</span>' +
                 '</div>' +
-                '<div style="display:flex; gap:12px; margin-bottom:10px; font-size:10px; color:#6b21a8;">' +
-                    '<span>Income <strong>$'+income.toLocaleString()+'</strong>/mo</span>' +
-                    '<span>Rent <strong>$'+rent.toLocaleString()+'</strong>/mo</span>' +
-                    '<span style="opacity:0.6;">50/30/20</span>' +
+                goalBar('Vacation Fund', vacPct, '$1,200 / $3,000 · '+vacPct+'%', true) +
+                goalBar('Monthly Savings Goal', savingsPct, '$'+totalSavings.toLocaleString()+' / $'+Math.round(goalSavingsTarget*ps).toLocaleString(), savingsPct >= 80) +
+                goalBar('Budget Discipline', underBudget ? budgetPct : 0, underBudget ? '$'+netDiff.toLocaleString()+' under' : '$'+netDiff.toLocaleString()+' over', underBudget) +
+                '<div style="font-size:10px; color:#6b7280; margin-top:4px;">' +
+                    (allOnTrack
+                        ? 'All goals on track — auto-sweep savings into USDC to accelerate your vacation fund.'
+                        : underBudget
+                            ? 'Increase monthly savings to $'+goalSavingsTarget+' to hit your target. Consider auto-sweep to maximize yield.'
+                            : 'Dining and Shopping are over budget. Reduce by $'+netDiff.toLocaleString()+' to free up savings.') +
                 '</div>' +
-                aiBar('Needs', needsPct, actualNeeds, needsBudget, '#7c3aed', false) +
-                aiBar('Wants', wantsPct, actualWants, wantsBudget, '#7c3aed', false) +
-                aiBar('Savings', savePct, actualSaving, savingsBudget, '#7c3aed', true) +
-                '<div style="font-size:10px; margin-top:4px;">'+insight+'</div>' +
             '</div>';
-    },
-
-    editCOLAssumptions() {
-        const inc = prompt('Monthly take-home income ($):', this.state.colIncome);
-        if (inc === null) return;
-        const r = prompt('Monthly rent ($):', this.state.colRent);
-        if (r === null) return;
-        this.state.colIncome = Math.max(0, parseInt(inc) || 5500);
-        this.state.colRent = Math.max(0, parseInt(r) || 2100);
-        this.renderBudgetTab();
-        this.updateAmountDisplay();
     },
 
     // ===== SAVINGS (combined Yields + What If) =====
@@ -1443,33 +1414,38 @@ const app = {
         const blendedRate = pctTotal > 0 ? ((annualYield / pctTotal) * 100).toFixed(1) : '0';
         const allocDollar = (pct) => Math.round(MONTHLY_SAVINGS * pct / 100);
 
-        // Monthly inflow breakdown with sources
+        // Unified balance + inflow area
         const inflowRow = (label, amount, color) =>
-            '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f3f4f6;">' +
+            '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(0,0,0,0.05);">' +
                 '<span style="font-size:11px; color:#374151;">'+label+'</span>' +
                 '<span style="font-size:11px; font-weight:600; color:'+color+';">$'+amount+'/mo</span>' +
             '</div>';
 
-        document.getElementById('savings-summary').innerHTML =
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px; margin-bottom:8px;">' +
+        document.getElementById('savings-balance-area').innerHTML =
+            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Savings Balance</div>' +
+                    '<div style="font-size:22px; font-weight:700; color:#166534;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
+                '</div>' +
+                '<div style="height:1px; background:#bbf7d0; margin-bottom:10px;"></div>' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Monthly Inflow to Savings</div>' +
-                    '<div style="font-size:18px; font-weight:700; color:#166534;">$'+totalInflow+'/mo</div>' +
+                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Monthly Inflow</div>' +
+                    '<div style="font-size:14px; font-weight:700; color:#166534;">$'+totalInflow+'/mo</div>' +
                 '</div>' +
                 inflowRow('Auto-transfer (savings account)', MONTHLY_SAVINGS, '#166534') +
                 inflowRow('Gold Card cashback', cashback, '#1d4ed8') +
                 inflowRow('Round-ups', MONTHLY_ROUNDUPS, '#9a3412') +
             '</div>';
 
-        // Current rate display
-        document.getElementById('savings-projected').innerHTML =
-            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px; margin-bottom:4px;">' +
+        // Blended APY display
+        document.getElementById('savings-apy-area').innerHTML =
+            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                     '<div>' +
-                        '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Blended Rate</div>' +
+                        '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Blended APY</div>' +
                         '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">'+pctTotal+'% allocated · $'+allocDollar(pctTotal)+'/mo across '+[a.safe>0,a.moderate>0,a.growth>0].filter(Boolean).length+' tiers</div>' +
                     '</div>' +
-                    '<div style="font-size:24px; font-weight:700; color:#2563eb;">'+blendedRate+'%</div>' +
+                    '<div style="font-size:26px; font-weight:700; color:#2563eb;">'+blendedRate+'%</div>' +
                 '</div>' +
             '</div>';
 
@@ -1521,9 +1497,17 @@ const app = {
         }
         const adv = Math.round(proj - bank);
 
-        document.getElementById('savings-projected').innerHTML =
-            'Blended <strong>'+blended+'% APY</strong> · $'+monthlyContrib+'/mo contributions<br>' +
-            '<span style="font-size:11px; color:#047857;">5yr: <strong>$'+Math.round(proj).toLocaleString()+'</strong> vs $'+Math.round(bank).toLocaleString()+' at bank · <strong>+$'+adv.toLocaleString()+' more</strong></span>';
+        document.getElementById('savings-apy-area').innerHTML =
+            '<div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                    '<div>' +
+                        '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Blended APY</div>' +
+                        '<div style="font-size:10px; color:#1e40af; opacity:0.7; margin-top:2px;">'+pctTotal+'% allocated · $'+monthlyContrib+'/mo contributions</div>' +
+                    '</div>' +
+                    '<div style="font-size:26px; font-weight:700; color:#2563eb;">'+blended+'%</div>' +
+                '</div>' +
+                '<div style="margin-top:8px; font-size:11px; color:#047857;">5yr: <strong>$'+Math.round(proj).toLocaleString()+'</strong> vs $'+Math.round(bank).toLocaleString()+' at bank · <strong>+$'+adv.toLocaleString()+' more</strong></div>' +
+            '</div>';
 
         // What-if comparison cards
         const monthlySpend = this.getMonthlyRate();
