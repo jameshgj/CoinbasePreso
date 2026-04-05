@@ -2516,24 +2516,22 @@
                     <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Parent Block Control — Demo</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; margin-bottom: 12px;">Interactive walkthrough of the parent and teen experience</div>
 
-                    <div style="flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; min-height: 0; margin-top: 4px;">
+                    <div style="flex: 1; display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: center; min-height: 0; margin-top: 4px;">
                         <!-- Left: Screenshot carousel -->
-                        <div style="display: flex; align-items: center; gap: 12px; height: 100%;">
-                            <button onclick="demoPrev()" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                                <svg width="14" height="14" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
-                            <div style="display: flex; flex-direction: column; align-items: center;">
-                                <div id="demo-carousel" style="overflow: hidden; border: 1px solid rgba(0,82,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
-                                    <img id="demo-carousel-img" src="screenshots/nav-1.png" style="max-height: 400px; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
-                                    <div id="demo-carousel-label" style="font-size: 0.75em; font-weight: 600; color: #0052FF;">Nav: Family Pairing</div>
-                                    <div id="demo-carousel-counter" style="font-size: 0.68em; color: rgba(26,26,46,0.35); font-weight: 500;">1 / 24</div>
-                                </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div id="demo-carousel" style="overflow: hidden; border: 1px solid rgba(0,82,255,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+                                <img id="demo-carousel-img" src="screenshots/nav-1.png" style="max-height: 340px; width: auto; object-fit: contain; transition: opacity 0.3s ease; display: block;">
                             </div>
-                            <button onclick="demoNext()" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
-                                <svg width="14" height="14" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </button>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                                <button onclick="demoPrev()" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                    <svg width="12" height="12" viewBox="0 0 20 20"><path d="M13 4l-6 6 6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <div id="demo-carousel-label" style="font-size: 0.72em; font-weight: 600; color: #0052FF;">Nav: Family Pairing</div>
+                                <div id="demo-carousel-counter" style="font-size: 0.65em; color: rgba(26,26,46,0.3); font-weight: 500;">1 / 24</div>
+                                <button onclick="demoNext()" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,82,255,0.2); background: rgba(0,82,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,82,255,0.12)'" onmouseout="this.style.background='rgba(0,82,255,0.05)'">
+                                    <svg width="12" height="12" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Right: Design choices -->
