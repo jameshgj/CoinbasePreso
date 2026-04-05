@@ -383,20 +383,20 @@
     <div class="container">
         <div class="left-panel">
             <div class="card active" data-tab="overview">
-                <div class="card-title"><span class="card-number">1</span>The Vision</div>
-                <div class="card-subtitle">Mint + Acorns for crypto — turn Robinhood into where people manage all their money</div>
+                <div class="card-title"><span class="card-number">1</span>The Problem</div>
+                <div class="card-subtitle">27M accounts but only ~4M trade crypto. 14M+ dormant. No spending insights, no savings tools, no reason to open the app beyond trading</div>
             </div>
             <div class="card" data-tab="overview">
-                <div class="card-title"><span class="card-number">2</span>The Problem</div>
-                <div class="card-subtitle">27M accounts, ~4M trade crypto. Revenue drops 38% in bear markets. Mint is dead, Acorns is niche</div>
+                <div class="card-title"><span class="card-number">2</span>The Gap</div>
+                <div class="card-subtitle">No non-trading reason to be on the platform. Revenue drops 38% in bear markets because users have nothing else to do. Mint is dead, leaving 3.6M users without a home</div>
             </div>
             <div class="card" data-tab="savings">
                 <div class="card-title"><span class="card-number">3</span>The Insight</div>
-                <div class="card-subtitle">Average savings: 0.39% APY. Invisible wealth erosion. Acorns proved micro-investing works — now do it with crypto yield</div>
+                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.39% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
             </div>
             <div class="card" data-tab="overview">
                 <div class="card-title"><span class="card-number">4</span>The Strategy</div>
-                <div class="card-subtitle">See everything (Mint) → Find money (budgets) → Auto-invest (Acorns) → Crypto yield (10x)</div>
+                <div class="card-subtitle">Give them Mint (see everything) → insights find the money → auto-invest like Acorns → crypto yield (10x). Two plays: spending insights + savings insights</div>
             </div>
             <div class="card" data-tab="budget">
                 <div class="card-title"><span class="card-number">5</span>The Funnel</div>
@@ -758,21 +758,12 @@ const app = {
                 changeEl.className = dn ? 'amount-change' : 'amount-change negative';
             }
         } else if (tab === 'budget') {
-            const period = this.state.activePeriod;
-            const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
-            const forecastMonths = monthsCfg[period] || 12;
-            const monthlyNet = MONTHLY_SAVINGS + 15;
-            let projected = EXISTING_SAVINGS;
-            for (let i = 0; i < forecastMonths; i++) projected = projected * (1 + RATES.usdc/12) + monthlyNet;
-            mainEl.textContent = '$' + Math.round(projected).toLocaleString();
-            const periodLabels = { '1w': '1mo forecast', '1m': '3mo forecast', '3m': '6mo forecast', 'ytd': '6mo forecast', '1y': '1yr forecast', 'all': '5yr forecast' };
-            const vacTarget = this.state.vacationTarget || 3000;
-            let projVac = 1200;
-            const vacContrib = Math.round((MONTHLY_SAVINGS + 15) * 0.3);
-            for (let i = 0; i < forecastMonths; i++) projVac = projVac * (1 + RATES.usdc/12) + vacContrib;
-            projVac = Math.min(Math.round(projVac), vacTarget);
-            const vacPct = Math.round((projVac / vacTarget) * 100);
-            changeEl.textContent = (periodLabels[period] || 'forecast') + ' · vacation ' + vacPct + '% of $' + vacTarget.toLocaleString();
+            mainEl.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
+            const lastYearMonthly = 1820;
+            const monthlySpend = this.getMonthlyRate();
+            const reduction = ((lastYearMonthly - monthlySpend) / lastYearMonthly * 100).toFixed(1);
+            const onTrack = monthlySpend <= Math.round(lastYearMonthly * 0.95);
+            changeEl.textContent = 'Total savings · Spending ' + (onTrack ? '↓'+reduction+'% on track' : '↑ off track');
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const a = this.state.allocations;
@@ -868,10 +859,12 @@ const app = {
         });
 
         const cumulative = this.state.chartCumulative;
+        const budgetItems = this.getBudgetData();
+        const budgetTotal = budgetItems.reduce((s, b) => s + b.limit, 0);
 
         if (cumulative) {
             // Cumulative: running totals
-            const totalMax = cats.reduce((s,c) => s + c.amount, 0);
+            const totalMax = Math.max(cats.reduce((s,c) => s + c.amount, 0), budgetTotal);
             const yS = gh / (totalMax * 1.15);
 
             this.state.chartPoints = [];
@@ -907,6 +900,17 @@ const app = {
                 const isHL = hl === cats[ci].name, isDim = hl && !isHL;
                 svg.appendChild(svgEl('path', { d: ad, fill: cats[ci].color, opacity: isDim ? '0.12' : (isHL ? '0.95' : '0.65') }));
             }
+            // Budget dotted line (cumulative diagonal)
+            svg.appendChild(svgEl('line', { x1: p, y1: p+gh, x2: p+gw, y2: p+gh-budgetTotal*yS, stroke: '#6b7280', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
+            // Circle where spending first exceeds budget
+            for (let d = 1; d <= steps; d++) {
+                let cumSpend = 0;
+                for (let c = 0; c < cats.length; c++) cumSpend += daily[c].slice(0, d+1).reduce((a,b) => a+b, 0);
+                if (cumSpend > (d/steps) * budgetTotal) {
+                    svg.appendChild(svgEl('circle', { cx: p+(d/steps)*gw, cy: p+gh-cumSpend*yS, r: '5', fill: '#dc2626', stroke: 'white', 'stroke-width': '2' }));
+                    break;
+                }
+            }
         } else {
             // Per-period: daily/weekly/monthly spend
             let dailyMax = 0;
@@ -915,6 +919,8 @@ const app = {
                 for (let c = 0; c < cats.length; c++) total += daily[c][d];
                 if (total > dailyMax) dailyMax = total;
             }
+            const dailyBudget = budgetTotal / steps;
+            dailyMax = Math.max(dailyMax, dailyBudget);
             const yS = gh / (dailyMax * 1.15);
 
             this.state.chartPoints = [];
@@ -950,16 +956,26 @@ const app = {
             const isHL = hl === cats[ci].name, isDim = hl && !isHL;
             svg.appendChild(svgEl('path', { d: ad, fill: cats[ci].color, opacity: isDim ? '0.12' : (isHL ? '0.95' : '0.65') }));
             }
+            // Budget dotted line (daily avg)
+            const budgetLineY = p + gh - dailyBudget * yS;
+            svg.appendChild(svgEl('line', { x1: p, y1: budgetLineY, x2: p+gw, y2: budgetLineY, stroke: '#6b7280', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
+            // Circles where daily spending exceeds budget
+            for (let d = 0; d < steps; d++) {
+                let tot = 0;
+                for (let c = 0; c < cats.length; c++) tot += daily[c][d];
+                if (tot > dailyBudget * 1.05) {
+                    svg.appendChild(svgEl('circle', { cx: p+(d/(steps-1))*gw, cy: p+gh-tot*yS, r: '4', fill: '#dc2626', stroke: 'white', 'stroke-width': '1.5' }));
+                }
+            }
         }
 
-        const budgets = this.getBudgetData();
         document.getElementById('chartLegend').innerHTML = cats.map(c => {
-            const b = budgets.find(x => x.name === c.name);
+            const b = budgetItems.find(x => x.name === c.name);
             const isOver = b && b.spent > b.limit;
             return '<div class="legend-item" style="cursor:'+(isOver?'pointer':'default')+';'+(isOver?' color:#dc2626; font-weight:600;':'')+'" '+(isOver?'onclick="app.openCategoryDrill(\''+c.name+'\')"':'')+'>' +
                 '<div class="legend-dot" style="background:'+c.color+'"></div>'+c.name+(isOver ? ' <span style="font-size:8px; background:#fef2f2; border:1px solid #fecaca; padding:0 3px; border-radius:3px; vertical-align:middle;">OVER</span>' : '') +
             '</div>';
-        }).join('');
+        }).join('') + '<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #6b7280;"></div>Budget</div>';
 
         // Update toggle button label
         const toggleBtn = document.getElementById('chartModeToggle');
@@ -979,77 +995,66 @@ const app = {
         svg.innerHTML = '';
 
         const period = this.state.activePeriod;
-        const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
-        const months = monthsCfg[period] || 12;
-        const monthlyNet = MONTHLY_SAVINGS + 15;
-        const savingsGoal = this.state.savingsGoal || 300;
         const vacationTarget = this.state.vacationTarget || 3000;
 
-        // Compute savings growth over chart period
-        const savingsPts = [], vacationPts = [];
-        let savV = EXISTING_SAVINGS, vacV = 1200; // vacation fund starts at 1200
-        for (let i = 0; i <= months; i++) {
-            savingsPts.push(savV);
-            vacationPts.push(Math.min(vacV, vacationTarget)); // cap at target
-            savV = savV * (1 + RATES.usdc/12) + monthlyNet;
-            vacV = vacV * (1 + RATES.usdc/12) + Math.round(monthlyNet * 0.3); // 30% allocated to vacation
+        // Generate 24 months of historical data
+        const historyMonths = 24;
+        const rng = seededRandom(55);
+        const savingsHistory = [], vacationHistory = [];
+        let sv = 0, vv = 0;
+        const baseContrib = EXISTING_SAVINGS / historyMonths;
+        const vacContrib = 1200 / 18;
+        for (let i = 0; i <= historyMonths; i++) {
+            savingsHistory.push(sv);
+            vacationHistory.push(vv);
+            if (i < historyMonths) {
+                const v = 0.85 + rng() * 0.3;
+                sv = sv * (1 + RATES.usdc/12) + baseContrib * v;
+                if (i >= 6) vv = vv * (1 + RATES.usdc/12) + vacContrib * v;
+            }
+        }
+        // Normalize to hit actual current values
+        const savScale = EXISTING_SAVINGS / (savingsHistory[historyMonths] || 1);
+        const vacScale = 1200 / (vacationHistory[historyMonths] || 1);
+        for (let i = 0; i <= historyMonths; i++) {
+            savingsHistory[i] = Math.round(savingsHistory[i] * savScale);
+            vacationHistory[i] = Math.round(vacationHistory[i] * vacScale);
         }
 
-        // Savings goal line = monthly target accumulated
-        const goalTotal = savingsGoal * months + EXISTING_SAVINGS;
-        const maxVal = Math.max(goalTotal, savingsPts[months], vacationTarget) * 1.1;
+        // Period → months of history to show
+        const viewMap = { '1w': 1, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const viewMonths = viewMap[period] || 12;
+        const startIdx = historyMonths - viewMonths;
+        const viewSavings = savingsHistory.slice(startIdx);
+        const viewVacation = vacationHistory.slice(startIdx);
+        const months = viewSavings.length - 1;
+        if (months <= 0) return;
 
+        const maxVal = Math.max(...viewSavings, ...viewVacation) * 1.2;
         this.addYAxis(svg, p, gh, maxVal, 4);
         this.state.chartPoints = [];
 
-        // Savings goal target line (top dashed line)
-        const goalY = p + gh - (goalTotal / maxVal) * gh;
-        svg.appendChild(svgEl('line', { x1: p, y1: goalY, x2: p+gw, y2: goalY, stroke: '#2563eb', 'stroke-width': '1.5', 'stroke-dasharray': '6 4' }));
-        const gl = svgEl('text', { x: p+gw-2, y: goalY-4, fill: '#2563eb', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        gl.textContent = 'Goal $'+goalTotal.toLocaleString();
-        svg.appendChild(gl);
-
-        // Vacation target line
-        const vacGoalY = p + gh - (vacationTarget / maxVal) * gh;
-        svg.appendChild(svgEl('line', { x1: p, y1: vacGoalY, x2: p+gw, y2: vacGoalY, stroke: '#f59e0b', 'stroke-width': '1', 'stroke-dasharray': '4 3', opacity: '0.6' }));
-        const vl = svgEl('text', { x: p+gw-2, y: vacGoalY+10, fill: '#f59e0b', 'font-size': '7', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        vl.textContent = 'Vacation $'+vacationTarget.toLocaleString();
-        svg.appendChild(vl);
-
-        // Vacation fund area (orange, behind)
-        const vacChartPts = vacationPts.map((v, i) => [p + (i/months)*gw, p + gh - (v/maxVal)*gh]);
-        let vacArea = smoothPath(vacChartPts) + ' L '+vacChartPts[vacChartPts.length-1][0]+' '+(p+gh)+' L '+vacChartPts[0][0]+' '+(p+gh)+' Z';
+        // Vacation fund area (orange)
+        const vacPts = viewVacation.map((v, i) => [p + (i/months)*gw, p + gh - (v/maxVal)*gh]);
+        let vacArea = smoothPath(vacPts) + ' L '+vacPts[vacPts.length-1][0]+' '+(p+gh)+' L '+vacPts[0][0]+' '+(p+gh)+' Z';
         svg.appendChild(svgEl('path', { d: vacArea, fill: '#f59e0b', opacity: '0.15' }));
-        svg.appendChild(svgEl('path', { d: smoothPath(vacChartPts), stroke: '#f59e0b', fill: 'none', 'stroke-width': '1.5' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(vacPts), stroke: '#f59e0b', fill: 'none', 'stroke-width': '1.5' }));
 
-        // Total savings area (green, on top)
-        const savChartPts = savingsPts.map((v, i) => {
+        // Total savings area (green)
+        const savPts = viewSavings.map((v, i) => {
             const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
-            this.state.chartPoints.push({ x, y, label: 'Mo '+i+': $'+Math.round(v).toLocaleString() });
+            const mAgo = months - i;
+            const label = (mAgo === 0 ? 'Now' : mAgo + 'mo ago') + ': Savings $'+v.toLocaleString()+' · Vacation $'+viewVacation[i].toLocaleString();
+            this.state.chartPoints.push({ x, y, label });
             return [x, y];
         });
-        let savArea = smoothPath(savChartPts) + ' L '+savChartPts[savChartPts.length-1][0]+' '+(p+gh)+' L '+savChartPts[0][0]+' '+(p+gh)+' Z';
+        let savArea = smoothPath(savPts) + ' L '+savPts[savPts.length-1][0]+' '+(p+gh)+' L '+savPts[0][0]+' '+(p+gh)+' Z';
         svg.appendChild(svgEl('path', { d: savArea, fill: '#00C805', opacity: '0.12' }));
-        svg.appendChild(svgEl('path', { d: smoothPath(savChartPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
-
-        // "Now" marker
-        const nowMonth = Math.min(YTD_MONTHS, months);
-        const nowX = p + (nowMonth / months) * gw;
-        svg.appendChild(svgEl('line', { x1: nowX, y1: p, x2: nowX, y2: p + gh, stroke: '#ef4444', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.5' }));
-        const nl = svgEl('text', { x: nowX + 3, y: p + 10, fill: '#ef4444', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
-        nl.textContent = 'Now';
-        svg.appendChild(nl);
-
-        // End labels
-        const lastSav = savChartPts[savChartPts.length-1];
-        const lbl1 = svgEl('text', { x: lastSav[0]-4, y: Math.max(lastSav[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        lbl1.textContent = '$'+Math.round(savingsPts[months]).toLocaleString();
-        svg.appendChild(lbl1);
+        svg.appendChild(svgEl('path', { d: smoothPath(savPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
 
         document.getElementById('chartLegend').innerHTML =
             '<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>Total savings</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Vacation fund</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Savings goal</div>';
+            '<div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Vacation fund</div>';
     },
 
     drawSavingsChart() {
@@ -1353,54 +1358,47 @@ const app = {
         const totalMonthlySaving = MONTHLY_SAVINGS + Math.round(underBudgetSavings / Math.max(ps,1));
 
         // Goal data
-        const savingsGoal = this.state.savingsGoal || 300;
         const vacationSaved = 1200, vacationTarget = this.state.vacationTarget || 3000;
-        // Project vacation fund progress based on period
-        const monthsCfg = { '1w': 1, '1m': 3, '3m': 6, 'ytd': 6, '1y': 12, 'all': 60 };
-        const forecastMonths = monthsCfg[period] || 12;
-        let projectedVacation = vacationSaved;
         const vacMonthlyContrib = Math.round(totalMonthlySaving * 0.3);
-        for (let i = 0; i < forecastMonths; i++) projectedVacation = projectedVacation * (1 + RATES.usdc/12) + vacMonthlyContrib;
-        projectedVacation = Math.min(Math.round(projectedVacation), vacationTarget);
-        const vacationPct = Math.round((projectedVacation / vacationTarget) * 100);
-        const monthsToVacation = Math.ceil((vacationTarget - vacationSaved) / totalMonthlySaving);
-        const dashLen = (vacationPct / 100) * 157.08;
-        // Project total savings
-        let projectedSavings = EXISTING_SAVINGS;
-        const monthlyNet = totalMonthlySaving;
-        for (let i = 0; i < forecastMonths; i++) projectedSavings = projectedSavings * (1 + RATES.usdc/12) + monthlyNet;
-        projectedSavings = Math.round(projectedSavings);
-        const periodLabels = { '1w': '1mo', '1m': '3mo', '3m': '6mo', 'ytd': '6mo', '1y': '1yr', 'all': '5yr' };
-        const pLabel = periodLabels[period] || '1yr';
+        const monthsToVacation = vacMonthlyContrib > 0 ? Math.ceil((vacationTarget - vacationSaved) / vacMonthlyContrib) : 999;
+        const vacPct = Math.round((vacationSaved / vacationTarget) * 100);
+        const dashLen = (vacPct / 100) * 157.08;
 
-        // Three editable hero cards
+        // Spending reduction goal
+        const lastYearMonthly = 1820;
+        const monthlySpend = this.getMonthlyRate();
+        const targetMonthly = Math.round(lastYearMonthly * 0.95);
+        const spendReduction = ((lastYearMonthly - monthlySpend) / lastYearMonthly * 100).toFixed(1);
+        const onTrack = monthlySpend <= targetMonthly;
+
+        // Hero cards
         document.getElementById('budget-hero-cards').innerHTML =
             '<div style="display:flex; gap:8px; margin-bottom:12px;">' +
                 // Total Savings
-                '<div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px; text-align:center; cursor:pointer;" onclick="app.editGoalField(\'savings\')">' +
-                    '<div style="font-size:9px; color:#166534; font-weight:600; text-transform:uppercase;">Savings ('+pLabel+')</div>' +
-                    '<div style="font-size:18px; font-weight:700; color:#166534; margin:2px 0;">$'+projectedSavings.toLocaleString()+'</div>' +
-                    '<div style="font-size:9px; color:#059669;">+$'+totalMonthlySaving+'/mo</div>' +
+                '<div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px; text-align:center;">' +
+                    '<div style="font-size:9px; color:#166534; font-weight:600; text-transform:uppercase;">Total Savings</div>' +
+                    '<div style="font-size:18px; font-weight:700; color:#166534; margin:2px 0;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
+                    '<div style="font-size:9px; color:#0052ff; cursor:pointer; font-weight:600;" onclick="app.switchFeatureTab(\'savings\')">Grow your savings →</div>' +
                 '</div>' +
                 // Spending Goal
-                '<div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; text-align:center; cursor:pointer;" onclick="app.editGoalField(\'spending\')">' +
-                    '<div style="font-size:9px; color:#1e40af; font-weight:600; text-transform:uppercase;">Savings Goal</div>' +
-                    '<div style="font-size:18px; font-weight:700; color:'+(totalMonthlySaving >= savingsGoal ? '#166534' : '#f59e0b')+'; margin:2px 0;">$'+savingsGoal+'<span style="font-size:10px; font-weight:400;">/mo</span></div>' +
-                    '<div style="font-size:9px; color:'+(totalMonthlySaving >= savingsGoal ? '#059669' : '#d97706')+';">'+(totalMonthlySaving >= savingsGoal ? 'On track' : '$'+(savingsGoal - totalMonthlySaving)+' gap')+'</div>' +
+                '<div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px; text-align:center;">' +
+                    '<div style="font-size:9px; color:#1e40af; font-weight:600; text-transform:uppercase;">Spending Goal</div>' +
+                    '<div style="font-size:18px; font-weight:700; color:'+(onTrack ? '#166534' : '#dc2626')+'; margin:2px 0;">-5%<span style="font-size:10px; font-weight:400;">/yr</span></div>' +
+                    '<div style="font-size:9px; color:'+(onTrack ? '#059669' : '#dc2626')+';">'+(onTrack ? 'On track ↓'+spendReduction+'%' : 'Off track +'+Math.abs(spendReduction)+'%')+'</div>' +
                 '</div>' +
             '</div>' +
             // Vacation Fund row
-            '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px; margin-bottom:12px; cursor:pointer;" onclick="app.editGoalField(\'vacation\')">' +
+            '<div style="background:#fefce8; border:1px solid #fde68a; border-radius:12px; padding:12px; margin-bottom:12px; cursor:pointer;" onclick="app.editGoalField(\'vacation\')">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                     '<div>' +
-                        '<div style="font-size:11px; font-weight:700; color:#166534;">Vacation Fund <span style="font-size:9px; font-weight:500; color:#059669;">('+pLabel+' projection)</span></div>' +
-                        '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+projectedVacation.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
-                        '<div style="font-size:10px; color:#166534;">'+(projectedVacation >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go at current rate')+'</div>' +
+                        '<div style="font-size:11px; font-weight:700; color:#92400e;">Vacation Fund</div>' +
+                        '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+vacationSaved.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
+                        '<div style="font-size:10px; color:#92400e;">'+(vacationSaved >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go at current rate')+'</div>' +
                     '</div>' +
                     '<svg viewBox="0 0 60 60" style="width:46px; height:46px;">' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
-                        '<circle cx="30" cy="30" r="25" fill="none" stroke="#00C805" stroke-width="3" stroke-dasharray="'+dashLen.toFixed(1)+' 157.08" transform="rotate(-90 30 30)"/>' +
-                        '<text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">'+vacationPct+'%</text>' +
+                        '<circle cx="30" cy="30" r="25" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="'+dashLen.toFixed(1)+' 157.08" transform="rotate(-90 30 30)"/>' +
+                        '<text x="30" y="33" text-anchor="middle" font-size="11" font-weight="600" fill="#111">'+vacPct+'%</text>' +
                     '</svg>' +
                 '</div>' +
             '</div>';
@@ -1573,10 +1571,10 @@ const app = {
         // Yield promo card
         document.getElementById('savings-yield-promo').innerHTML =
             '<div style="background:linear-gradient(90deg, #fef2f2, #f0fdf4); border:1px solid #d1e3f8; border-radius:10px; padding:12px;">' +
-                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">WHERE YOUR SAVINGS COULD GROW</div>' +
+                '<div style="font-size:10px; font-weight:700; color:#374151; margin-bottom:6px;">MOVE YOUR CHECKING BALANCE TO USDC</div>' +
                 '<div style="display:flex; gap:8px;">' +
                     '<div style="flex:1; text-align:center; padding:6px; background:rgba(220,38,38,0.05); border-radius:8px;">' +
-                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Bank</div>' +
+                        '<div style="font-size:9px; color:#9ca3af; font-weight:600;">Checking</div>' +
                         '<div style="font-size:14px; font-weight:700; color:#dc2626;">'+(RATES.bank*100).toFixed(2)+'%</div>' +
                         '<div style="font-size:9px; color:#9ca3af;">$'+Math.round(EXISTING_SAVINGS * RATES.bank)+'/yr</div>' +
                     '</div>' +
@@ -1593,7 +1591,7 @@ const app = {
                         '<div style="font-size:9px; color:#9ca3af;">Your mix</div>' +
                     '</div>' +
                 '</div>' +
-                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> by moving from bank → USDC</span></div>' +
+                '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; color:#166534; font-weight:600;">10.5x more yield</span><span style="font-size:10px; color:#9ca3af;"> — move your Chase checking to USDC</span></div>' +
             '</div>';
 
         this.updateSavingsProjections();
