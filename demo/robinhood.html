@@ -508,6 +508,7 @@
                                 </div>
                             </div>
                         </div>
+                        <div id="budget-col-ai"></div>
                         <button class="cta-btn ghost" onclick="alert('Edit budget limits for each category')">Edit budgets</button>
                     </div>
 
@@ -1286,9 +1287,18 @@ const app = {
         const underBudget = totalSpent <= totalBudget;
         const netDiff = Math.abs(totalBudget - totalSpent);
 
-        // Forecast savings: what you'll save for the remaining months this year
-        const remainingMonths = 12 - YTD_MONTHS;
-        const forecastSavings = MONTHLY_SAVINGS * remainingMonths;
+        // Forecast savings: period-aware projection
+        const forecastMap = {
+            '1w':  { amount: Math.round(MONTHLY_SAVINGS / 4.33), label: '$'+MONTHLY_SAVINGS+'/mo ÷ 4.3 weeks' },
+            '1m':  { amount: MONTHLY_SAVINGS, label: '$'+MONTHLY_SAVINGS+'/mo auto-transfer' },
+            '3m':  { amount: MONTHLY_SAVINGS * 3, label: '$'+MONTHLY_SAVINGS+'/mo × 3 months' },
+            'ytd': { amount: MONTHLY_SAVINGS * YTD_MONTHS, label: '$'+MONTHLY_SAVINGS+'/mo × '+YTD_MONTHS+' months YTD' },
+            '1y':  { amount: MONTHLY_SAVINGS * 12, label: '$'+MONTHLY_SAVINGS+'/mo × 12 months' },
+            'all': { amount: MONTHLY_SAVINGS * 60, label: '$'+MONTHLY_SAVINGS+'/mo × 60 months (5yr)' }
+        };
+        const fc = forecastMap[period] || forecastMap['1m'];
+        const forecastSavings = fc.amount;
+        const forecastLabel = fc.label;
 
         // Spending card: green when under budget, orange/red when over
         const spendBg = underBudget ? '#f0fdf4' : '#fff7ed';
@@ -1309,7 +1319,7 @@ const app = {
                 '<div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px;">' +
                     '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Forecast Savings</div>' +
                     '<div style="font-size:20px; font-weight:700; color:#2563eb;">$'+forecastSavings.toLocaleString()+'</div>' +
-                    '<div style="font-size:10px; color:#1e40af; opacity:0.7;">$'+MONTHLY_SAVINGS+'/mo × '+remainingMonths+' months left</div>' +
+                    '<div style="font-size:10px; color:#1e40af; opacity:0.7;">'+forecastLabel+'</div>' +
                 '</div>' +
             '</div>' +
             '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="margin-bottom:12px; padding:10px; font-size:12px;">⚡ Auto-sweep savings → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)</button>';
@@ -1337,6 +1347,47 @@ const app = {
             '<div class="savings-item">Cut food delivery 40% → Save <strong>$'+Math.round(112*ps)+'/'+pn.toLowerCase()+'</strong></div>' +
             '<div class="savings-item">Review subscriptions → Save <strong>$'+Math.round(42*ps)+'</strong></div>' +
             '<div class="savings-item">Increase auto-transfer → <strong>$'+Math.round(200*ps)+'</strong></div>';
+
+        // Cost of Living AI section
+        const income = 5500; // monthly take-home
+        const rent = 2100;
+        const afterRent = income - rent;
+        // 50/30/20 on post-rent income: 50% needs, 30% wants, 20% savings
+        const needsBudget = Math.round(afterRent * 0.50);
+        const wantsBudget = Math.round(afterRent * 0.30);
+        const savingsBudget = Math.round(afterRent * 0.20);
+        const actualNeeds = budgets.filter(b => ['Groceries','Transport','Utilities'].includes(b.name)).reduce((s,b)=>s+b.spent,0);
+        const actualWants = budgets.filter(b => ['Dining','Shopping','Subscriptions'].includes(b.name)).reduce((s,b)=>s+b.spent,0);
+        const actualSaving = forecastSavings;
+        const needsOk = actualNeeds <= Math.round(needsBudget * ps);
+        const wantsOk = actualWants <= Math.round(wantsBudget * ps);
+        const savingsOk = actualSaving >= Math.round(savingsBudget * ps);
+
+        const aiRow = (label, rec, actual, ok) =>
+            '<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f3f4f6;">' +
+                '<div style="font-size:11px; color:#374151;">'+label+'</div>' +
+                '<div style="display:flex; gap:8px; align-items:center;">' +
+                    '<span style="font-size:11px; color:#6b7280;">rec $'+rec.toLocaleString()+'</span>' +
+                    '<span style="font-size:11px; font-weight:600; color:'+(ok?'#166534':'#ea580c')+';">$'+actual.toLocaleString()+(ok?' ✓':' ⚠')+'</span>' +
+                '</div>' +
+            '</div>';
+
+        document.getElementById('budget-col-ai').innerHTML =
+            '<div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:12px; margin-top:10px;">' +
+                '<div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">' +
+                    '<span style="font-size:14px;">🧠</span>' +
+                    '<span style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.5px;">Cost of Living AI</span>' +
+                '</div>' +
+                '<div style="font-size:10px; color:#6b21a8; margin-bottom:8px;">Based on $'+income.toLocaleString()+'/mo income · $'+rent.toLocaleString()+'/mo rent · 50/30/20 rule</div>' +
+                aiRow('Needs (groceries, transport, utilities)', Math.round(needsBudget * ps), actualNeeds, needsOk) +
+                aiRow('Wants (dining, shopping, subs)', Math.round(wantsBudget * ps), actualWants, wantsOk) +
+                aiRow('Savings target', Math.round(savingsBudget * ps), actualSaving, savingsOk) +
+                '<div style="margin-top:8px; padding:8px; background:#ede9fe; border-radius:8px; font-size:10px; color:#5b21b6;">' +
+                    (wantsOk && needsOk && savingsOk
+                        ? '✅ You\'re within AI-recommended limits across all categories.'
+                        : '💡 AI suggests reducing <strong>wants</strong> spending by $'+Math.max(0, actualWants - Math.round(wantsBudget * ps)).toLocaleString()+' to hit your 50/30/20 targets.') +
+                '</div>' +
+            '</div>';
     },
 
     // ===== SAVINGS (combined Yields + What If) =====
