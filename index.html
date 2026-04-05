@@ -416,44 +416,37 @@
 
         /* Card Styles */
         .card {
-            background: rgba(0, 82, 255, 0.08);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 82, 255, 0.1);
+            border: 1px solid rgba(0, 82, 255, 0.08);
             border-radius: 12px;
             padding: 18px;
             margin: 6px 0;
-            transition: all 0.3s ease;
+            transition: none;
             animation: fadeInUp 0.8s ease forwards;
             opacity: 0;
             position: relative;
         }
 
         .slide.active .card {
-            animation: fadeInUp 0.8s ease forwards, breathe 5s ease-in-out 1.5s infinite;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .slide.active .stat-card {
-            animation: fadeInUp 0.8s ease forwards, breathe 6s ease-in-out 2s infinite;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .slide.active .col-box {
-            animation: fadeInUp 0.8s ease forwards, breathe 5.5s ease-in-out 1.8s infinite;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .slide.active .challenge-box {
-            animation: fadeInUp 0.8s ease forwards, breathe 5s ease-in-out 2s infinite;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .slide.active .quote-block {
-            animation: fadeInUp 0.8s ease forwards, breathe 6s ease-in-out 1.5s infinite;
-        }
-
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 82, 255, 0.15);
-            transform: translateY(-6px) scale(1.01);
-            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         .card-title {
@@ -687,7 +680,7 @@
 
         /* Quote Block */
         .quote-block {
-            background: rgba(0, 82, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
             border-left: 4px solid #0052FF;
             border-radius: 8px;
             padding: 24px;
@@ -714,8 +707,8 @@
         }
 
         .col-box {
-            background: rgba(0, 82, 255, 0.04);
-            border: 1px solid rgba(0, 82, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 82, 255, 0.08);
             border-radius: 12px;
             padding: 32px;
             animation: fadeInUp 0.8s ease forwards;
@@ -1001,8 +994,8 @@
 
         /* Challenge Box */
         .challenge-box {
-            background: rgba(0, 82, 255, 0.08);
-            border: 2px solid rgba(0, 82, 255, 0.5);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(0, 82, 255, 0.15);
             border-radius: 12px;
             padding: 24px;
             margin: 16px 0;
@@ -1798,13 +1791,10 @@
         @media (hover: none) and (pointer: coarse) {
             .card:hover {
                 transform: none !important;
-                background: rgba(0, 82, 255, 0.08);
-                border-color: rgba(0, 82, 255, 0.12);
             }
 
             .card:active {
-                transform: scale(1.01);
-                background: rgba(255, 255, 255, 0.08);
+                transform: none;
             }
 
             .screenshot-expandable:hover {
@@ -3862,8 +3852,7 @@
         function overlayNext() {
             event.stopPropagation();
             if (demoIdx >= demoImages.length - 1) {
-                overlayOpen = false;
-                document.getElementById('screenshot-overlay').classList.remove('active');
+                closeScreenshotOverlay();
                 return;
             }
             demoIdx++;
@@ -3876,10 +3865,13 @@
             updateOverlayImage();
             updateDemoCarousel();
         }
-        function closeScreenshotOverlay() {
-            event.stopPropagation();
+        function closeScreenshotOverlay(fromEvent) {
+            if (fromEvent) event.stopPropagation();
             overlayOpen = false;
             document.getElementById('screenshot-overlay').classList.remove('active');
+            // Reset carousel to 1/27 so it's ready to replay
+            demoIdx = 0;
+            updateDemoCarousel();
         }
         // Click on overlay — in carousel mode, clicking the image or backdrop advances (or closes on last)
         document.getElementById('screenshot-overlay').addEventListener('click', (e) => {
@@ -3889,8 +3881,7 @@
             if (overlay._mode === 'carousel') {
                 e.stopPropagation();
                 if (demoIdx >= demoImages.length - 1) {
-                    overlayOpen = false;
-                    overlay.classList.remove('active');
+                    closeScreenshotOverlay();
                 } else {
                     demoIdx++;
                     updateOverlayImage();
@@ -3899,8 +3890,7 @@
             } else {
                 if (e.target === overlay) {
                     e.stopPropagation();
-                    overlayOpen = false;
-                    overlay.classList.remove('active');
+                    closeScreenshotOverlay();
                 }
             }
         });
@@ -3908,13 +3898,13 @@
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('screenshot-overlay').classList.contains('active')) return;
             if (document.getElementById('screenshot-overlay')._mode !== 'carousel') {
-                if (e.key === 'Escape') { overlayOpen = false; document.getElementById('screenshot-overlay').classList.remove('active'); e.stopPropagation(); }
+                if (e.key === 'Escape') { closeScreenshotOverlay(); e.stopPropagation(); }
                 return;
             }
             e.stopPropagation();
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { if (demoIdx >= demoImages.length - 1) { overlayOpen = false; document.getElementById('screenshot-overlay').classList.remove('active'); return; } demoIdx++; updateOverlayImage(); updateDemoCarousel(); }
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { if (demoIdx >= demoImages.length - 1) { closeScreenshotOverlay(); return; } demoIdx++; updateOverlayImage(); updateDemoCarousel(); }
             else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { demoIdx = (demoIdx - 1 + demoImages.length) % demoImages.length; updateOverlayImage(); updateDemoCarousel(); }
-            else if (e.key === 'Escape') { overlayOpen = false; document.getElementById('screenshot-overlay').classList.remove('active'); }
+            else if (e.key === 'Escape') { closeScreenshotOverlay(); }
         });
 
         // Fix squished timeline circles when preserveAspectRatio="none"
