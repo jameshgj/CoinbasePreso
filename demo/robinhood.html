@@ -384,35 +384,35 @@
         <div class="left-panel">
             <div class="card active" data-tab="overview">
                 <div class="card-title"><span class="card-number">1</span>The Vision</div>
-                <div class="card-subtitle">Turn Robinhood into where people manage all their money</div>
+                <div class="card-subtitle">Mint + Acorns for crypto — turn Robinhood into where people manage all their money</div>
             </div>
             <div class="card" data-tab="overview">
                 <div class="card-title"><span class="card-number">2</span>The Problem</div>
-                <div class="card-subtitle">27M accounts, ~4M trade crypto. Revenue drops 38% in bear markets</div>
+                <div class="card-subtitle">27M accounts, ~4M trade crypto. Revenue drops 38% in bear markets. Mint is dead, Acorns is niche</div>
             </div>
             <div class="card" data-tab="what-if">
                 <div class="card-title"><span class="card-number">3</span>The Insight</div>
-                <div class="card-subtitle">Average savings: 0.39% APY. Invisible wealth erosion every day</div>
+                <div class="card-subtitle">Average savings: 0.39% APY. Invisible wealth erosion. Acorns proved micro-investing works — now do it with crypto yield</div>
             </div>
             <div class="card" data-tab="overview">
                 <div class="card-title"><span class="card-number">4</span>The Strategy</div>
-                <div class="card-subtitle">Be useful → Show truth → Make it easy → Auto-convert</div>
+                <div class="card-subtitle">See everything (Mint) → Find money (budgets) → Auto-invest (Acorns) → Crypto yield (10x)</div>
             </div>
             <div class="card" data-tab="budget">
                 <div class="card-title"><span class="card-number">5</span>The Funnel</div>
-                <div class="card-subtitle">See spending → Spot waste → Set budgets → Save → Sweep to crypto</div>
+                <div class="card-subtitle">See spending → Spot waste → Set budgets → Round-ups + sweeps → Yield on every dollar</div>
             </div>
             <div class="card" data-tab="yields">
                 <div class="card-title"><span class="card-number">6</span>10X Math</div>
-                <div class="card-subtitle">3-5M crypto → 30-50M users. ~$1B → $10B revenue</div>
+                <div class="card-subtitle">3-5M crypto → 30-50M users. ~$1B → $10B revenue. Subscription + yield margin + card interchange</div>
             </div>
             <div class="card" data-tab="rules">
                 <div class="card-title"><span class="card-number">7</span>Why Now</div>
-                <div class="card-subtitle">Mint dead. Plaid ready. Super-app window is open</div>
+                <div class="card-subtitle">Mint dead. Plaid ready. Acorns proved round-ups. Super-app window is open</div>
             </div>
             <div class="card" data-tab="overview">
                 <div class="card-title"><span class="card-number">8</span>Why Robinhood</div>
-                <div class="card-subtitle">Only platform with 27M users + crypto + banking rails</div>
+                <div class="card-subtitle">Only platform with 27M users + crypto + banking rails + Gold Card for the full Mint-to-Acorns pipeline</div>
             </div>
         </div>
 
@@ -528,6 +528,11 @@
                         <div id="yields-intro" style="display:none;"></div>
                         <div id="yields-tiers" style="display:none;"></div>
                         <div class="projected-yield" id="yields-projected" style="margin-bottom:12px;"></div>
+                        <div style="display:flex; gap:6px; margin-bottom:12px;">
+                            <button onclick="app.setPreset('safe')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #d1fae5; background:#f0fdf4; font-size:11px; font-weight:600; color:#065f46; cursor:pointer;">Safe Saver</button>
+                            <button onclick="app.setPreset('balanced')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #bfdbfe; background:#eff6ff; font-size:11px; font-weight:600; color:#1e40af; cursor:pointer;">Balanced</button>
+                            <button onclick="app.setPreset('growth')" style="flex:1; padding:8px 4px; border-radius:8px; border:1px solid #fed7aa; background:#fff7ed; font-size:11px; font-weight:600; color:#9a3412; cursor:pointer;">Growth</button>
+                        </div>
                         <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">ADJUST YOUR SAVINGS MIX</div>
                         <div id="yields-sliders"></div>
                         <button class="cta-btn primary" onclick="app.switchFeatureTab('rules')" style="margin-top:16px;">Set up yield rules</button>
@@ -578,20 +583,29 @@ function svgEl(tag, attrs) {
     return el;
 }
 
+// ===== RATE CONSTANTS =====
+const RATES = {
+    bank: 0.0039,
+    usdc: 0.041,
+    defi: 0.07,
+    btc: 0.30
+};
+const MONTHLY_SAVINGS = 95; // actual monthly auto-transfer to savings
+const YTD_MONTHS = 3; // Q1 elapsed
+
 const app = {
     state: {
         activeTab: 'overview', activePeriod: '1m', whatIfPeriod: 3,
         chartCumulative: false,
         highlightedCategory: null,
-        allocations: { safe: 250, moderate: 150, growth: 100 },
+        allocations: { safe: 50, moderate: 30, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
             { name: 'Groceries',     color: '#00C805', amount: 520, count: 18, change: -5 },
             { name: 'Shopping',      color: '#2196F3', amount: 310, count: 12, change: 8 },
             { name: 'Transport',     color: '#9C27B0', amount: 200, count: 15, change: -15 },
             { name: 'Subscriptions', color: '#00BCD4', amount: 140, count: 8,  change: 2 },
-            { name: 'Utilities',     color: '#607D8B', amount: 185, count: 4,  change: 3 },
-            { name: 'Savings',       color: '#FFD700', amount: 95,  count: 1,  change: -12 }
+            { name: 'Utilities',     color: '#607D8B', amount: 185, count: 4,  change: 3 }
         ],
         transactions: {
             'Dining': [
@@ -627,19 +641,22 @@ const app = {
                 {name:'Con Edison (Electric)',date:'Mar 5',amount:82.40},{name:'NYC Water Board',date:'Mar 5',amount:35.20},
                 {name:'National Grid (Gas)',date:'Mar 3',amount:47.80},{name:'Spectrum Internet',date:'Mar 1',amount:19.60}
             ],
-            'Savings': [{name:'Auto-transfer to savings',date:'Mar 1',amount:95.00}]
         },
         // Store chart points for hover
         chartPoints: []
     },
 
-    periodData: {
-        '1w':  { amount: 387,   change: -52,  pct: 12, label: 'vs last week' },
-        '1m':  { amount: 1730,  change: -110, pct: 6,  label: 'vs last month' },
-        '3m':  { amount: 5390,  change: 230,  pct: 4.5, label: 'vs prior 3 months' },
-        'ytd': { amount: 5390,  change: 230,  pct: 4.5, label: 'year to date' },
-        '1y':  { amount: 20540, change: -960, pct: 5,  label: 'vs last year' },
-        'all': { amount: 46800, change: 0,    pct: 0,  label: 'all time' }
+    getPeriodData() {
+        const base = this.state.categories.reduce((s,c) => s + c.amount, 0); // $1,635/mo
+        const scales = this.periodScales;
+        return {
+            '1w':  { amount: Math.round(base * scales['1w'].scale),  change: -52,  pct: 12,  label: 'vs last week' },
+            '1m':  { amount: Math.round(base * scales['1m'].scale),  change: -110, pct: 6,   label: 'vs last month' },
+            '3m':  { amount: Math.round(base * scales['3m'].scale),  change: 230,  pct: 4.5, label: 'vs prior 3 months' },
+            'ytd': { amount: Math.round(base * scales['ytd'].scale), change: 230,  pct: 4.5, label: 'year to date' },
+            '1y':  { amount: Math.round(base * scales['1y'].scale),  change: -960, pct: 5,   label: 'vs last year' },
+            'all': { amount: Math.round(base * scales['all'].scale), change: 0,    pct: 0,   label: 'all time' }
+        };
     },
 
     init() {
@@ -750,7 +767,7 @@ const app = {
     },
 
     updateAmountDisplay() {
-        const d = this.periodData[this.state.activePeriod];
+        const d = this.getPeriodData()[this.state.activePeriod];
         document.getElementById('mainAmount').textContent = '$' + d.amount.toLocaleString();
         const el = document.getElementById('amountChange');
         if (d.change === 0) { el.textContent = d.label; el.className = 'amount-change'; }
@@ -939,14 +956,14 @@ const app = {
         svg.innerHTML = '';
 
         const monthlySpend = this.getMonthlyRate();
-        const contrib = Math.round(monthlySpend * 0.055);
+        const contrib = MONTHLY_SAVINGS;
         const months = this.state.whatIfPeriod * 12;
 
         const lines = [
-            { rate: 0.0039, color: '#9ca3af', label: 'Bank', dash: true, card: false },
-            { rate: 0.041, color: '#00C805', label: 'USDC', dash: false, card: false },
-            { rate: 0.041, color: '#3b82f6', label: 'Card+USDC', dash: false, card: true },
-            { rate: 0.30, color: '#f97316', label: 'BTC DCA', dash: false, card: false }
+            { rate: RATES.bank, color: '#9ca3af', label: 'Bank', dash: true, card: false },
+            { rate: RATES.usdc, color: '#00C805', label: 'USDC', dash: false, card: false },
+            { rate: RATES.usdc, color: '#3b82f6', label: 'Card+USDC', dash: false, card: true },
+            { rate: RATES.btc, color: '#f97316', label: 'BTC DCA', dash: false, card: false }
         ];
 
         let maxVal = 0;
@@ -972,7 +989,7 @@ const app = {
                 let hv = 0;
                 for (let i = 0; i <= months; i++) {
                     this.state.chartPoints.push({ x: p + (i/months)*gw, y: p + gh - (hv/maxVal)*gh, label: 'Mo '+i+': $'+Math.round(hv).toLocaleString() });
-                    hv = hv * (1 + 0.041/12) + contrib;
+                    hv = hv * (1 + RATES.usdc/12) + contrib;
                 }
             }
             const line = svgEl('path', { d: smoothPath(pts), stroke: t.color, fill: 'none', 'stroke-width': '2' });
@@ -991,10 +1008,19 @@ const app = {
     drawBudgetChart() {
         const { svg, p, gw, gh } = this.dim();
         svg.innerHTML = '';
-        const days = 30, budgetLimit = 1730, maxVal = 2200, rng = seededRandom(99);
+
+        // Derive budget limit from actual category budget data
+        const baseBudgets = [250, 600, 300, 150, 250, 200]; // Dining, Groceries, Shopping, Subs, Transport, Utilities
+        const period = this.state.activePeriod;
+        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const ps = periodScale[period] || 1;
+        const budgetLimit = Math.round(baseBudgets.reduce((s,b) => s + b, 0) * ps);
+        const maxVal = Math.round(budgetLimit * 1.3);
+        const days = 30, rng = seededRandom(99);
 
         const ds = [];
-        for (let i = 0; i < days; i++) ds.push(rng() > 0.3 ? 30 + rng() * 50 : 0);
+        const dailyAvg = budgetLimit / days;
+        for (let i = 0; i < days; i++) ds.push(rng() > 0.3 ? dailyAvg * (0.5 + rng() * 0.8) : 0);
 
         let cum = 0;
         const pts = [];
@@ -1008,19 +1034,24 @@ const app = {
 
         this.addYAxis(svg, p, gh, maxVal, 4);
 
+        // Budget limit line — green if under, red if over
+        const finalSpend = cum;
+        const underBudget = finalSpend <= budgetLimit;
+        const limitColor = underBudget ? '#00C805' : '#ff5000';
         const budgetY = p + gh - (budgetLimit/maxVal)*gh;
-        svg.appendChild(svgEl('line', { x1:p, y1:budgetY, x2:p+gw, y2:budgetY, stroke:'#ff5000', 'stroke-width':'1.5', 'stroke-dasharray':'6 4' }));
-        const bl = svgEl('text', { x:p+gw-2, y:budgetY-5, fill:'#ff5000', 'font-size':'9', 'font-weight':'500', 'text-anchor':'end', 'font-family':'Inter,sans-serif' });
-        bl.textContent = 'Budget $1,730';
+        svg.appendChild(svgEl('line', { x1:p, y1:budgetY, x2:p+gw, y2:budgetY, stroke:limitColor, 'stroke-width':'1.5', 'stroke-dasharray':'6 4' }));
+        const bl = svgEl('text', { x:p+gw-2, y:budgetY-5, fill:limitColor, 'font-size':'9', 'font-weight':'500', 'text-anchor':'end', 'font-family':'Inter,sans-serif' });
+        bl.textContent = 'Budget $'+budgetLimit.toLocaleString();
         svg.appendChild(bl);
 
+        const lineColor = underBudget ? '#00C805' : '#f97316';
         let ad = smoothPath(pts) + ' L '+pts[pts.length-1][0]+' '+(p+gh)+' L '+pts[0][0]+' '+(p+gh)+' Z';
-        svg.appendChild(svgEl('path', { d: ad, fill: '#f97316', opacity: '0.12' }));
-        svg.appendChild(svgEl('path', { d: smoothPath(pts), stroke: '#f97316', fill: 'none', 'stroke-width': '2' }));
+        svg.appendChild(svgEl('path', { d: ad, fill: lineColor, opacity: '0.12' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(pts), stroke: lineColor, fill: 'none', 'stroke-width': '2' }));
 
         document.getElementById('chartLegend').innerHTML =
-            '<div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Spending</div>' +
-            '<div class="legend-item"><div class="legend-dot" style="background:#ff5000"></div>Budget limit</div>';
+            '<div class="legend-item"><div class="legend-dot" style="background:'+lineColor+'"></div>Spending</div>' +
+            '<div class="legend-item"><div class="legend-dot" style="background:'+limitColor+'"></div>Budget limit</div>';
     },
 
     drawYieldsChart() {
@@ -1032,18 +1063,16 @@ const app = {
         if (monthly === 0) { this.state.chartPoints = []; document.getElementById('chartLegend').innerHTML = ''; return; }
 
         const years = 5, months = years * 12;
-        const ytdMonths = 3; // Q1 elapsed
-
         // Individual tier lines for stacked colored areas
         const tiers = [
-            { key: 'safe',     amount: a.safe,     rate: 0.041, color: '#00C805', label: 'Safe (USDC)' },
-            { key: 'moderate', amount: a.moderate,  rate: 0.07,  color: '#f59e0b', label: 'Moderate (DeFi)' },
-            { key: 'growth',   amount: a.growth,    rate: 0.30,  color: '#f97316', label: 'Growth (BTC/ETH)' }
+            { key: 'safe',     amount: a.safe,     rate: RATES.usdc, color: '#00C805', label: 'Safe (USDC)' },
+            { key: 'moderate', amount: a.moderate,  rate: RATES.defi, color: '#f59e0b', label: 'Moderate (DeFi)' },
+            { key: 'growth',   amount: a.growth,    rate: RATES.btc,  color: '#f97316', label: 'Growth (BTC/ETH)' }
         ].filter(t => t.amount > 0);
 
         // Bank baseline
         let bankMax = 0, bankV = 0;
-        for (let i = 0; i < months; i++) { bankV = bankV * (1 + 0.0039/12) + monthly; }
+        for (let i = 0; i < months; i++) { bankV = bankV * (1 + RATES.bank/12) + monthly; }
         bankMax = bankV;
 
         // Compute each tier's growth independently
@@ -1105,14 +1134,14 @@ const app = {
         let bv = 0;
         for (let i = 0; i <= months; i++) {
             bankPts.push([p + (i/months)*gw, p + gh - (bv/maxVal)*gh]);
-            bv = bv * (1 + 0.0039/12) + monthly;
+            bv = bv * (1 + RATES.bank/12) + monthly;
         }
         const bankLine = svgEl('path', { d: smoothPath(bankPts), stroke: '#9ca3af', fill: 'none', 'stroke-width': '1.5' });
         bankLine.setAttribute('stroke-dasharray', '6 4');
         svg.appendChild(bankLine);
 
         // YTD marker line
-        const ytdX = p + (ytdMonths / months) * gw;
+        const ytdX = p + (YTD_MONTHS / months) * gw;
         svg.appendChild(svgEl('line', { x1: ytdX, y1: p, x2: ytdX, y2: p + gh, stroke: '#ef4444', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.5' }));
         const ytdLabel = svgEl('text', { x: ytdX + 3, y: p + 10, fill: '#ef4444', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
         ytdLabel.textContent = 'Now';
@@ -1129,7 +1158,7 @@ const app = {
         svg.appendChild(lbl2);
 
         const legendItems = tiers.map(t => '<div class="legend-item"><div class="legend-dot" style="background:'+t.color+'"></div>'+t.label+'</div>');
-        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Bank (0.39%)</div>');
+        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>Bank ('+(RATES.bank*100).toFixed(2)+'%)</div>');
         document.getElementById('chartLegend').innerHTML = legendItems.join('');
     },
 
@@ -1173,8 +1202,8 @@ const app = {
     },
 
     // ===== HELPERS =====
-    getSavingsAmount() { return (this.state.categories.find(c => c.name === 'Savings') || {}).amount || 95; },
-    getTotalSpending() { return this.state.categories.reduce((s,c) => s + (c.name === 'Savings' ? 0 : c.amount), 0); },
+    getMonthlySavings() { return MONTHLY_SAVINGS; },
+    getTotalSpending() { return this.state.categories.reduce((s,c) => s + c.amount, 0); },
 
     // ===== OVERVIEW =====
     renderOverviewTab() {
@@ -1216,10 +1245,10 @@ const app = {
         document.getElementById('overview-insights').innerHTML =
             '<div class="section-label">Insights</div>' +
             '<div class="insight-card warning"><strong>Food delivery up '+(diningAmt ? Math.abs(diningAmt.change) : 23)+'%</strong> '+pl+' — $'+Math.round((diningAmt ? diningAmt.amount : 280) * 0.4)+' on DoorDash alone</div>' +
-            '<div class="insight-card info"><strong>8 active subscriptions</strong> — Hulu, ClassPass, Adobe CC haven\'t been used in 30+ days</div>' +
+            '<div class="insight-card warning"><strong>8 active subscriptions</strong> — Hulu, ClassPass, Adobe CC unused 30+ days. Cancel → auto-invest $73/mo in USDC</div>' +
             '<div class="insight-card success"><strong>Transport down '+(transportCat ? Math.abs(transportCat.change) : 15)+'%</strong> — nice work with the bus pass switch</div>' +
             '<div class="insight-card info"><strong>Utilities stable</strong> — Electric bill up 3% (seasonal). Water & gas unchanged</div>' +
-            '<div class="insight-card info"><strong>Savings down 12%</strong> — transfer was $108 last month. Consider auto-increasing</div>' +
+            '<div class="insight-card success"><strong>Auto-save on track</strong> — $'+MONTHLY_SAVINGS+'/mo transferring. Round-ups adding ~$18/mo extra</div>' +
             '<div class="sweep-cta" onclick="app.switchFeatureTab(\'what-if\')"><div class="sweep-cta-text">See what your savings could earn →</div><div class="sweep-cta-arrow">→</div></div>';
     },
 
@@ -1260,42 +1289,48 @@ const app = {
 
     updateWhatIf() {
         const monthlySpend = this.getMonthlyRate();
-        const monthlySavings = Math.round(monthlySpend * 0.055); // ~5.5% savings rate
+        const monthlySavings = MONTHLY_SAVINGS;
         const years = this.state.whatIfPeriod;
         const months = years * 12;
-        const ytdMonths = 3; // Q1 elapsed
-        const missedYield = Math.round(monthlySavings * ytdMonths * 0.041 / 12 * ytdMonths);
+
+        // Proper compound missed yield: USDC vs bank over YTD
+        let ytdUsdc = 0, ytdBank = 0;
+        for (let i = 0; i < YTD_MONTHS; i++) {
+            ytdUsdc = ytdUsdc * (1 + RATES.usdc/12) + monthlySavings;
+            ytdBank = ytdBank * (1 + RATES.bank/12) + monthlySavings;
+        }
+        const missedYield = Math.round(ytdUsdc - ytdBank);
 
         document.getElementById('what-if-summary').innerHTML =
-            '<div style="font-size:13px; color:#6b7280; line-height:1.6;">Based on <strong style="color:#111;">$'+monthlySpend.toLocaleString()+'/mo</strong> spending, you save ~<strong style="color:#111;">$'+monthlySavings+'/mo</strong>. ' +
+            '<div style="font-size:13px; color:#6b7280; line-height:1.6;">You auto-save <strong style="color:#111;">$'+monthlySavings+'/mo</strong> from <strong style="color:#111;">$'+monthlySpend.toLocaleString()+'/mo</strong> spending. ' +
             'YTD you\'ve missed <strong style="color:#f97316;">~$'+missedYield+'</strong> in potential yield vs a bank.</div>';
 
         let savingsVal = 0, usdcVal = 0, cardVal = 0, btcVal = 0;
         for (let i = 0; i < months; i++) {
-            savingsVal = savingsVal * (1 + 0.0039/12) + monthlySavings;
-            usdcVal = usdcVal * (1 + 0.041/12) + monthlySavings;
-            cardVal = cardVal * (1 + 0.041/12) + monthlySavings + (monthlySpend * 0.03);
-            btcVal = btcVal * (1 + 0.30/12) + monthlySavings;
+            savingsVal = savingsVal * (1 + RATES.bank/12) + monthlySavings;
+            usdcVal = usdcVal * (1 + RATES.usdc/12) + monthlySavings;
+            cardVal = cardVal * (1 + RATES.usdc/12) + monthlySavings + (monthlySpend * 0.03);
+            btcVal = btcVal * (1 + RATES.btc/12) + monthlySavings;
         }
 
         const usdcG = usdcVal - savingsVal, cardG = cardVal - savingsVal, btcG = btcVal - savingsVal;
         const monthlyRewards = Math.round(monthlySpend * 0.03);
 
         document.getElementById('what-if-results').innerHTML =
-            '<div class="result-card gray"><div class="result-card-title">Bank savings · 0.39% APY</div>' +
+            '<div class="result-card gray"><div class="result-card-title">Bank savings · '+(RATES.bank*100).toFixed(2)+'% APY</div>' +
             '<div class="result-amount">$'+Math.round(savingsVal).toLocaleString()+'</div>' +
             '<div style="font-size:12px; color:#6b7280;">$'+monthlySavings+'/mo for '+years+'yr at current bank rate</div></div>' +
 
-            '<div class="result-card green"><div class="result-card-title">USDC Stablecoin · 4.1% APY</div>' +
+            '<div class="result-card green"><div class="result-card-title">USDC Stablecoin · '+(RATES.usdc*100).toFixed(1)+'% APY</div>' +
             '<div class="result-amount">$'+Math.round(usdcVal).toLocaleString()+'</div>' +
             '<div class="result-benefit">+$'+Math.round(usdcG).toLocaleString()+' more — same stability, 10x yield</div></div>' +
 
             '<div class="result-card blue"><div class="result-card-title">Gold Card (3% back) + USDC sweep</div>' +
             '<div class="result-amount">$'+Math.round(cardVal).toLocaleString()+'</div>' +
             '<div class="result-benefit">+$'+Math.round(cardG).toLocaleString()+' more — $'+monthlyRewards+'/mo cashback auto-swept</div>' +
-            '<div class="result-note">3% uncapped cashback · Rewards earn 4.1% in USDC</div></div>' +
+            '<div class="result-note">3% uncapped cashback · Rewards earn '+(RATES.usdc*100).toFixed(1)+'% in USDC</div></div>' +
 
-            '<div class="result-card orange"><div class="result-card-title">Bitcoin DCA · ~30% historical avg</div>' +
+            '<div class="result-card orange"><div class="result-card-title">Bitcoin DCA · ~'+(RATES.btc*100)+'% historical avg</div>' +
             '<div class="result-amount">$'+Math.round(btcVal).toLocaleString()+'</div>' +
             '<div class="result-benefit">+$'+Math.round(btcG).toLocaleString()+' more — with volatility</div>' +
             '<div class="result-note">Past performance ≠ future results · 3+ yr horizon</div></div>';
@@ -1332,27 +1367,36 @@ const app = {
 
         const totalSpent = budgets.reduce((s,b) => s + b.spent, 0);
         const totalBudget = budgets.reduce((s,b) => s + b.limit, 0);
+        const underBudget = totalSpent <= totalBudget;
+        const netDiff = Math.abs(totalBudget - totalSpent);
 
-        // YTD forecast: annualize current rate
-        const monthlyRate = this.getMonthlyRate();
-        const ytdForecast = monthlyRate * 12;
-        const monthlySavings = Math.round(monthlyRate * 0.055);
-        const ytdSavings = monthlySavings * 12;
+        // Forecast savings: what you'll save for the remaining months this year
+        const remainingMonths = 12 - YTD_MONTHS;
+        const forecastSavings = MONTHLY_SAVINGS * remainingMonths;
+
+        // Spending card: green when under budget, orange/red when over
+        const spendBg = underBudget ? '#f0fdf4' : '#fff7ed';
+        const spendBorder = underBudget ? '#bbf7d0' : '#fed7aa';
+        const spendColor = underBudget ? '#166534' : '#ea580c';
+        const spendLabelColor = underBudget ? '#166534' : '#9a3412';
+        const spendNote = underBudget
+            ? '$'+netDiff.toLocaleString()+' under budget'
+            : '$'+netDiff.toLocaleString()+' over $'+totalBudget.toLocaleString()+' budget';
 
         document.getElementById('budget-summary-area').innerHTML =
             '<div style="display:flex; gap:8px; margin-bottom:10px;">' +
-                '<div style="flex:1; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px;">' +
-                    '<div style="font-size:10px; color:#9a3412; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">'+pn+'</div>' +
-                    '<div style="font-size:20px; font-weight:700; color:#ea580c;">$'+totalSpent.toLocaleString()+'</div>' +
-                    '<div style="font-size:10px; color:#9a3412; opacity:0.7;">of $'+totalBudget.toLocaleString()+' budget</div>' +
+                '<div style="flex:1; background:'+spendBg+'; border:1px solid '+spendBorder+'; border-radius:10px; padding:12px;">' +
+                    '<div style="font-size:10px; color:'+spendLabelColor+'; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">'+pn+' Spent</div>' +
+                    '<div style="font-size:20px; font-weight:700; color:'+spendColor+';">$'+totalSpent.toLocaleString()+'</div>' +
+                    '<div style="font-size:10px; color:'+spendLabelColor+'; opacity:0.7;">'+spendNote+'</div>' +
                 '</div>' +
                 '<div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px;">' +
-                    '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">YTD Forecast</div>' +
-                    '<div style="font-size:20px; font-weight:700; color:#2563eb;">$'+ytdForecast.toLocaleString()+'</div>' +
-                    '<div style="font-size:10px; color:#1e40af; opacity:0.7;">at current pace · save $'+ytdSavings.toLocaleString()+'</div>' +
+                    '<div style="font-size:10px; color:#1e40af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Forecast Savings</div>' +
+                    '<div style="font-size:20px; font-weight:700; color:#2563eb;">$'+forecastSavings.toLocaleString()+'</div>' +
+                    '<div style="font-size:10px; color:#1e40af; opacity:0.7;">$'+MONTHLY_SAVINGS+'/mo × '+remainingMonths+' months left</div>' +
                 '</div>' +
             '</div>' +
-            '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="margin-bottom:12px; padding:10px; font-size:12px;">⚡ Auto-sweep savings → USDC (4.1% APY)</button>';
+            '<button class="cta-btn primary" onclick="app.switchFeatureTab(\'rules\')" style="margin-bottom:12px; padding:10px; font-size:12px;">⚡ Auto-sweep savings → USDC ('+(RATES.usdc*100).toFixed(1)+'% APY)</button>';
 
         const container = document.getElementById('budget-bars');
         container.innerHTML = '';
@@ -1371,7 +1415,7 @@ const app = {
         const overBudget = budgets.filter(b => b.spent > b.limit);
         document.getElementById('budget-alert').innerHTML = overBudget.length ?
             '<div class="alert-box">' + overBudget.map(b => '<strong>'+b.name+'</strong> $'+(b.spent-b.limit)+' over').join(' · ') + ' '+pn.toLowerCase()+'</div>' :
-            '<div class="alert-box" style="border-color:#bbf7d0; background:#f0fdf4; color:#166534;">All categories within budget '+pn.toLowerCase()+'</div>';
+            '<div class="alert-box" style="border-color:#bbf7d0; background:#f0fdf4; color:#166534;">All categories within budget '+pn.toLowerCase()+' — net savings on track</div>';
 
         document.getElementById('budget-savings').innerHTML =
             '<div class="savings-item">Cut food delivery 40% → Save <strong>$'+Math.round(112*ps)+'/'+pn.toLowerCase()+'</strong></div>' +
@@ -1385,25 +1429,27 @@ const app = {
             'Choose how your <strong style="color:#111;">saved money</strong> works for you. Adjust the mix below — the chart shows your projected savings growth over 5 years vs a traditional bank.';
 
         document.getElementById('yields-tiers').innerHTML =
-            '<div class="tier-card safe"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">4.1% APY</div><div style="font-size:11px; color:#00C805; font-weight:600;">LOW RISK</div></div>' +
+            '<div class="tier-card safe"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">'+(RATES.usdc*100).toFixed(1)+'% APY</div><div style="font-size:11px; color:#00C805; font-weight:600;">LOW RISK</div></div>' +
             '<div class="tier-description">USDC Stablecoin · Dollar-pegged, no volatility. Like a high-yield savings but 10x better.</div>' +
             '<div class="risk-meter"><div class="risk-bar filled" style="color:#00C805;"></div><div class="risk-bar"></div><div class="risk-bar"></div><div class="risk-bar"></div><div class="risk-bar"></div></div></div>' +
 
-            '<div class="tier-card moderate"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">6-8% APY</div><div style="font-size:11px; color:#f59e0b; font-weight:600;">MODERATE</div></div>' +
+            '<div class="tier-card moderate"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">'+(RATES.defi*100)+'% APY</div><div style="font-size:11px; color:#f59e0b; font-weight:600;">MODERATE</div></div>' +
             '<div class="tier-description">DeFi Lending · Robinhood manages complexity. You see a simple yield slider.</div>' +
             '<div class="risk-meter"><div class="risk-bar filled" style="color:#f59e0b;"></div><div class="risk-bar filled" style="color:#f59e0b;"></div><div class="risk-bar"></div><div class="risk-bar"></div><div class="risk-bar"></div></div></div>' +
 
-            '<div class="tier-card growth"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">~30%/yr avg</div><div style="font-size:11px; color:#f97316; font-weight:600;">HIGHER RISK</div></div>' +
+            '<div class="tier-card growth"><div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="tier-apy">~'+(RATES.btc*100)+'%/yr avg</div><div style="font-size:11px; color:#f97316; font-weight:600;">HIGHER RISK</div></div>' +
             '<div class="tier-description">BTC/ETH DCA · 3+ year horizon. Volatile but historically strong.</div>' +
             '<div class="risk-meter"><div class="risk-bar filled" style="color:#f97316;"></div><div class="risk-bar filled" style="color:#f97316;"></div><div class="risk-bar filled" style="color:#f97316;"></div><div class="risk-bar filled" style="color:#f97316;"></div><div class="risk-bar"></div></div></div>';
 
+        // Realistic defaults matching MONTHLY_SAVINGS ($95/mo split)
+        const a = this.state.allocations;
         document.getElementById('yields-sliders').innerHTML =
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">Safe (USDC)</div><div class="slider-value" id="safe-value">$250/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="250" oninput="app.updateYieldsSlider(\'safe\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f59e0b;">Moderate (DeFi)</div><div class="slider-value" id="moderate-value">$150/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="150" oninput="app.updateYieldsSlider(\'moderate\',this.value)"></div>' +
-            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH)</div><div class="slider-value" id="growth-value">$100/mo</div></div>' +
-            '<input type="range" min="0" max="500" value="100" oninput="app.updateYieldsSlider(\'growth\',this.value)"></div>';
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#00C805;">Safe (USDC)</div><div class="slider-value" id="safe-value">$'+a.safe+'/mo</div></div>' +
+            '<input type="range" min="0" max="500" value="'+a.safe+'" oninput="app.updateYieldsSlider(\'safe\',this.value)"></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f59e0b;">Moderate (DeFi)</div><div class="slider-value" id="moderate-value">$'+a.moderate+'/mo</div></div>' +
+            '<input type="range" min="0" max="500" value="'+a.moderate+'" oninput="app.updateYieldsSlider(\'moderate\',this.value)"></div>' +
+            '<div class="slider-group"><div class="slider-label"><div class="slider-name" style="color:#f97316;">Growth (BTC/ETH)</div><div class="slider-value" id="growth-value">$'+a.growth+'/mo</div></div>' +
+            '<input type="range" min="0" max="500" value="'+a.growth+'" oninput="app.updateYieldsSlider(\'growth\',this.value)"></div>';
 
         this.updateYields();
     },
@@ -1415,32 +1461,43 @@ const app = {
         this.updateYields();
     },
 
+    setPreset(preset) {
+        const presets = {
+            safe:     { safe: 80, moderate: 15, growth: 0 },
+            balanced: { safe: 50, moderate: 30, growth: 15 },
+            growth:   { safe: 15, moderate: 25, growth: 55 }
+        };
+        const p = presets[preset] || presets.balanced;
+        this.state.allocations = { ...p };
+        this.renderYieldsTab();
+    },
+
     updateYields() {
         const a = this.state.allocations;
         const total = a.safe + a.moderate + a.growth;
-        const annualYield = (a.safe * 0.041) + (a.moderate * 0.07) + (a.growth * 0.30);
+        const annualYield = (a.safe * RATES.usdc) + (a.moderate * RATES.defi) + (a.growth * RATES.btc);
         const blended = total > 0 ? ((annualYield / total) * 100).toFixed(1) : '0';
 
         // 5yr projection
         let proj = 0, bank = 0;
         for (let i = 0; i < 60; i++) {
             proj = proj * (1 + (total > 0 ? annualYield/total/12 : 0)) + total;
-            bank = bank * (1 + 0.0039/12) + total;
+            bank = bank * (1 + RATES.bank/12) + total;
         }
         const adv = Math.round(proj - bank);
 
-        // YTD missed yield (3 months elapsed at bank rate vs blended)
+        // YTD missed yield (elapsed months at bank rate vs blended)
         let ytdProj = 0, ytdBank = 0;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < YTD_MONTHS; i++) {
             ytdProj = ytdProj * (1 + (total > 0 ? annualYield/total/12 : 0)) + total;
-            ytdBank = ytdBank * (1 + 0.0039/12) + total;
+            ytdBank = ytdBank * (1 + RATES.bank/12) + total;
         }
         const ytdMissed = Math.round(ytdProj - ytdBank);
 
         document.getElementById('yields-projected').innerHTML =
-            'Blended <strong>'+blended+'% APY</strong> · Annual yield: <strong>$'+Math.round(annualYield).toLocaleString()+'</strong><br>' +
-            '<span style="font-size:11px; color:#047857;">5-yr advantage vs bank: <strong>+$'+adv.toLocaleString()+'</strong></span>' +
-            (ytdMissed > 0 ? '<br><span style="font-size:11px; color:#f97316;">YTD missed yield at bank rate: <strong>~$'+ytdMissed+'</strong></span>' : '');
+            'Blended <strong>'+blended+'% APY</strong> · Yield on $'+total+'/mo: <strong>$'+Math.round(annualYield).toLocaleString()+'/yr</strong><br>' +
+            '<span style="font-size:11px; color:#047857;">5-yr advantage vs bank ('+(RATES.bank*100).toFixed(2)+'%): <strong>+$'+adv.toLocaleString()+'</strong></span>' +
+            (ytdMissed > 0 ? '<br><span style="font-size:11px; color:#f97316;">YTD missed yield ('+YTD_MONTHS+' mo at bank): <strong>~$'+ytdMissed+'</strong></span>' : '');
 
         this.drawYieldsChart();
     },
@@ -1451,15 +1508,22 @@ const app = {
             '<div style="background:#f0fdf4; border-radius:10px; padding:14px; margin-bottom:12px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
                 '<div style="font-weight:500; font-size:13px; color:#111;">Auto-sweep savings → USDC</div>' +
-                '<div style="font-size:11px; color:#047857; margin-top:2px;">Earns 4.1% APY on idle cash</div></div>' +
+                '<div style="font-size:11px; color:#047857; margin-top:2px;">Earns '+(RATES.usdc*100).toFixed(1)+'% APY on idle cash</div></div>' +
                 '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>' +
             '<div style="background:#eff6ff; border-radius:10px; padding:14px; margin-bottom:12px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
                 '<div style="font-weight:500; font-size:13px; color:#111;">RH Gold Card rewards → USDC</div>' +
-                '<div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested at 4.1% APY</div></div>' +
+                '<div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested at '+(RATES.usdc*100).toFixed(1)+'% APY</div></div>' +
+                '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>' +
+            '<div style="background:#fff7ed; border-radius:10px; padding:14px; margin-bottom:12px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center;"><div>' +
+                '<div style="font-weight:500; font-size:13px; color:#111;">Round-ups → USDC</div>' +
+                '<div style="font-size:11px; color:#9a3412; margin-top:2px;">Round every purchase to nearest $1, invest the spare change</div></div>' +
                 '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div></div>';
 
         document.getElementById('rules-active').innerHTML =
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change from every purchase → USDC at '+(RATES.usdc*100).toFixed(1)+'%</div></div>' +
+            '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, sweep difference</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Weekly BTC DCA ($50)</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Every Friday, buy $50 BTC</div></div>' +
@@ -1468,13 +1532,15 @@ const app = {
             '<button class="toggle" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>';
 
         document.getElementById('rules-templates').innerHTML =
-            ['If dining < $200/mo, sweep difference to USDC','Every Friday, $50 → BTC','If BTC drops 10% in a week, buy $100','If total spending < budget, save extra to goal'].map(t =>
+            ['Round-ups: invest spare change from every purchase','If dining < $200/mo, sweep difference to USDC','Every Friday, $50 → BTC','If BTC drops 10% in a week, buy $100','If total spending < budget, save extra to goal','Smart Deposit: detect extra cash, auto-invest'].map(t =>
                 '<div class="template-row"><div class="template-text">'+t+'</div><button class="template-add-btn" onclick="this.textContent=\'✓\';this.style.background=\'#065f46\';">+</button></div>'
             ).join('');
 
         document.getElementById('rules-activity').innerHTML =
-            [{date:'Mar 27',desc:'Swept $48 to USDC (dining under budget)',color:'#00C805'},
+            [{date:'Mar 27',desc:'Round-up: $0.50 + $0.80 + $0.70 → USDC',color:'#f97316'},
+             {date:'Mar 27',desc:'Swept $48 to USDC (dining under budget)',color:'#00C805'},
              {date:'Mar 26',desc:'RH Card rewards: $49.05 → USDC',color:'#3b82f6'},
+             {date:'Mar 26',desc:'Round-up: $0.01 + $1.00 + $0.50 → USDC',color:'#f97316'},
              {date:'Mar 21',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
              {date:'Mar 18',desc:'Swept $112 to USDC (dining under budget)',color:'#00C805'},
              {date:'Mar 14',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
