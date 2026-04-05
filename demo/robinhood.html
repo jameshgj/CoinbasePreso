@@ -669,6 +669,24 @@ const app = {
         });
     },
 
+    periodScales: {
+        '1w':  { scale: 0.224, seed: 10, label: 'vs last week',       changeMultiplier: 1.5 },
+        '1m':  { scale: 1.0,   seed: 42, label: 'vs last month',      changeMultiplier: 1.0 },
+        '3m':  { scale: 3.11,  seed: 55, label: 'vs prior 3 months',  changeMultiplier: 0.7 },
+        'ytd': { scale: 3.11,  seed: 65, label: 'year to date',       changeMultiplier: 0.7 },
+        '1y':  { scale: 11.87, seed: 80, label: 'vs last year',       changeMultiplier: 0.5 },
+        'all': { scale: 27.05, seed: 99, label: 'all time',           changeMultiplier: 0.3 }
+    },
+
+    getScaledCategories() {
+        const cfg = this.periodScales[this.state.activePeriod] || this.periodScales['1m'];
+        return this.state.categories.map(c => ({
+            ...c,
+            amount: Math.round(c.amount * cfg.scale * 100) / 100,
+            change: Math.round(c.change * cfg.changeMultiplier)
+        }));
+    },
+
     initPeriods() {
         document.querySelectorAll('.time-pills .time-pill[data-period]').forEach(pill => {
             pill.addEventListener('click', () => {
@@ -676,6 +694,7 @@ const app = {
                 pill.classList.add('active');
                 this.state.activePeriod = pill.dataset.period;
                 this.updateAmountDisplay(); this.drawChart();
+                if (this.state.activeTab === 'overview') this.renderOverviewTab();
             });
         });
     },
@@ -786,9 +805,21 @@ const app = {
     drawOverviewChart() {
         const { svg, w, h, p, gw, gh } = this.dim();
         svg.innerHTML = '';
-        const cats = this.state.categories;
+        const cats = this.getScaledCategories();
         const hl = this.state.highlightedCategory;
-        const steps = 30, rng = seededRandom(42);
+        const period = this.state.activePeriod;
+
+        const periodCfg = {
+            '1w':  { days: 7,   seed: 10, unit: 'Day' },
+            '1m':  { days: 30,  seed: 42, unit: 'Day' },
+            '3m':  { days: 90,  seed: 55, unit: 'Day' },
+            'ytd': { days: 90,  seed: 65, unit: 'Day' },
+            '1y':  { days: 52,  seed: 80, unit: 'Wk' },
+            'all': { days: 24,  seed: 99, unit: 'Mo' }
+        };
+        const cfg = periodCfg[period] || periodCfg['1m'];
+        const steps = Math.min(cfg.days, 60);
+        const rng = seededRandom(cfg.seed);
 
         const daily = cats.map(c => {
             const d = [], b = c.amount / steps;
@@ -799,7 +830,6 @@ const app = {
         const totalMax = cats.reduce((s,c) => s + c.amount, 0);
         const yS = gh / (totalMax * 1.15);
 
-        // Store hover points (total cumulative at each step)
         this.state.chartPoints = [];
         for (let d = 0; d <= steps; d++) {
             let total = 0;
@@ -807,7 +837,7 @@ const app = {
             this.state.chartPoints.push({
                 x: p + (d / steps) * gw,
                 y: p + gh - total * yS,
-                label: 'Day ' + d + ': $' + Math.round(total)
+                label: cfg.unit + ' ' + d + ': $' + Math.round(total).toLocaleString()
             });
         }
 
@@ -1044,8 +1074,15 @@ const app = {
         const container = document.getElementById('overview-categories');
         container.innerHTML = '';
         const hl = this.state.highlightedCategory;
+        const scaledCats = this.getScaledCategories();
+        const period = this.state.activePeriod;
+        const cfg = this.periodScales[period] || this.periodScales['1m'];
 
-        this.state.categories.forEach(cat => {
+        // Scale transaction counts by period
+        const countScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const cs = countScale[period] || 1;
+
+        scaledCats.forEach(cat => {
             const row = document.createElement('div');
             row.className = 'category-row' + (hl === cat.name ? ' highlighted' : '');
             row.onclick = () => this.handleCategoryClick(cat.name);
@@ -1055,18 +1092,25 @@ const app = {
             else if (cat.change > 0) { cc = 'bad'; ct = '▲ ' + cat.change + '%'; }
 
             const cl = cat.name==='Subscriptions' ? 'services' : (cat.name==='Savings' ? 'transfer' : (cat.name==='Utilities' ? 'bills' : 'transactions'));
+            const txnCount = Math.max(1, Math.round(cat.count * cs));
 
             row.innerHTML =
-                '<div class="category-left"><div class="category-dot" style="background:'+cat.color+'"></div><div class="category-info"><div class="category-name">'+cat.name+'</div><div class="category-count">'+cat.count+' '+cl+'</div></div></div>' +
+                '<div class="category-left"><div class="category-dot" style="background:'+cat.color+'"></div><div class="category-info"><div class="category-name">'+cat.name+'</div><div class="category-count">'+txnCount+' '+cl+'</div></div></div>' +
                 '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div></div>';
             container.appendChild(row);
         });
 
+        // Period-aware insights
+        const periodLabel = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' };
+        const pl = periodLabel[period] || 'this month';
+        const diningAmt = scaledCats.find(c => c.name === 'Dining');
+        const transportCat = scaledCats.find(c => c.name === 'Transport');
+
         document.getElementById('overview-insights').innerHTML =
             '<div class="section-label">Insights</div>' +
-            '<div class="insight-card warning"><strong>Food delivery up 23%</strong> this quarter — $112/mo on DoorDash alone</div>' +
+            '<div class="insight-card warning"><strong>Food delivery up '+(diningAmt ? Math.abs(diningAmt.change) : 23)+'%</strong> '+pl+' — $'+Math.round((diningAmt ? diningAmt.amount : 280) * 0.4)+' on DoorDash alone</div>' +
             '<div class="insight-card info"><strong>8 active subscriptions</strong> — Hulu, ClassPass, Adobe CC haven\'t been used in 30+ days</div>' +
-            '<div class="insight-card success"><strong>Transport down 15%</strong> — nice work with the bus pass switch</div>' +
+            '<div class="insight-card success"><strong>Transport down '+(transportCat ? Math.abs(transportCat.change) : 15)+'%</strong> — nice work with the bus pass switch</div>' +
             '<div class="insight-card info"><strong>Utilities stable</strong> — Electric bill up 3% (seasonal). Water & gas unchanged</div>' +
             '<div class="insight-card info"><strong>Savings down 12%</strong> — transfer was $108 last month. Consider auto-increasing</div>' +
             '<div class="sweep-cta" onclick="app.switchFeatureTab(\'what-if\')"><div class="sweep-cta-text">See what your savings could earn →</div><div class="sweep-cta-arrow">→</div></div>';
@@ -1079,8 +1123,10 @@ const app = {
 
     openCategoryDrill(category) {
         document.getElementById('drill-category-name').textContent = category;
-        const cd = this.state.categories.find(c => c.name === category);
-        document.getElementById('drill-category-amount').textContent = '$' + cd.amount.toFixed(2) + ' this month';
+        const scaledCats = this.getScaledCategories();
+        const cd = scaledCats.find(c => c.name === category);
+        const periodLabel = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' };
+        document.getElementById('drill-category-amount').textContent = '$' + cd.amount.toFixed(2) + ' ' + (periodLabel[this.state.activePeriod] || 'this month');
         const txns = this.state.transactions[category] || [];
         const tc = document.getElementById('drill-transactions');
         tc.innerHTML = '';
