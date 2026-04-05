@@ -655,7 +655,7 @@ const app = {
             '3m':  { amount: Math.round(base * scales['3m'].scale),  change: 230,  pct: 4.5, label: 'vs prior 3 months' },
             'ytd': { amount: Math.round(base * scales['ytd'].scale), change: 230,  pct: 4.5, label: 'year to date' },
             '1y':  { amount: Math.round(base * scales['1y'].scale),  change: -960, pct: 5,   label: 'vs last year' },
-            'all': { amount: Math.round(base * scales['all'].scale), change: 0,    pct: 0,   label: 'all time' }
+            'all': { amount: Math.round(base * scales['all'].scale), change: 8200, pct: 9.2, label: 'all time (5 yr)' }
         };
     },
 
@@ -693,7 +693,7 @@ const app = {
         '3m':  { scale: 3.11,  seed: 55, label: 'vs prior 3 months',  changeMultiplier: 0.7 },
         'ytd': { scale: 3.11,  seed: 65, label: 'year to date',       changeMultiplier: 0.7 },
         '1y':  { scale: 11.87, seed: 80, label: 'vs last year',       changeMultiplier: 0.5 },
-        'all': { scale: 27.05, seed: 99, label: 'all time',           changeMultiplier: 0.3 }
+        'all': { scale: 59.4,  seed: 99, label: 'all time',           changeMultiplier: 0.2 }
     },
 
     getScaledCategories() {
@@ -838,7 +838,7 @@ const app = {
             '3m':  { days: 90,  seed: 55, unit: 'Day', spiky: 0.7 },
             'ytd': { days: 90,  seed: 65, unit: 'Day', spiky: 0.6 },
             '1y':  { days: 52,  seed: 80, unit: 'Wk',  spiky: 0.4 },
-            'all': { days: 24,  seed: 99, unit: 'Mo',  spiky: 0.25 }
+            'all': { days: 60,  seed: 99, unit: 'Mo',  spiky: 0.2 }
         };
         const cfg = periodCfg[period] || periodCfg['1m'];
         const steps = Math.min(cfg.days, 60);
@@ -1012,7 +1012,7 @@ const app = {
         // Derive budget limit from actual category budget data
         const baseBudgets = [250, 600, 300, 150, 250, 200]; // Dining, Groceries, Shopping, Subs, Transport, Utilities
         const period = this.state.activePeriod;
-        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 };
         const ps = periodScale[period] || 1;
         const budgetLimit = Math.round(baseBudgets.reduce((s,b) => s + b, 0) * ps);
         const maxVal = Math.round(budgetLimit * 1.3);
@@ -1215,7 +1215,7 @@ const app = {
         const cfg = this.periodScales[period] || this.periodScales['1m'];
 
         // Scale transaction counts by period
-        const countScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const countScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 };
         const cs = countScale[period] || 1;
 
         scaledCats.forEach(cat => {
@@ -1283,7 +1283,7 @@ const app = {
         const period = this.state.activePeriod;
         const scaledCats = this.getScaledCategories();
         const totalPeriod = scaledCats.reduce((s,c) => s + c.amount, 0);
-        const toMonthly = { '1w': 4.33, '1m': 1, '3m': 1/3, 'ytd': 1/3, '1y': 1/12, 'all': 1/24 };
+        const toMonthly = { '1w': 4.33, '1m': 1, '3m': 1/3, 'ytd': 1/3, '1y': 1/12, 'all': 1/60 };
         return Math.round(totalPeriod * (toMonthly[period] || 1));
     },
 
@@ -1337,7 +1337,7 @@ const app = {
     // ===== BUDGET =====
     renderBudgetTab() {
         const period = this.state.activePeriod;
-        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 24 };
+        const periodScale = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 60 };
         const ps = periodScale[period] || 1;
         const periodNames = { '1w': 'This Week', '1m': 'This Month', '3m': 'This Quarter', 'ytd': 'Year to Date', '1y': 'This Year', 'all': 'All Time' };
         const pn = periodNames[period] || 'This Month';
