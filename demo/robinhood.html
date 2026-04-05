@@ -1293,17 +1293,9 @@ const app = {
         const years = this.state.whatIfPeriod;
         const months = years * 12;
 
-        // Proper compound missed yield: USDC vs bank over YTD
-        let ytdUsdc = 0, ytdBank = 0;
-        for (let i = 0; i < YTD_MONTHS; i++) {
-            ytdUsdc = ytdUsdc * (1 + RATES.usdc/12) + monthlySavings;
-            ytdBank = ytdBank * (1 + RATES.bank/12) + monthlySavings;
-        }
-        const missedYield = Math.round(ytdUsdc - ytdBank);
-
         document.getElementById('what-if-summary').innerHTML =
             '<div style="font-size:13px; color:#6b7280; line-height:1.6;">You auto-save <strong style="color:#111;">$'+monthlySavings+'/mo</strong> from <strong style="color:#111;">$'+monthlySpend.toLocaleString()+'/mo</strong> spending. ' +
-            'YTD you\'ve missed <strong style="color:#f97316;">~$'+missedYield+'</strong> in potential yield vs a bank.</div>';
+            'Your bank pays <strong style="color:#9ca3af;">'+(RATES.bank*100).toFixed(2)+'%</strong> — USDC earns <strong style="color:#00C805;">'+(RATES.usdc*100).toFixed(1)+'%</strong>. That\'s <strong style="color:#00C805;">10x more</strong> on every dollar.</div>';
 
         let savingsVal = 0, usdcVal = 0, cardVal = 0, btcVal = 0;
         for (let i = 0; i < months; i++) {
