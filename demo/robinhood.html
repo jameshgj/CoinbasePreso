@@ -1578,7 +1578,7 @@ const app = {
                 '</div>' +
                 projRow('Starting balance', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
                 projRow('Savings deposits ($'+MONTHLY_SAVINGS+'/mo × '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
-                projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months), '#059669', false) +
+                projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months), '#059669', false) +
                 (s.checkingToUsdc ? projRow('Checking yield at '+(RATES.usdc*100).toFixed(1)+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) : '') +
                 (s.goldCard ? projRow('Gold Card cashback ($'+monthlyCashback+'/mo)', deltaGoldCard, '#1d4ed8', false) : '') +
                 projRow('Total', total, anyActive ? '#166534' : '#374151', true) +
@@ -1588,10 +1588,10 @@ const app = {
             // Strategy checkboxes with individual deltas
             '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
             chk('savingsToUsdc', 'Convert existing savings to USDC',
-                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.savings*100)+'% on $'+EXISTING_SAVINGS.toLocaleString()+' + $'+MONTHLY_SAVINGS+'/mo',
+                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.savings*100).toFixed(2)+'% on $'+EXISTING_SAVINGS.toLocaleString()+' + $'+MONTHLY_SAVINGS+'/mo',
                 deltaSavings, s.savingsToUsdc) +
             chk('checkingToUsdc', 'Move your checking balance to USDC',
-                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.checking*100)+'% on $'+CHECKING_BALANCE.toLocaleString(),
+                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.checking*100).toFixed(2)+'% on $'+CHECKING_BALANCE.toLocaleString(),
                 deltaChecking, s.checkingToUsdc) +
             chk('goldCard', 'Gold Card — 3% cashback on all spending',
                 '$'+monthlyCashback+'/mo cashback auto-invested into USDC',
