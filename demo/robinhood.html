@@ -979,7 +979,7 @@ const app = {
         svg.innerHTML = '';
 
         const period = this.state.activePeriod;
-        const vacationTarget = this.state.vacationTarget || 1200;
+        const vacationTarget = this.state.vacationTarget || 900;
 
         // Generate 24 months of historical data
         const historyMonths = 24;
@@ -1319,9 +1319,13 @@ const app = {
         const totalMonthlySaving = MONTHLY_SAVINGS + Math.round(underBudgetSavings / Math.max(ps,1));
 
         // Goal data
-        const vacationSaved = 500, vacationTarget = this.state.vacationTarget || 1200;
+        const vacationSaved = 500, vacationTarget = this.state.vacationTarget || 900;
         const vacMonthlyContrib = Math.round(totalMonthlySaving * 0.3);
         const monthsToVacation = vacMonthlyContrib > 0 ? Math.ceil((vacationTarget - vacationSaved) / vacMonthlyContrib) : 999;
+        // Calculate USDC interest earned over that period
+        let _vBal = vacationSaved, _vInt = 0;
+        for (let i = 0; i < monthsToVacation; i++) { const ir = _vBal * (RATES.usdc/12); _vInt += ir; _vBal += ir + vacMonthlyContrib; }
+        const vacUsdcBonus = Math.round(_vInt);
         const vacPct = Math.round((vacationSaved / vacationTarget) * 100);
         const dashLen = (vacPct / 100) * 157.08;
 
@@ -1354,7 +1358,7 @@ const app = {
                     '<div>' +
                         '<div style="font-size:11px; font-weight:700; color:#92400e;">Vacation Fund</div>' +
                         '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+vacationSaved.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
-                        '<div style="font-size:10px; color:#92400e;">'+(vacationSaved >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go · <span style="color:#0052ff;">USDC → 2 months sooner</span>')+'</div>' +
+                        '<div style="font-size:10px; color:#92400e;">'+(vacationSaved >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go · <span style="color:#0052ff;">+$'+vacUsdcBonus+' with USDC yield</span>')+'</div>' +
                     '</div>' +
                     '<svg viewBox="0 0 60 60" style="width:46px; height:46px;">' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
@@ -1456,7 +1460,7 @@ const app = {
             const val = prompt('Set monthly savings goal ($):', this.state.savingsGoal || 300);
             if (val !== null) { this.state.savingsGoal = Math.max(0, parseInt(val) || 300); this.renderBudgetTab(); this.updateAmountDisplay(); }
         } else if (field === 'vacation') {
-            const val = prompt('Set vacation fund target ($):', this.state.vacationTarget || 1200);
+            const val = prompt('Set vacation fund target ($):', this.state.vacationTarget || 900);
             if (val !== null) { this.state.vacationTarget = Math.max(0, parseInt(val) || 1200); this.renderBudgetTab(); this.updateAmountDisplay(); }
         }
     },
