@@ -965,7 +965,7 @@ const app = {
             const b = budgetItems.find(x => x.name === c.name);
             const isOver = b && b.spent > b.limit;
             return '<div class="legend-item" style="cursor:'+(isOver?'pointer':'default')+';'+(isOver?' color:#dc2626; font-weight:600;':'')+'" '+(isOver?'onclick="app.openCategoryDrill(\''+c.name+'\')"':'')+'>' +
-                '<div class="legend-dot" style="background:'+c.color+'"></div>'+c.name+(isOver ? ' <span style="font-size:8px; background:#fef2f2; border:1px solid #fecaca; padding:0 3px; border-radius:3px; vertical-align:middle;">OVER</span>' : '') +
+                '<div class="legend-dot" style="background:'+c.color+'"></div>'+c.name +
             '</div>';
         }).join('') + '<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #6b7280;"></div>Budget</div>';
 
