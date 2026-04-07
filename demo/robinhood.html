@@ -467,7 +467,7 @@
                         <button class="feature-tab active" data-feature="overview">Spending</button>
                         <button class="feature-tab" data-feature="budget">Savings</button>
                         <button class="feature-tab" data-feature="savings">Grow</button>
-                        <button class="feature-tab" data-feature="rules">Rules</button>
+                        <button class="feature-tab" data-feature="rules"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></button>
                     </div>
                     </div><!-- /sticky-chart-area -->
 
@@ -796,7 +796,7 @@ const app = {
             }
             const baseline = Math.round(bSav + bChk);
             const gain = projected - baseline;
-            mainEl.textContent = '$' + projected.toLocaleString();
+            mainEl.innerHTML = '<span style="font-size:14px;font-weight:500;color:#6b7280;letter-spacing:0.5px;">FORECAST </span>$' + projected.toLocaleString();
             if (anyActive && gain > 0) {
                 changeEl.textContent = years + '-year projected · +$' + gain.toLocaleString() + ' with strategies';
             } else {
@@ -1712,11 +1712,10 @@ const app = {
             '</div>';
 
         document.getElementById('rules-suggested').innerHTML =
-            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SUGGESTED FOR YOU</div>' +
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">INSIGHTS FOR GOLD MEMBERS</div>' +
             (potentialSavings > 0 ? suggestedCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
             suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → Gold Sweep', 'Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY (FDIC insured) on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
-            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested.', "alert('Apply for Gold Card in Settings')", 'Apply') +
-            suggestedCard('#f9fafb','#e5e7eb','#374151','↑','Increase auto-transfer to $200/mo', 'Boost from $'+MONTHLY_SAVINGS+'/mo for faster goal progress. Hit honeymoon goal sooner.', "alert('Updated auto-transfer to $200/mo')", 'Update');
+            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested.', "alert('Apply for Gold Card in Settings')", 'Apply');
 
         // Active Rules
         document.getElementById('rules-active').innerHTML =
