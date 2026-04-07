@@ -696,6 +696,7 @@ const app = {
                 this.state.whatIfPeriod = parseInt(pill.dataset.wperiod);
                 this.updateSavingsProjections();
                 this.updateAmountDisplay();
+                this.drawChart();
             });
         });
     },
@@ -750,12 +751,13 @@ const app = {
                 changeEl.className = dn ? 'amount-change' : 'amount-change negative';
             }
         } else if (tab === 'budget') {
+            const pl = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' }[this.state.activePeriod] || 'this month';
             mainEl.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
             const lastYearMonthly = 1820;
             const monthlySpend = this.getMonthlyRate();
             const reduction = ((lastYearMonthly - monthlySpend) / lastYearMonthly * 100).toFixed(1);
             const onTrack = monthlySpend <= Math.round(lastYearMonthly * 0.95);
-            changeEl.textContent = 'Total savings · Spending ' + (onTrack ? '↓'+reduction+'% on track' : '↑ off track');
+            changeEl.textContent = 'Total savings · Spending ' + (onTrack ? '↓'+reduction+'% ' + pl : '↑ off track ' + pl);
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const totalMonthly = MONTHLY_SAVINGS + MONTHLY_ROUNDUPS;
@@ -793,7 +795,7 @@ const app = {
         if (toggleBtn) toggleBtn.style.display = (t === 'overview') ? 'block' : 'none';
         if (t === 'overview') this.drawOverviewChart();
         else if (t === 'budget') this.drawBudgetChart();
-        else if (t === 'savings') this.drawBudgetChart();
+        else if (t === 'savings') this.drawSavingsChart();
         else if (t === 'rules') this.drawRulesChart();
     },
 
@@ -988,21 +990,24 @@ const app = {
         const savingsHistory = [], vacationHistory = [];
         let sv = 0, vv = 0;
         const baseContrib = EXISTING_SAVINGS / historyMonths;
-        const vacContrib = 150;
+        const vacContrib = 115; // monthly surplus auto-swept to USDC
+        const vacStartMonth = historyMonths - YTD_MONTHS; // started 3 months ago
         for (let i = 0; i <= historyMonths; i++) {
             savingsHistory.push(sv);
             vacationHistory.push(vv);
             if (i < historyMonths) {
                 const v = 0.85 + rng() * 0.3;
                 sv = sv * (1 + RATES.usdc/12) + baseContrib * v;
-                if (i >= 21) vv = vv * (1 + RATES.usdc/12) + vacContrib * v;
+                if (i >= vacStartMonth) vv = vv * (1 + RATES.usdc/12) + vacContrib * v;
             }
         }
         // Normalize to hit actual current values
         const savScale = EXISTING_SAVINGS / (savingsHistory[historyMonths] || 1);
+        const vacSaved = vacContrib * YTD_MONTHS;
+        const vacScale = vacationHistory[historyMonths] > 0 ? vacSaved / vacationHistory[historyMonths] : 1;
         for (let i = 0; i <= historyMonths; i++) {
             savingsHistory[i] = Math.round(savingsHistory[i] * savScale);
-            vacationHistory[i] = 0; // honeymoon fund just created, no history yet
+            vacationHistory[i] = i <= vacStartMonth ? 0 : Math.round(vacationHistory[i] * vacScale);
         }
 
         // Period → months of history to show
@@ -1050,80 +1055,109 @@ const app = {
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
         const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
-        const years = this.state.whatIfPeriod;
-        const months = years * 12;
-
-        // Baseline (do nothing — current bank rates)
-        const baselinePts = [];
-        let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
-        for (let i = 0; i <= months; i++) {
-            baselinePts.push(bSav + bChk);
-            if (i < months) {
-                bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
-                bChk = bChk * (1 + RATES.checking/12);
-            }
-        }
-
-        // With strategies
-        const stratPts = [];
-        let sSav = EXISTING_SAVINGS, sChk = CHECKING_BALANCE;
-        for (let i = 0; i <= months; i++) {
-            stratPts.push(sSav + sChk);
-            if (i < months) {
-                sSav = sSav * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
-                sChk = sChk * (1 + chkRate/12);
-            }
-        }
-
-        const startVal = EXISTING_SAVINGS + CHECKING_BALANCE;
-        const maxVal = Math.max(stratPts[months], baselinePts[months]) * 1.1;
-        this.addYAxis(svg, p, gh, maxVal, 4);
-        this.state.chartPoints = [];
-
+        const forecastYears = this.state.whatIfPeriod;
+        const forecastMonths = forecastYears * 12;
         const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
 
-        // Strategy area (green)
+        // --- Historical: 6 months of real savings growth ---
+        const histMonths = 6;
+        const rng = seededRandom(42);
+        const histVals = [];
+        const histStart = EXISTING_SAVINGS - (MONTHLY_SAVINGS * histMonths);
+        let hBal = Math.max(histStart, 500);
+        for (let i = 0; i <= histMonths; i++) {
+            histVals.push(hBal + CHECKING_BALANCE);
+            if (i < histMonths) hBal += MONTHLY_SAVINGS * (0.85 + rng() * 0.3);
+        }
+        // Normalize so last point = current value
+        const currentTotal = EXISTING_SAVINGS + CHECKING_BALANCE;
+        const hScale = currentTotal / histVals[histMonths];
+        for (let i = 0; i <= histMonths; i++) histVals[i] = Math.round(histVals[i] * hScale);
+
+        // --- Forecast: baseline (do nothing) ---
+        const baseVals = [currentTotal];
+        let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
+        for (let i = 0; i < forecastMonths; i++) {
+            bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
+            bChk = bChk * (1 + RATES.checking/12);
+            baseVals.push(Math.round(bSav + bChk));
+        }
+
+        // --- Forecast: with strategies ---
+        const stratVals = [currentTotal];
+        let sSav = EXISTING_SAVINGS, sChk = CHECKING_BALANCE;
+        for (let i = 0; i < forecastMonths; i++) {
+            sSav = sSav * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
+            sChk = sChk * (1 + chkRate/12);
+            stratVals.push(Math.round(sSav + sChk));
+        }
+
+        // --- Layout ---
+        const totalMonths = histMonths + forecastMonths;
+        const allVals = [...histVals, ...baseVals.slice(1), ...(anyActive ? stratVals.slice(1) : [])];
+        const maxVal = Math.max(...allVals) * 1.1;
+        this.addYAxis(svg, p, gh, maxVal, 4);
+        this.state.chartPoints = [];
+        const nowX = p + (histMonths / totalMonths) * gw;
+
+        // "Now" divider
+        svg.appendChild(svgEl('line', { x1: nowX, y1: p, x2: nowX, y2: p + gh, stroke: '#0052FF', 'stroke-width': '1', 'stroke-dasharray': '3 3', opacity: '0.3' }));
+        const nowLabel = svgEl('text', { x: nowX, y: p - 2, fill: '#0052FF', 'font-size': '7', 'font-weight': '600', 'text-anchor': 'middle', 'font-family': 'Inter,sans-serif' });
+        nowLabel.textContent = 'Now';
+        svg.appendChild(nowLabel);
+
+        // Historical line (solid green with fill)
+        const hPts = histVals.map((v, i) => {
+            const x = p + (i / totalMonths) * gw, y = p + gh - (v / maxVal) * gh;
+            const mAgo = histMonths - i;
+            this.state.chartPoints.push({ x, y, label: (mAgo === 0 ? 'Now' : mAgo + 'mo ago') + ': $' + v.toLocaleString() });
+            return [x, y];
+        });
+        let hArea = smoothPath(hPts) + ' L ' + hPts[hPts.length-1][0] + ' ' + (p+gh) + ' L ' + hPts[0][0] + ' ' + (p+gh) + ' Z';
+        svg.appendChild(svgEl('path', { d: hArea, fill: '#00C805', opacity: '0.1' }));
+        svg.appendChild(svgEl('path', { d: smoothPath(hPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
+
+        // Now marker dot
+        const nowPt = hPts[hPts.length - 1];
+        svg.appendChild(svgEl('circle', { cx: nowPt[0], cy: nowPt[1], r: '4', fill: '#00C805', stroke: 'white', 'stroke-width': '2' }));
+        const nowValLabel = svgEl('text', { x: Number(nowPt[0]) + 6, y: Number(nowPt[1]) + 3, fill: '#166534', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
+        nowValLabel.textContent = '$' + currentTotal.toLocaleString();
+        svg.appendChild(nowValLabel);
+
+        // Strategy forecast (dotted green)
         if (anyActive) {
-            const sPts = stratPts.map((v, i) => {
-                const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
-                const yr = (i/12).toFixed(1);
-                this.state.chartPoints.push({ x, y, label: yr+'yr: $'+Math.round(v).toLocaleString()+' (+$'+Math.round(v - baselinePts[i]).toLocaleString()+')' });
+            const sPts = stratVals.map((v, i) => {
+                const x = p + ((histMonths + i) / totalMonths) * gw, y = p + gh - (v / maxVal) * gh;
+                this.state.chartPoints.push({ x, y, label: '+' + (i/12).toFixed(1) + 'yr: $' + v.toLocaleString() + ' (+$' + (v - baseVals[i]).toLocaleString() + ')' });
                 return [x, y];
             });
-            let sArea = smoothPath(sPts) + ' L '+sPts[sPts.length-1][0]+' '+(p+gh)+' L '+sPts[0][0]+' '+(p+gh)+' Z';
-            svg.appendChild(svgEl('path', { d: sArea, fill: '#00C805', opacity: '0.12' }));
-            svg.appendChild(svgEl('path', { d: smoothPath(sPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' }));
-            const lastS = sPts[sPts.length-1];
+            const sLine = svgEl('path', { d: smoothPath(sPts), stroke: '#00C805', fill: 'none', 'stroke-width': '2' });
+            sLine.setAttribute('stroke-dasharray', '6 4');
+            svg.appendChild(sLine);
+            const lastS = sPts[sPts.length - 1];
             const sl = svgEl('text', { x: lastS[0]-4, y: Math.max(lastS[1]-5, p+8), fill: '#166534', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-            sl.textContent = '$'+Math.round(stratPts[months]).toLocaleString();
+            sl.textContent = '$' + stratVals[forecastMonths].toLocaleString();
             svg.appendChild(sl);
         }
 
-        // Baseline line (gray dashed)
-        const bPts = baselinePts.map((v, i) => {
-            const x = p + (i/months)*gw, y = p + gh - (v/maxVal)*gh;
-            const yr = (i/12).toFixed(1);
-            if (!anyActive) this.state.chartPoints.push({ x, y, label: yr+'yr: $'+Math.round(v).toLocaleString() });
+        // Baseline forecast (dashed gray)
+        const bPts = baseVals.map((v, i) => {
+            const x = p + ((histMonths + i) / totalMonths) * gw, y = p + gh - (v / maxVal) * gh;
+            if (!anyActive) this.state.chartPoints.push({ x, y, label: '+' + (i/12).toFixed(1) + 'yr: $' + v.toLocaleString() });
             return [x, y];
         });
         const bankLine = svgEl('path', { d: smoothPath(bPts), stroke: '#9ca3af', fill: 'none', 'stroke-width': '1.5' });
-        bankLine.setAttribute('stroke-dasharray', '6 4');
+        bankLine.setAttribute('stroke-dasharray', '4 3');
         svg.appendChild(bankLine);
-        const lastB = bPts[bPts.length-1];
+        const lastB = bPts[bPts.length - 1];
         const bl = svgEl('text', { x: lastB[0]-4, y: Math.min(lastB[1]+12, p+gh-4), fill: '#9ca3af', 'font-size': '8', 'font-weight': '600', 'text-anchor': 'end', 'font-family': 'Inter,sans-serif' });
-        bl.textContent = '$'+Math.round(baselinePts[months]).toLocaleString();
+        bl.textContent = '$' + baseVals[forecastMonths].toLocaleString();
         svg.appendChild(bl);
 
-        // Starting point marker
-        const startY = p + gh - (startVal/maxVal)*gh;
-        svg.appendChild(svgEl('circle', { cx: p, cy: startY, r: '3', fill: '#374151' }));
-        const startLabel = svgEl('text', { x: p + 6, y: startY + 3, fill: '#374151', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
-        startLabel.textContent = '$'+startVal.toLocaleString()+' today';
-        svg.appendChild(startLabel);
-
-        const legendItems = [];
-        if (anyActive) legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>With strategies</div>');
-        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Current rates</div>');
+        // Legend
+        const legendItems = ['<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>Actual</div>'];
+        if (anyActive) legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #00C805;"></div>With strategies</div>');
+        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Do nothing</div>');
         document.getElementById('chartLegend').innerHTML = legendItems.join('');
     },
 
@@ -1318,10 +1352,12 @@ const app = {
         const spendingSurplus = underBudgetSavings;
         const totalMonthlySaving = MONTHLY_SAVINGS + Math.round(underBudgetSavings / Math.max(ps,1));
 
-        // Goal data
-        const vacationSaved = 0, vacationTarget = this.state.vacationTarget || 2000;
-        const vacMonthlyContrib = 150;
-        const monthsToVacation = vacMonthlyContrib > 0 ? Math.ceil((vacationTarget - vacationSaved) / vacMonthlyContrib) : 999;
+        // Goal data — vacation fund is fueled by under-budget surplus auto-swept to USDC
+        const monthlySurplus = Math.round(underBudgetSavings / Math.max(ps, 1));
+        const vacMonthlyContrib = monthlySurplus || 115; // monthly spending reduction → USDC
+        const vacationTarget = this.state.vacationTarget || 2000;
+        const vacationSaved = vacMonthlyContrib * YTD_MONTHS; // 3 months of surplus saved so far
+        const monthsToVacation = vacMonthlyContrib > 0 ? Math.round((vacationTarget - vacationSaved) / vacMonthlyContrib) : 999;
         // Calculate weeks saved with USDC vs bank savings (fractional interpolation)
         let _fb = vacationSaved, _fbPrev = vacationSaved, _mB = 0;
         while (_fb < vacationTarget) { _fbPrev = _fb; _fb = _fb * (1 + RATES.savings/12) + vacMonthlyContrib; _mB++; }
@@ -1489,6 +1525,7 @@ const app = {
         this.state.growthStrategies[key] = !this.state.growthStrategies[key];
         this.updateSavingsProjections();
         this.updateAmountDisplay();
+        this.drawChart();
     },
 
     updateSavingsProjections() {
