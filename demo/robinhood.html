@@ -56,6 +56,14 @@
         .phone-content::-webkit-scrollbar-track { background: transparent; }
         .phone-content::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 2px; }
 
+        .sticky-chart-area {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
         .phone-header {
             padding: 16px 20px; display: flex; justify-content: space-between;
             align-items: center; border-bottom: 1px solid #f3f4f6; flex-shrink: 0;
@@ -117,7 +125,7 @@
         }
         .feature-tab.active { color: #111; border-bottom-color: #00C805; }
 
-        .tab-content { flex: 1; overflow-y: auto; padding: 20px; animation: fadeIn 0.2s ease; }
+        .tab-content { padding: 20px; animation: fadeIn 0.2s ease; }
         .tab-content.hidden { display: none; }
 
         .category-row {
@@ -423,6 +431,7 @@
                     <span style="letter-spacing:-1px;">●●●●●</span>
                 </div>
                 <div class="phone-content">
+                    <div class="sticky-chart-area">
                     <div class="phone-header">
                         <div class="phone-header-title">Spending overview</div>
                         <div class="header-icons">
@@ -460,6 +469,7 @@
                         <button class="feature-tab" data-feature="savings">Grow</button>
                         <button class="feature-tab" data-feature="rules">Rules</button>
                     </div>
+                    </div><!-- /sticky-chart-area -->
 
                     <!-- OVERVIEW -->
                     <div class="tab-content" id="overview-content">
@@ -566,7 +576,7 @@ const app = {
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
         breakdownOpen: false,
-            growthStrategies: { savingsToUsdc: true, checkingToUsdc: false, goldCard: false },
+            growthStrategies: { savingsToUsdc: false, checkingToUsdc: false, goldCard: false },
             allocations: { safe: 85, moderate: 0, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
@@ -1050,10 +1060,13 @@ const app = {
     },
 
     drawSavingsChart() {
+        const s = this.state.growthStrategies;
+        const anyStrat = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
+        // When no strategies selected, show same savings history chart as Savings tab
+        if (!anyStrat) return this.drawBudgetChart();
+
         const { svg, p, gw, gh } = this.dim();
         svg.innerHTML = '';
-
-        const s = this.state.growthStrategies;
         const monthlySpend = this.getMonthlyRate();
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
@@ -1265,8 +1278,12 @@ const app = {
             catRows +=
                 '<div class="category-row'+(hl === cat.name ? ' highlighted' : '')+'" onclick="app.handleCategoryClick(\''+cat.name+'\')">' +
                 '<div class="category-left"><div class="category-dot" style="background:'+cat.color+'"></div><div class="category-info"><div class="category-name">'+cat.name+budgetTag+'</div><div class="category-count">'+txnCount+' '+cl+'</div></div></div>' +
-                '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div>' +
-                '<div onclick="event.stopPropagation(); app.openCategoryDrill(\''+cat.name+'\')" style="margin-left:6px; width:20px; height:20px; border-radius:50%; background:rgba(0,82,255,0.06); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+                '<div class="category-right">' +
+                '<div style="display:flex; align-items:center; justify-content:flex-end; gap:2px;">' +
+                    '<div class="category-amount">$'+cat.amount.toFixed(2)+'</div>' +
+                    '<div onclick="event.stopPropagation(); app.openCategoryDrill(\''+cat.name+'\')" style="cursor:pointer; padding:2px; opacity:0.35; transition:opacity 0.15s;" onmouseenter="this.style.opacity=0.8" onmouseleave="this.style.opacity=0.35"><svg width="8" height="8" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+                '</div>' +
+                '<div class="category-change '+cc+'">'+ct+'</div>' +
                 '</div></div>';
         });
         container.innerHTML = catRows;
@@ -1649,8 +1666,6 @@ const app = {
             chk('goldCard', 'Gold Card — 3% cashback on all spending',
                 '$'+monthlyCashback+'/mo cashback auto-invested',
                 deltaGoldCard, s.goldCard);
-
-        this.drawBudgetChart();
     },
 
     // ===== RULES =====
