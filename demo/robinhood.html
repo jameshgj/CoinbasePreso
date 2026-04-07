@@ -400,7 +400,7 @@
             </div>
             <div class="card" data-tab="savings">
                 <div class="card-title"><span class="card-number">5</span>The Insight</div>
-                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.40% APY is invisible erosion — then lead them to USDC yield, Gold Card, and deeper engagement</div>
+                <div class="card-subtitle">Spending insights + savings insights are the drawbridge. Show users where money leaks and that 0.40% APY is invisible erosion — then offer free USDC for fun goals, Gold Sweep (FDIC insured) for serious savings, and Gold Card for daily spend</div>
             </div>
             <div class="card" data-tab="budget">
                 <div class="card-title"><span class="card-number">6</span>The Funnel</div>
@@ -549,7 +549,8 @@ function svgEl(tag, attrs) {
 const RATES = {
     checking: 0.0007, // national avg checking APY ~0.07%
     savings: 0.004,   // national avg savings APY ~0.40%
-    usdc: 0.03,       // Robinhood USDC Crypto Earn ~3.00%
+    usdc: 0.03,       // Robinhood USDC Crypto Earn ~3.00% (free, not FDIC insured)
+    goldSweep: 0.0335, // Robinhood Gold Cash Sweep ~3.35% (FDIC insured up to $2.5M)
     btc: 0.30         // BTC historical avg ~30%
 };
 const MONTHLY_SAVINGS = 95; // actual monthly auto-transfer to savings
@@ -1047,7 +1048,7 @@ const app = {
         const s = this.state.growthStrategies;
         const monthlySpend = this.getMonthlyRate();
         const cashbackRate = s.goldCard ? 0.03 : 0;
-        const savRate = s.savingsToUsdc ? RATES.usdc : RATES.savings;
+        const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
         const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
         const years = this.state.whatIfPeriod;
         const months = years * 12;
@@ -1361,7 +1362,7 @@ const app = {
                     '<div>' +
                         '<div style="font-size:11px; font-weight:700; color:#92400e;">Honeymoon Fund</div>' +
                         '<div style="font-size:16px; font-weight:700; color:#111; margin:2px 0;">$'+vacationSaved.toLocaleString()+' <span style="font-size:11px; font-weight:400; color:#6b7280;">/ $'+vacationTarget.toLocaleString()+'</span></div>' +
-                        '<div style="font-size:10px; color:#92400e;">'+(vacationSaved >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go · <span style="color:#0052ff;">USDC → '+vacWeeksSaved+' week'+(vacWeeksSaved!==1?'s':'')+' sooner</span>')+'</div>' +
+                        '<div style="font-size:10px; color:#92400e;">'+(vacationSaved >= vacationTarget ? 'Goal reached!' : monthsToVacation+' months to go · <span style="color:#0052ff;">Free USDC 3.0% → '+vacWeeksSaved+' week'+(vacWeeksSaved!==1?'s':'')+' sooner</span> <span style="color:#9ca3af; font-size:9px;">(not FDIC insured)</span>')+'</div>' +
                     '</div>' +
                     '<svg viewBox="0 0 60 60" style="width:46px; height:46px;">' +
                         '<circle cx="30" cy="30" r="25" fill="none" stroke="#e5e7eb" stroke-width="3"/>' +
@@ -1533,10 +1534,10 @@ const app = {
         const baseline = Math.round(bSav + bChk);
 
         // Calculate each strategy's individual delta
-        // 1. USDC Savings delta
-        let usdcSav = EXISTING_SAVINGS;
-        for (let i = 0; i < months; i++) usdcSav = usdcSav * (1 + RATES.usdc/12) + MONTHLY_SAVINGS;
-        const deltaSavings = Math.round(usdcSav - bSav);
+        // 1. Gold Sweep Savings delta (FDIC insured)
+        let sweepSav = EXISTING_SAVINGS;
+        for (let i = 0; i < months; i++) sweepSav = sweepSav * (1 + RATES.goldSweep/12) + MONTHLY_SAVINGS;
+        const deltaSavings = Math.round(sweepSav - bSav);
 
         // 2. USDC Checking delta
         let usdcChk = CHECKING_BALANCE;
@@ -1548,7 +1549,7 @@ const app = {
         const deltaGoldCard = monthlyCashback * months;
 
         // With strategies applied
-        const savRate = s.savingsToUsdc ? RATES.usdc : RATES.savings;
+        const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
         const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
         const cashbackRate = s.goldCard ? 0.03 : 0;
         let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
@@ -1585,7 +1586,7 @@ const app = {
                 '</div>' +
                 projRow('Starting balance ($'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+CHECKING_BALANCE.toLocaleString()+' checking)', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
                 projRow('Savings deposits ($'+MONTHLY_SAVINGS+'/mo × '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
-                projRow('Interest at '+(s.savingsToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
+                projRow('Interest at '+(s.savingsToUsdc ? (RATES.goldSweep*100).toFixed(2) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
                 projRow('Checking yield at '+(s.checkingToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.checking*100).toFixed(2))+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) +
                 (s.goldCard ? projRow('Gold Card cashback ($'+monthlyCashback+'/mo)', deltaGoldCard, '#1d4ed8', false) : '') +
                 projRow('Total', total, anyActive ? '#166534' : '#374151', true) +
@@ -1594,14 +1595,14 @@ const app = {
 
             // Strategy checkboxes with individual deltas
             '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
-            chk('savingsToUsdc', 'Convert existing savings to USDC',
-                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.savings*100).toFixed(2)+'% on $'+EXISTING_SAVINGS.toLocaleString()+' + $'+MONTHLY_SAVINGS+'/mo',
+            chk('savingsToUsdc', 'Gold Cash Sweep — FDIC insured',
+                (RATES.goldSweep*100).toFixed(2)+'% APY on $'+EXISTING_SAVINGS.toLocaleString()+' + $'+MONTHLY_SAVINGS+'/mo · Insured up to $2.5M',
                 deltaSavings, s.savingsToUsdc) +
-            chk('checkingToUsdc', 'Move your checking balance to USDC',
-                (RATES.usdc*100).toFixed(1)+'% APY instead of '+(RATES.checking*100).toFixed(2)+'% on $'+CHECKING_BALANCE.toLocaleString(),
+            chk('checkingToUsdc', 'Free USDC — accelerate fun goals',
+                (RATES.usdc*100).toFixed(1)+'% APY on idle checking · Great for short-term goals · Not FDIC insured',
                 deltaChecking, s.checkingToUsdc) +
             chk('goldCard', 'Gold Card — 3% cashback on all spending',
-                '$'+monthlyCashback+'/mo cashback auto-invested into USDC',
+                '$'+monthlyCashback+'/mo cashback auto-invested',
                 deltaGoldCard, s.goldCard);
 
         this.drawBudgetChart();
@@ -1626,20 +1627,20 @@ const app = {
         document.getElementById('rules-suggested').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SUGGESTED FOR YOU</div>' +
             (potentialSavings > 0 ? suggestedCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
-            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → USDC', 'Earn '+(RATES.usdc*100).toFixed(1)+'% APY on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
-            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested into USDC.', "alert('Apply for Gold Card in Settings')", 'Apply') +
+            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → Gold Sweep', 'Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY (FDIC insured) on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
+            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested.', "alert('Apply for Gold Card in Settings')", 'Apply') +
             suggestedCard('#f9fafb','#e5e7eb','#374151','↑','Increase auto-transfer to $200/mo', 'Boost from $'+MONTHLY_SAVINGS+'/mo for faster goal progress. Hit honeymoon goal sooner.', "alert('Updated auto-transfer to $200/mo')", 'Update');
 
         // Active Rules
         document.getElementById('rules-active').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">ACTIVE RULES</div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Auto-sweep savings → USDC</div><div style="font-size:11px; color:#047857; margin-top:2px;">Under-budget savings earn '+(RATES.usdc*100).toFixed(1)+'% APY</div></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Auto-sweep savings → Gold Sweep</div><div style="font-size:11px; color:#047857; margin-top:2px;">Under-budget savings earn '+(RATES.goldSweep*100).toFixed(2)+'% APY · FDIC insured</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Gold Card rewards → USDC</div><div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested</div></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Gold Card rewards → auto-invest</div><div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change from every purchase</div></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change into free USDC for goals</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, sweep difference</div></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, sweep to fun goals</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Weekly BTC DCA ($50)</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Every Friday, buy $50 BTC</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
@@ -1649,15 +1650,15 @@ const app = {
         // Templates
         document.getElementById('rules-templates').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">TEMPLATES</div>' +
-            ['If total spending < budget, save extra to goal','Smart Deposit: detect extra cash, auto-invest','Paycheck split: 20% of deposit → USDC','Monthly subscription audit alert','If savings goal met, boost honeymoon fund'].map(t =>
+            ['If total spending < budget, sweep extra to Gold Sweep','Smart Deposit: detect extra cash, auto-invest','Paycheck split: 20% of deposit → Gold Sweep','Monthly subscription audit alert','If savings goal met, boost honeymoon fund via USDC'].map(t =>
                 '<div class="template-row"><div class="template-text">'+t+'</div><button class="template-add-btn" onclick="this.textContent=\'✓\';this.style.background=\'#065f46\';">+</button></div>'
             ).join('');
 
         document.getElementById('rules-activity').innerHTML =
             [{date:'Mar 27',desc:'Round-up: $0.50 + $0.80 + $0.70 → USDC',color:'#f97316'},
-             {date:'Mar 27',desc:'Swept $48 to USDC (dining under budget)',color:'#00C805'},
-             {date:'Mar 26',desc:'RH Card rewards: $49.05 → USDC',color:'#3b82f6'},
-             {date:'Mar 26',desc:'Round-up: $0.01 + $1.00 + $0.50 → USDC',color:'#f97316'},
+             {date:'Mar 27',desc:'Swept $48 to USDC (dining under budget — fun goals)',color:'#00C805'},
+             {date:'Mar 26',desc:'RH Card rewards: $49.05 → auto-invested',color:'#3b82f6'},
+             {date:'Mar 26',desc:'Round-up: $0.01 + $1.00 + $0.50 → USDC goals',color:'#f97316'},
              {date:'Mar 21',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
              {date:'Mar 18',desc:'Swept $112 to USDC (dining under budget)',color:'#00C805'},
              {date:'Mar 14',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
