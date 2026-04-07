@@ -247,6 +247,15 @@
             animation: zoomIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .slide.morph-enter .slide-content {
+            animation: morphIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes morphIn {
+            0% { opacity: 0; transform: scale(0.97); filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -2149,21 +2158,21 @@
                             <div class="tl-card" style="flex: 1; text-align: center; padding: 0 4px;">
                                 <div style="font-size: 2.25em; color: #1abc9c; font-weight: 700; font-family: 'Space Grotesk', monospace; margin-bottom: 6px; line-height: 1;">01</div>
                                 <div style="font-weight: 600; font-size: 0.95em;">Context</div>
-                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">The product challenge</div>
+                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">Driving solutions out of ambiguity through research and data</div>
                             </div>
 
                             <!-- Context -->
                             <div class="tl-card" style="flex: 1; text-align: center; padding: 0 4px;">
                                 <div style="font-size: 2.25em; color: #0052FF; font-weight: 700; font-family: 'Space Grotesk', monospace; margin-bottom: 6px; line-height: 1;">02</div>
                                 <div style="font-weight: 600; font-size: 0.95em;">Strategy</div>
-                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">Research and framework</div>
+                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">Managing a complex large project on time across time-zones</div>
                             </div>
 
                             <!-- Strategy -->
                             <div class="tl-card" style="flex: 1; text-align: center; padding: 0 4px;">
                                 <div style="font-size: 2.25em; color: #f0a500; font-weight: 700; font-family: 'Space Grotesk', monospace; margin-bottom: 6px; line-height: 1;">03</div>
                                 <div style="font-weight: 600; font-size: 0.95em;">Product</div>
-                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">Recommendation and design</div>
+                                <div style="font-size: 0.75em; opacity: 0.5; font-style: italic; margin-top: 6px;">Delivering a truly useful global product solution</div>
                             </div>
 
                             <!-- Product -->
@@ -2188,29 +2197,25 @@
             <div class="slide slide-enter" data-slide="2" data-section="Strategy">
                 <div class="slide-content">
                     <h1 class="slide-title animate-stagger">How I Built the Recommendation</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">A framework balancing compliance, user needs, and build efficiency</div>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">How I turned an ambiguous legal request into a truly useful and patent-pending product solution</div>
 
                     <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative;">
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; border-top: 3px solid #0052FF; text-align: center; padding: 24px 16px;">
                             <div style="margin-bottom: 12px;"><svg width="56" height="56" viewBox="0 0 36 36"><rect x="8" y="4" width="20" height="28" rx="3" fill="none" stroke="#0052FF" stroke-width="2"/><line x1="13" y1="12" x2="23" y2="12" stroke="#0052FF" stroke-width="1.5"><animate attributeName="opacity" values="0.3;1" dur="1.5s" repeatCount="1" fill="freeze" begin="0s"/></line><line x1="13" y1="17" x2="23" y2="17" stroke="#0052FF" stroke-width="1.5"><animate attributeName="opacity" values="0.3;1" dur="1.5s" repeatCount="1" fill="freeze" begin="0.4s"/></line><line x1="13" y1="22" x2="19" y2="22" stroke="#0052FF" stroke-width="1.5"><animate attributeName="opacity" values="0.3;1" dur="1.5s" repeatCount="1" fill="freeze" begin="0.8s"/></line></svg></div>
                             <div class="card-title" style="font-size: 1em;">Read the Law</div>
-                            <div class="card-content" style="font-size: 0.85em;">Study the actual Online Safety Code Part B and work with Legal to analyze approach</div>
-                        </div>
+                                                    </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; border-top: 3px solid #f0a500; text-align: center; padding: 24px 16px;">
                             <div style="margin-bottom: 12px;"><svg width="56" height="56" viewBox="0 0 36 36"><rect x="4" y="10" width="28" height="16" rx="8" fill="none" stroke="#f0a500" stroke-width="2"/><circle cx="12" cy="18" r="3" fill="none" stroke="#f0a500" stroke-width="1.5"/><circle cx="24" cy="18" r="3" fill="none" stroke="#f0a500" stroke-width="1.5"/><circle cx="12" cy="18" r="1.5" fill="#f0a500"><animate attributeName="cx" values="11;13;12" dur="2s" repeatCount="1" fill="freeze"/></circle><circle cx="24" cy="18" r="1.5" fill="#f0a500"><animate attributeName="cx" values="23;25;24" dur="2s" repeatCount="1" fill="freeze"/></circle></svg></div>
-                            <div class="card-title" style="color: #f0a500; font-size: 1em;">Industry Benchmark</div>
-                            <div class="card-content" style="font-size: 0.85em;">Research existing parental control approaches — identify gaps to inspire a proactive model</div>
-                        </div>
+                            <div class="card-title" style="color: #f0a500; font-size: 1em;">Industry Research</div>
+                                                    </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; border-top: 3px solid #3498db; text-align: center; padding: 24px 16px;">
                             <div style="margin-bottom: 12px;"><svg width="56" height="56" viewBox="0 0 36 36"><rect x="6" y="20" width="6" height="12" rx="1" fill="none" stroke="#3498db" stroke-width="2"><animate attributeName="height" values="4;12" dur="1.5s" repeatCount="1" fill="freeze" begin="0s"/><animate attributeName="y" values="28;20" dur="1.5s" repeatCount="1" fill="freeze" begin="0s"/></rect><rect x="15" y="12" width="6" height="20" rx="1" fill="none" stroke="#3498db" stroke-width="2"><animate attributeName="height" values="4;20" dur="1.5s" repeatCount="1" fill="freeze" begin="0.3s"/><animate attributeName="y" values="28;12" dur="1.5s" repeatCount="1" fill="freeze" begin="0.3s"/></rect><rect x="24" y="6" width="6" height="26" rx="1" fill="none" stroke="#3498db" stroke-width="2"><animate attributeName="height" values="4;26" dur="1.5s" repeatCount="1" fill="freeze" begin="0.6s"/><animate attributeName="y" values="28;6" dur="1.5s" repeatCount="1" fill="freeze" begin="0.6s"/></rect></svg></div>
                             <div class="card-title" style="color: #3498db; font-size: 1em;">UXR Validation</div>
-                            <div class="card-content" style="font-size: 0.85em;">Validate with research that this is a global parent demand — not just EU compliance</div>
-                        </div>
+                                                    </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.5s; border-top: 3px solid #2ecc71; text-align: center; padding: 24px 16px;">
                             <div style="margin-bottom: 12px;"><svg width="56" height="56" viewBox="0 0 36 36"><rect x="4" y="10" width="28" height="22" rx="3" fill="none" stroke="#2ecc71" stroke-width="2"/><path d="M4 14h28" fill="none" stroke="#2ecc71" stroke-width="2"/><g transform-origin="4 10"><path d="M14 4h8l4 6H10z" fill="none" stroke="#2ecc71" stroke-width="2" stroke-linejoin="round"/><animateTransform attributeName="transform" type="rotate" values="0 4 10;-15 4 10;0 4 10" dur="2s" repeatCount="1" fill="freeze"/></g><!-- Map pin dropping in --><g><circle cx="18" cy="22" r="2" fill="#2ecc71" opacity="0.6"/><path d="M18 18v-4" stroke="#2ecc71" stroke-width="1.5" stroke-linecap="round"/><animateTransform attributeName="transform" type="translate" values="0,-6;0,0" dur="1s" begin="0.5s" repeatCount="1" fill="freeze"/></g></svg></div>
-                            <div class="card-title" style="color: #2ecc71; font-size: 1em;">Map Product Tools</div>
-                            <div class="card-content" style="font-size: 0.85em;">Map muting, blocking, restricted feeds — identify block control as closest fit</div>
-                        </div>
+                            <div class="card-title" style="color: #2ecc71; font-size: 1em;">Internal Feature Audit</div>
+                                                    </div>
                     </div>
                     <!-- 3-column reveal layout: Goal → Process → Outcome -->
                     <div class="animate-stagger" style="animation-delay: 0.6s; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(26,26,46,0.35); margin-top: 24px; margin-bottom: 8px; text-align: center;">Organization &amp; Principles</div>
@@ -2268,9 +2273,9 @@
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
                             <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">2</div><span style="font-size: 0.8em;">UXR Validation</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Benchmark</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Research</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Map Product Tools</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Internal Feature Audit</span></div>
                     </div>
                     <h1 class="slide-title animate-stagger">What does "unknown to the child" mean on an algorithm-driven platform?</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Ireland's Online Safety Code Part B, §14.2(a) required parental controls for "unknown" contacts</div>
@@ -2334,9 +2339,9 @@
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
                             <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 22px; height: 22px; border-radius: 50%; background: #3498db; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">2</div><span style="font-weight: 600; color: #3498db; font-size: 0.8em;">UXR Validation</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Benchmark</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Research</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Map Product Tools</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Internal Feature Audit</span></div>
                     </div>
                     <h1 class="slide-title animate-stagger">UXR Validated Global Parent Demand</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Underpinning an appropriate legal response — connecting regulatory needs to clearer user research</div>
@@ -2368,7 +2373,7 @@
                 </div>
             </div>
 
-            <!-- SLIDE 9: Industry Benchmark -->            <div class="slide slide-enter" data-slide="5" data-section="Strategy">
+            <!-- SLIDE 9: Industry Research -->            <div class="slide slide-enter" data-slide="5" data-section="Strategy">
                 <div class="slide-content">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 10px 16px; background: rgba(0, 82, 255, 0.03); border: 1px solid rgba(0, 82, 255, 0.08); border-radius: 8px; flex-wrap: wrap; animation: fadeInUp 0.5s ease forwards;">
                         <div style="font-size: 0.7em; font-weight: 600; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px;">How I Built the Recommendation</div>
@@ -2377,9 +2382,9 @@
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
                             <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">2</div><span style="font-size: 0.8em;">UXR Validation</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 22px; height: 22px; border-radius: 50%; background: #f0a500; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-weight: 600; color: #f0a500; font-size: 0.8em;">Industry Benchmark</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 22px; height: 22px; border-radius: 50%; background: #f0a500; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-weight: 600; color: #f0a500; font-size: 0.8em;">Industry Research</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Map Product Tools</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-size: 0.8em;">Internal Feature Audit</span></div>
                     </div>
                     <h1 class="slide-title animate-stagger">Inspired Adaptation: Learning from Roblox</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Assessing similar approaches in industry to justify our internal approach</div>
@@ -2455,9 +2460,9 @@
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
                             <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">2</div><span style="font-size: 0.8em;">UXR Validation</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Benchmark</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px; opacity: 0.3;"><div style="width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 82, 255, 0.12); color: rgba(26,26,46,0.5); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">3</div><span style="font-size: 0.8em;">Industry Research</span></div>
                             <div style="width: 20px; height: 1px; background: rgba(0, 82, 255, 0.12);"></div>
-                            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 22px; height: 22px; border-radius: 50%; background: #2ecc71; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-weight: 600; color: #2ecc71; font-size: 0.8em;">Map Product Tools</span></div>
+                            <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 22px; height: 22px; border-radius: 50%; background: #2ecc71; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.7em;">4</div><span style="font-weight: 600; color: #2ecc71; font-size: 0.8em;">Internal Feature Audit</span></div>
                     </div>
                     <h1 class="slide-title animate-stagger">Internal Tools / Gap Analysis</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">External research validated the user research findings — offering parents more control over their teens' connections</div>
@@ -2695,8 +2700,7 @@
                             </div>
                             <div style="font-size: 1.6em; font-weight: 700; color: #2ecc71; margin-bottom: 6px;">On Time</div>
                             <div style="font-size: 0.85em; color: rgba(26,26,46,0.5); margin-bottom: 14px;">Shipped ahead of July 2025 deadline</div>
-                            <div style="font-size: 0.82em; color: rgba(26,26,46,0.45); line-height: 1.5; margin-top: 4px;">Regulatory compliance was non-negotiable — EU proceeded while global launch held for investigation</div>
-                        </div>
+                                                    </div>
 
                         <!-- Col 2: Global Rollout Paused - RED -->
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.35s; border-top: 3px solid #e8445a; padding: 20px; background: rgba(232,68,90,0.04);">
@@ -2711,14 +2715,13 @@
                                 <path d="M0 28 L30 26 L60 24 L100 21 L130 16 L155 10 L175 5 L200 2" fill="none" stroke="#e8445a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="300" stroke-dashoffset="300" style="animation: spikeLineUp 2s ease-out 0.5s forwards;"/>
                                 <path d="M0 28 L30 26 L60 24 L100 21 L130 16 L155 10 L175 5 L200 2 L200 32 L0 32Z" fill="url(#spikeGrad2)" opacity="0.2"/>
                             </svg>
-                            <div style="font-size: 0.82em; color: rgba(26,26,46,0.45); margin-top: 8px;">If teens unlink, ALL parental controls are lost</div>
-                        </div>
+                                                    </div>
                     </div>
                 </div>
             </div>
 
             <!-- SLIDE 13: Diagnosing & Solving the Unlink Spike -->
-            <div class="slide fade-enter" data-slide="11" data-section="Execution">
+            <div class="slide morph-enter" data-slide="11" data-section="Execution">
                 <div class="slide-content">
                     <h1 class="slide-title animate-stagger">Diagnosing the Guardrail Metric</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">How I diagnosed and resolved the <span style="color: #e8445a;">unlink spike</span> — from <span style="color: #f0a500;">hypothesis</span> to <span style="color: #2ecc71;">zero-cost fix</span> that cleared global launch</div>
@@ -2732,33 +2735,34 @@
                         </div>
                     </div>
 
-                    <!-- How I Diagnosed process bar (no subtext) -->
+                    <!-- How I Diagnosed process bar -->
                     <div style="margin-top: 22px; margin-bottom: 18px;">
                         <div style="font-size: 0.78em; opacity: 0.4; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">How I Diagnosed</div>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 0;">
-                            <div style="padding: 18px 16px; border: 1px solid rgba(0, 82, 255, 0.08); border-radius: 10px 0 0 10px; text-align: center;">
-                                <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e;">Data Deep Dive</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                            <div style="padding: 16px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-top: 3px solid #0052FF; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,82,255,0.1); color: #0052FF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75em;">1</div>
+                                <div style="font-weight: 600; font-size: 0.85em; color: #1a1a2e;">Data Deep Dive</div>
                             </div>
-                            <svg width="18" height="18" viewBox="0 0 20 20" style="flex-shrink: 0; margin: 0 1px;"><path d="M6 4l8 6-8 6" fill="none" stroke="rgba(26,26,46,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div style="padding: 18px 16px; border: 1px solid rgba(0, 82, 255, 0.08); text-align: center;">
-                                <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e;">Feature Audit</div>
+                            <div style="padding: 16px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-top: 3px solid #3498db; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(52,152,219,0.1); color: #3498db; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75em;">2</div>
+                                <div style="font-weight: 600; font-size: 0.85em; color: #1a1a2e;">Feature Audit</div>
                             </div>
-                            <svg width="18" height="18" viewBox="0 0 20 20" style="flex-shrink: 0; margin: 0 1px;"><path d="M6 4l8 6-8 6" fill="none" stroke="rgba(26,26,46,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div style="padding: 18px 16px; border: 1px solid rgba(0, 82, 255, 0.08); text-align: center;">
-                                <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e;">Design &amp; Copy Consultation</div>
+                            <div style="padding: 16px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-top: 3px solid #6c5ce7; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(108,92,231,0.1); color: #6c5ce7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75em;">3</div>
+                                <div style="font-weight: 600; font-size: 0.85em; color: #1a1a2e;">Design &amp; Copy Consultation</div>
                             </div>
-                            <svg width="18" height="18" viewBox="0 0 20 20" style="flex-shrink: 0; margin: 0 1px;"><path d="M6 4l8 6-8 6" fill="none" stroke="rgba(26,26,46,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <div style="padding: 18px 16px; border: 1px solid rgba(0, 82, 255, 0.08); border-radius: 0 10px 10px 0; text-align: center; position: relative;">
-                                <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e;">Solution Ideation &amp; Prioritization</div>
+                            <div style="padding: 16px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-top: 3px solid #f0a500; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(240,165,0,0.1); color: #f0a500; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75em;">4</div>
+                                <div style="font-weight: 600; font-size: 0.85em; color: #1a1a2e;">Solution Ideation &amp; Prioritization</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- REVEAL SECTION: click to show hypothesis + solutions + arrow -->
                     <div id="slide11-reveal" style="display: none;">
-                        <!-- Arrow from Solution Ideation down -->
-                        <div style="text-align: right; margin-right: 10%; margin-top: -8px; margin-bottom: 8px;">
-                            <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v12M4 10l6 6 6-6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <!-- Arrow connecting process to hypothesis -->
+                        <div style="text-align: center; margin-top: -4px; margin-bottom: 8px;">
+                            <svg width="20" height="24" viewBox="0 0 20 24"><path d="M10 2v18M4 14l6 6 6-6" fill="none" stroke="#0052FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
 
                         <!-- Hypothesis tile (no subtext) -->
@@ -2802,7 +2806,7 @@
             <div class="slide fade-enter" data-slide="12" data-section="Impact">
                 <div class="slide-content">
                     <h1 class="slide-title animate-stagger">Results</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;"><span style="color: #e8445a;">Unlink spike</span> resolved — compliant, patent-pending, and globally launched with maintained business metrics</div>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;"><span style="color: #e8445a;">Unlink spike</span> resolved — a genuinely useful solution for families, globally launched with patent-pending design and maintained business metrics</div>
 
                     <!-- 4 equal result columns -->
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 32px; width: 100%;">
@@ -2810,28 +2814,24 @@
                             <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                                 <svg width="52" height="52" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 14px;"><circle cx="24" cy="24" r="22" fill="rgba(0,82,255,0.1)" stroke="#0052FF" stroke-width="2"/><path d="M24 12l10 5v8c0 7-4.5 12-10 14-5.5-2-10-7-10-14v-8z" fill="none" stroke="#0052FF" stroke-width="2" stroke-linejoin="round"/><path d="M20 24l3 3 5-5" fill="none" stroke="#0052FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><animate attributeName="stroke-width" values="2.5;4.5;2.5" dur="1.5s" begin="0.5s" repeatCount="1" fill="freeze"/></path></svg>
                                 <div style="font-weight: 700; font-size: 1.05em; color: #0052FF; margin-bottom: 10px;">EU Regulatory Compliance</div>
-                                <p style="opacity: 0.55; font-size: 0.82em; line-height: 1.4; flex: 1;">Shipped ahead of July 2025 deadline</p>
                             </div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.3s; border-top: 3px solid #3a7bd5; padding: 24px 18px; background: rgba(58,123,213,0.04); text-align: center; display: flex; flex-direction: column;">
                             <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                                 <svg width="52" height="52" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 14px;"><circle cx="24" cy="24" r="22" fill="rgba(58,123,213,0.1)" stroke="#3a7bd5" stroke-width="2"/><rect x="14" y="14" width="14" height="20" rx="2" fill="none" stroke="#3a7bd5" stroke-width="2"/><line x1="18" y1="20" x2="24" y2="20" stroke="#3a7bd5" stroke-width="1.5" opacity="0.5"/><line x1="18" y1="24" x2="24" y2="24" stroke="#3a7bd5" stroke-width="1.5" opacity="0.5"/><line x1="18" y1="28" x2="22" y2="28" stroke="#3a7bd5" stroke-width="1.5" opacity="0.5"/><g><path d="M30 20l6-6M36 14h-5M36 14v5" stroke="#3a7bd5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><animateTransform attributeName="transform" type="translate" values="0,0;2,-2;0,0" dur="2s" repeatCount="1" fill="freeze"/></g></svg>
                                 <div style="font-weight: 700; font-size: 1.05em; color: #3a7bd5; margin-bottom: 10px;">Resolved Teen Unlinking</div>
-                                <p style="opacity: 0.55; font-size: 0.82em; line-height: 1.4; flex: 1;">+7% unlink spike eliminated — simple copy change unlocked global launch</p>
                             </div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.4s; border-top: 3px solid #6c5ce7; padding: 24px 18px; background: rgba(108,92,231,0.04); text-align: center; display: flex; flex-direction: column;">
                             <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                                 <svg width="52" height="52" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 14px;"><circle cx="24" cy="24" r="22" fill="rgba(108,92,231,0.1)" stroke="#6c5ce7" stroke-width="2"/><path d="M10 30l7-6 5 4 5-4 5 4 6-3" stroke="#6c5ce7" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><circle r="3" fill="#6c5ce7"><animate attributeName="cx" values="10;17;22;27;32;38" dur="3s" repeatCount="1" fill="freeze"/><animate attributeName="cy" values="30;24;28;24;28;25" dur="3s" repeatCount="1" fill="freeze"/></circle></svg>
                                 <div style="font-weight: 700; font-size: 1.05em; color: #6c5ce7; margin-bottom: 10px;">Success Metrics Met</div>
-                                <p style="opacity: 0.55; font-size: 0.82em; line-height: 1.4; flex: 1;">Open rate in range, core metrics neutral</p>
                             </div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.5s; border-top: 3px solid #9b59b6; padding: 24px 18px; background: rgba(155,89,182,0.04); text-align: center; display: flex; flex-direction: column;">
                             <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                                 <svg width="52" height="52" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 14px;"><circle cx="24" cy="24" r="22" fill="rgba(155,89,182,0.1)" stroke="#9b59b6" stroke-width="2"/><path d="M24 10c-6 0-10 4.5-10 10 0 4 2.5 7 6 8.5V32h8v-3.5c3.5-1.5 6-4.5 6-8.5 0-5.5-4-10-10-10z" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linejoin="round"/><path d="M20 32h8M21 35h6" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" opacity="0.6"/><g><line x1="24" y1="4" x2="24" y2="8" stroke="#9b59b6" stroke-width="1.5" stroke-linecap="round"/><line x1="35" y1="9" x2="33" y2="11" stroke="#9b59b6" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="9" x2="15" y2="11" stroke="#9b59b6" stroke-width="1.5" stroke-linecap="round"/><line x1="38" y1="20" x2="35" y2="20" stroke="#9b59b6" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="20" x2="13" y2="20" stroke="#9b59b6" stroke-width="1.5" stroke-linecap="round"/><animate attributeName="opacity" values="0;0.8;0.5" dur="1.5s" begin="0.5s" repeatCount="1" fill="freeze"/></g></svg>
                                 <div style="font-weight: 700; font-size: 1.05em; color: #9b59b6; margin-bottom: 10px;">Patent-Pending Design</div>
-                                <p style="opacity: 0.55; font-size: 0.82em; line-height: 1.4; flex: 1;">A first for social media</p>
                             </div>
                         </div>
                     </div>
@@ -2840,8 +2840,7 @@
                         <div style="display: flex; align-items: center; gap: 20px; background: rgba(0, 82, 255, 0.03); border-left: 3px solid rgba(0, 82, 255, 0.15); border-radius: 8px; padding: 16px 24px;">
                             <svg width="40" height="40" viewBox="0 0 48 48" style="flex-shrink: 0;"><circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.05)" stroke="rgba(0, 82, 255, 0.2)" stroke-width="2"/><g><path d="M24 12l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="none" stroke="rgba(26,26,46,0.4)" stroke-width="1.5" stroke-linejoin="round"/><animateTransform attributeName="transform" type="rotate" from="0 24 24" to="90 24 24" dur="3s" repeatCount="1" fill="freeze"/></g></svg>
                             <div style="flex: 1;">
-                                <div style="font-weight: 700; font-size: 1em; color: rgba(26,26,46,0.7); margin-bottom: 4px;">Media Recognition</div>
-                                <span style="font-size: 0.85em; opacity: 0.5;">Positive coverage across major outlets</span>
+                                <div style="font-weight: 700; font-size: 1em; color: rgba(26,26,46,0.7);">Media Recognition</div>
                             </div>
                             <div style="display: flex; gap: 10px; flex-shrink: 0;">
                                 <a href="https://techcrunch.com/2025/07/30/tiktok-adds-new-parental-controls-tools-for-creators/" target="_blank" style="padding: 8px 16px; background: rgba(0, 82, 255, 0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; font-size: 0.82em; font-weight: 600; color: rgba(26,26,46,0.6); text-decoration: none;">TechCrunch</a>
@@ -2852,44 +2851,24 @@
                         </div>
                     </div>
 
-                    <!-- Key Learnings -->
+                    <!-- Key Learnings - 4 tiles -->
                     <div style="font-size: 0.82em; opacity: 0.4; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 24px; margin-bottom: 12px; color: #1a1a2e;">Key Learnings</div>
-                    <!-- Retrospective as compact two-column section -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <!-- What Worked Well -->
-                        <div class="animate-stagger" style="animation-delay: 0.6s; padding: 18px; background: rgba(46,204,113,0.03); border: 1px solid rgba(46,204,113,0.15); border-top: 3px solid #2ecc71; border-radius: 10px;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                                <svg width="24" height="24" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="rgba(46,204,113,0.12)" stroke="#2ecc71" stroke-width="2"/><path d="M16 24l6 6 10-10" stroke="#2ecc71" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <div style="font-weight: 700; font-size: 0.95em; color: #2ecc71;">What Worked Well</div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8em; line-height: 1.4;">
-                                    <span style="color: #2ecc71; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</span>
-                                    <span><strong>Deep analysis of the potential solutions and the legal requirements</strong></span>
-                                </div>
-                                <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8em; line-height: 1.4;">
-                                    <span style="color: #2ecc71; font-weight: 700; flex-shrink: 0; margin-top: 2px;">✓</span>
-                                    <span><strong>Cross-functional alignment</strong> — pre-vetting avoided late-stage blockers</span>
-                                </div>
-                            </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+                        <div class="animate-stagger" style="animation-delay: 0.6s; padding: 18px 14px; border: 1px solid rgba(46,204,113,0.15); border-top: 3px solid #2ecc71; border-radius: 10px; text-align: center;">
+                            <div style="color: #2ecc71; font-size: 1.2em; margin-bottom: 8px;">✓</div>
+                            <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e; line-height: 1.35;">Deep product, data &amp; legal analysis</div>
                         </div>
-
-                        <!-- What I'd Do Differently -->
-                        <div class="animate-stagger" style="animation-delay: 0.65s; padding: 18px; background: rgba(240,165,0,0.03); border: 1px solid rgba(240,165,0,0.15); border-top: 3px solid #f0a500; border-radius: 10px;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                                <svg width="24" height="24" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="rgba(240,165,0,0.12)" stroke="#f0a500" stroke-width="2"/><path d="M24 16v10" stroke="#f0a500" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="32" r="2" fill="#f0a500"/></svg>
-                                <div style="font-weight: 700; font-size: 0.95em; color: #f0a500;">What I'd Do Differently</div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8em; line-height: 1.4;">
-                                    <span style="color: #f0a500; font-weight: 700; flex-shrink: 0; margin-top: 2px;">→</span>
-                                    <span><strong>Recognizing an inflection point</strong> — the teen's perspective on control vs. autonomy. This was harder to anticipate in a unique situation</span>
-                                </div>
-                                <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.8em; line-height: 1.4;">
-                                    <span style="color: #f0a500; font-weight: 700; flex-shrink: 0; margin-top: 2px;">→</span>
-                                    <span><strong>Broader notification audit</strong> before launch</span>
-                                </div>
-                            </div>
+                        <div class="animate-stagger" style="animation-delay: 0.65s; padding: 18px 14px; border: 1px solid rgba(46,204,113,0.15); border-top: 3px solid #2ecc71; border-radius: 10px; text-align: center;">
+                            <div style="color: #2ecc71; font-size: 1.2em; margin-bottom: 8px;">✓</div>
+                            <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e; line-height: 1.35;">Cross-functional alignment &amp; workback schedule</div>
+                        </div>
+                        <div class="animate-stagger" style="animation-delay: 0.7s; padding: 18px 14px; border: 1px solid rgba(240,165,0,0.15); border-top: 3px solid #f0a500; border-radius: 10px; text-align: center;">
+                            <div style="color: #f0a500; font-size: 1.2em; margin-bottom: 8px;">→</div>
+                            <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e; line-height: 1.35;">Earlier recognition of teen autonomy inflection point</div>
+                        </div>
+                        <div class="animate-stagger" style="animation-delay: 0.75s; padding: 18px 14px; border: 1px solid rgba(240,165,0,0.15); border-top: 3px solid #f0a500; border-radius: 10px; text-align: center;">
+                            <div style="color: #f0a500; font-size: 1.2em; margin-bottom: 8px;">→</div>
+                            <div style="font-weight: 600; font-size: 0.88em; color: #1a1a2e; line-height: 1.35;">Broader notification audit before launch</div>
                         </div>
                     </div>
                 </div>
@@ -2999,7 +2978,7 @@
             <div class="slide fade-enter" data-slide="14" data-section="Demo">
                 <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;" class="animate-stagger">10X PRODUCT SCALE DEMO</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2.2em; margin-bottom: 8px;">Turn Robinhood Into a Daily<br>Financial Companion</h1>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 8px;">Turn Robinhood Into a Daily<br>Financial Companion</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Zero non-trading reason to open the app today — spending &amp; savings insights change that, converting 14M dormant accounts into active, revenue-generating relationships</div>
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px;">
@@ -3034,8 +3013,8 @@
             <div class="slide fade-enter" data-slide="15" data-section="Demo">
                 <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;" class="animate-stagger">The Strategy</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 4px;">Insights Are the Drawbridge</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.92em;">Today there is zero non-trading, non-crypto reason to open Robinhood. Insights change that.</div>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 4px;">Insights Are the Drawbridge</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Today there is zero non-trading, non-crypto reason to open Robinhood. Insights change that.</div>
 
                     <!-- Two plays side by side -->
                     <div style="display: flex; gap: 10px; margin-top: 14px;">
@@ -3090,7 +3069,7 @@
             <div class="slide fade-enter" data-slide="16" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Business Case</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 12px;">10X the Product → 5–8X Revenue</h1>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 12px;">10X the Product → 5–8X Revenue</h1>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <!-- User value -->
@@ -3145,8 +3124,8 @@
             <div class="slide fade-enter" data-slide="17" data-section="Demo">
                 <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.92em;">Three tailwinds converging — and zero non-trading reason to stay on the platform today</div>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Three tailwinds converging — and zero non-trading reason to stay on the platform today</div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; border-left: 4px solid #059669;">
@@ -3182,7 +3161,7 @@
             <div class="slide fade-enter" data-slide="18" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
                     <div class="animate-stagger" style="font-size: 0.75em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;">10X Product Strategy — Crypto Growth</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
                     <div class="animate-stagger" style="animation-delay: 0.15s; font-size: 0.85em; line-height: 1.6; max-width: 520px; margin-bottom: 16px;">
                         <strong style="color: #1a1a2e;">Robinhood doesn't have an acquisition problem — it has an activation problem.</strong>
                         <span style="opacity: 0.6;"> 14M funded accounts sit dormant with no non-trading reason to come back. Spending insights change that.</span>
@@ -3218,7 +3197,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v2.0</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v2.1</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
@@ -3535,6 +3514,7 @@
             document.addEventListener('keydown', (e) => {
                 // Skip slide navigation when screenshot overlay is open
                 if (document.getElementById('screenshot-overlay').classList.contains('active')) return;
+                if (overlayJustClosed) return;
                 if (e.key === 'ArrowRight' || e.key === ' ') {
                     e.preventDefault();
                     nextSlide();
