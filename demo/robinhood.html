@@ -507,8 +507,8 @@
                         <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">MODEL YOUR GROWTH</div>
                         <div style="display:flex; gap:8px; margin-bottom:12px;">
                             <button class="time-pill" data-wperiod="1">1 Year</button>
-                            <button class="time-pill active" data-wperiod="3">3 Years</button>
-                            <button class="time-pill" data-wperiod="5">5 Years</button>
+                            <button class="time-pill" data-wperiod="3">3 Years</button>
+                            <button class="time-pill active" data-wperiod="5">5 Years</button>
                         </div>
                         <div id="savings-model"></div>
                     </div>
@@ -565,18 +565,16 @@ const RATES = {
 };
 const MONTHLY_SAVINGS = 95; // actual monthly auto-transfer to savings
 const YTD_MONTHS = 3; // Q1 elapsed
-const EXISTING_SAVINGS = 2400; // accumulated savings balance
-const CHECKING_BALANCE = 4800; // typical checking account balance
-const MONTHLY_ROUNDUPS = 18; // avg round-up spare change per month
+const EXISTING_SAVINGS = 15000; // accumulated savings balance (at another bank)
 
 const app = {
     state: {
-        activeTab: 'overview', activePeriod: '1m', whatIfPeriod: 3,
+        activeTab: 'overview', activePeriod: '1m', whatIfPeriod: 5,
         chartCumulative: false,
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
         breakdownOpen: false,
-            growthStrategies: { savingsToUsdc: false, checkingToUsdc: false, goldCard: false },
+            growthStrategies: { savingsToUsdc: false, goldCard: false },
             allocations: { safe: 85, moderate: 0, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
@@ -774,40 +772,36 @@ const app = {
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const s = this.state.growthStrategies;
-            const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
+            const anyActive = s.savingsToUsdc || s.goldCard;
             const years = this.state.whatIfPeriod;
             const months = years * 12;
             const monthlySpend = this.getMonthlyRate();
-            // Projected value with current strategies
             const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
-            const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
             const cashbackRate = s.goldCard ? 0.03 : 0;
-            let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
+            let savBal = EXISTING_SAVINGS;
             for (let i = 0; i < months; i++) {
                 savBal = savBal * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
-                chkBal = chkBal * (1 + chkRate/12);
             }
-            const projected = Math.round(savBal + chkBal);
-            // Baseline for comparison
-            let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
-            for (let i = 0; i < months; i++) {
-                bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
-                bChk = bChk * (1 + RATES.checking/12);
-            }
-            const baseline = Math.round(bSav + bChk);
+            const projected = Math.round(savBal);
+            let bSav = EXISTING_SAVINGS;
+            for (let i = 0; i < months; i++) bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
+            const baseline = Math.round(bSav);
             const gain = projected - baseline;
+            // Build strategy label
+            const stratNames = [];
+            if (s.savingsToUsdc) stratNames.push('Gold Sweep');
+            if (s.goldCard) stratNames.push('Gold Card');
             mainEl.innerHTML = '<span style="font-size:14px;font-weight:500;color:#6b7280;letter-spacing:0.5px;">FORECAST </span>$' + projected.toLocaleString();
             if (anyActive && gain > 0) {
-                changeEl.textContent = years + '-year projected · +$' + gain.toLocaleString() + ' with strategies';
+                changeEl.textContent = years + '-year projected · +$' + gain.toLocaleString() + ' with ' + stratNames.join(' + ');
             } else {
-                changeEl.textContent = years + '-year projected · Current path';
+                changeEl.textContent = years + '-year projected · Current path (bank 0.40%)';
             }
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
             const cashback = Math.round(this.getMonthlyRate() * 0.03);
-            const totalAuto = MONTHLY_SAVINGS + cashback + MONTHLY_ROUNDUPS;
-            mainEl.textContent = '$' + totalAuto.toLocaleString() + '/mo';
-            changeEl.textContent = '$' + MONTHLY_SAVINGS + ' save · $' + cashback + ' cashback · $' + MONTHLY_ROUNDUPS + ' round-ups';
+            mainEl.textContent = '$' + (MONTHLY_SAVINGS + cashback).toLocaleString() + '/mo';
+            changeEl.textContent = '$' + MONTHLY_SAVINGS + ' auto-save · $' + cashback + ' Gold Card cashback';
             changeEl.className = 'amount-change';
         }
     },
@@ -1093,10 +1087,9 @@ const app = {
         const monthlySpend = this.getMonthlyRate();
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
-        const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
         const forecastYears = this.state.whatIfPeriod;
         const forecastMonths = forecastYears * 12;
-        const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
+        const anyActive = s.savingsToUsdc || s.goldCard;
 
         // --- Historical: 6 months of real savings growth ---
         const histMonths = 6;
@@ -1105,30 +1098,27 @@ const app = {
         const histStart = EXISTING_SAVINGS - (MONTHLY_SAVINGS * histMonths);
         let hBal = Math.max(histStart, 500);
         for (let i = 0; i <= histMonths; i++) {
-            histVals.push(hBal + CHECKING_BALANCE);
+            histVals.push(hBal);
             if (i < histMonths) hBal += MONTHLY_SAVINGS * (0.85 + rng() * 0.3);
         }
         // Normalize so last point = current value
-        const currentTotal = EXISTING_SAVINGS + CHECKING_BALANCE;
-        const hScale = currentTotal / histVals[histMonths];
+        const hScale = EXISTING_SAVINGS / histVals[histMonths];
         for (let i = 0; i <= histMonths; i++) histVals[i] = Math.round(histVals[i] * hScale);
 
-        // --- Forecast: baseline (do nothing) ---
-        const baseVals = [currentTotal];
-        let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
+        // --- Forecast: baseline (do nothing — bank at 0.40%) ---
+        const baseVals = [EXISTING_SAVINGS];
+        let bSav = EXISTING_SAVINGS;
         for (let i = 0; i < forecastMonths; i++) {
             bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
-            bChk = bChk * (1 + RATES.checking/12);
-            baseVals.push(Math.round(bSav + bChk));
+            baseVals.push(Math.round(bSav));
         }
 
         // --- Forecast: with strategies ---
-        const stratVals = [currentTotal];
-        let sSav = EXISTING_SAVINGS, sChk = CHECKING_BALANCE;
+        const stratVals = [EXISTING_SAVINGS];
+        let sSav = EXISTING_SAVINGS;
         for (let i = 0; i < forecastMonths; i++) {
             sSav = sSav * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
-            sChk = sChk * (1 + chkRate/12);
-            stratVals.push(Math.round(sSav + sChk));
+            stratVals.push(Math.round(sSav));
         }
 
         // --- Layout ---
@@ -1160,7 +1150,7 @@ const app = {
         const nowPt = hPts[hPts.length - 1];
         svg.appendChild(svgEl('circle', { cx: nowPt[0], cy: nowPt[1], r: '4', fill: '#00C805', stroke: 'white', 'stroke-width': '2' }));
         const nowValLabel = svgEl('text', { x: Number(nowPt[0]) + 6, y: Number(nowPt[1]) + 3, fill: '#166534', 'font-size': '7', 'font-weight': '600', 'font-family': 'Inter,sans-serif' });
-        nowValLabel.textContent = '$' + currentTotal.toLocaleString();
+        nowValLabel.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
         svg.appendChild(nowValLabel);
 
         // Strategy forecast (dotted green)
@@ -1196,8 +1186,9 @@ const app = {
         // Legend
         const legendItems = ['<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>Actual</div>'];
         if (anyActive) {
-            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #00C805;"></div>With strategies</div>');
-            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Do nothing</div>');
+            const sn = []; if (s.savingsToUsdc) sn.push('Sweep'); if (s.goldCard) sn.push('Card');
+            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #00C805;"></div>Gold '+sn.join(' + ')+'</div>');
+            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Bank only</div>');
         } else {
             legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Projected</div>');
         }
@@ -1588,9 +1579,6 @@ const app = {
 
         // Period-adjusted inflow
         const periodSavings = MONTHLY_SAVINGS * months;
-        const periodRoundups = MONTHLY_ROUNDUPS * months;
-        const periodTotal = periodSavings + periodRoundups;
-        const periodLabel = years + '-Year Inflow';
 
         const inflowRow = (label, amount, color) =>
             '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(0,0,0,0.05);">' +
@@ -1602,55 +1590,45 @@ const app = {
         document.getElementById('savings-balance-area').innerHTML =
             '<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:14px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Savings</div>' +
+                    '<div><div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Savings</div>' +
+                    '<div style="font-size:9px; color:#9ca3af; margin-top:2px;">At bank · earning 0.40% APY</div></div>' +
                     '<div style="font-size:22px; font-weight:700; color:#166534;">$'+EXISTING_SAVINGS.toLocaleString()+'</div>' +
                 '</div>' +
                 '<div style="height:1px; background:#bbf7d0; margin-bottom:10px;"></div>' +
                 '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">'+periodLabel+'</div>' +
-                    '<div style="font-size:14px; font-weight:700; color:#166534;">$'+periodTotal.toLocaleString()+'</div>' +
+                    '<div style="font-size:10px; color:#166534; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Deposits</div>' +
+                    '<div style="font-size:14px; font-weight:700; color:#166534;">$'+periodSavings.toLocaleString()+'</div>' +
                 '</div>' +
                 inflowRow('Under-budget savings ($'+MONTHLY_SAVINGS+'/mo)', periodSavings, '#166534') +
-                inflowRow('Round-ups ($'+MONTHLY_ROUNDUPS+'/mo)', periodRoundups, '#9a3412') +
             '</div>';
 
-        // Baseline: bank savings + bank checking, no strategies
-        let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
-        for (let i = 0; i < months; i++) {
-            bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
-            bChk = bChk * (1 + RATES.checking/12);
-        }
-        const baseline = Math.round(bSav + bChk);
+        // Baseline: bank savings only, no strategies
+        let bSav = EXISTING_SAVINGS;
+        for (let i = 0; i < months; i++) bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
+        const baseline = Math.round(bSav);
 
         // Calculate each strategy's individual delta
-        // 1. Gold Sweep Savings delta (FDIC insured)
+        // 1. Gold Cash Sweep (move savings to RH, FDIC insured)
         let sweepSav = EXISTING_SAVINGS;
         for (let i = 0; i < months; i++) sweepSav = sweepSav * (1 + RATES.goldSweep/12) + MONTHLY_SAVINGS;
         const deltaSavings = Math.round(sweepSav - bSav);
 
-        // 2. USDC Checking delta
-        let usdcChk = CHECKING_BALANCE;
-        for (let i = 0; i < months; i++) usdcChk = usdcChk * (1 + RATES.usdc/12);
-        const deltaChecking = Math.round(usdcChk - bChk);
-
-        // 3. Gold Card cashback (total over period)
+        // 2. Gold Card cashback (total over period)
         const monthlyCashback = Math.round(monthlySpend * 0.03);
         const deltaGoldCard = monthlyCashback * months;
 
         // With strategies applied
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
-        const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
         const cashbackRate = s.goldCard ? 0.03 : 0;
-        let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
+        let savBal = EXISTING_SAVINGS;
         for (let i = 0; i < months; i++) {
             savBal = savBal * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
-            chkBal = chkBal * (1 + chkRate/12);
         }
-        const total = Math.round(savBal + chkBal);
+        const total = Math.round(savBal);
         const gain = total - baseline;
-        const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
+        const anyActive = s.savingsToUsdc || s.goldCard;
 
-        // Checkbox UI — use <div> not <label> to prevent double-toggle
+        // Checkbox UI
         const chk = (key, title, desc, delta, checked) =>
             '<div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:'+(checked ? '#f0fdf4' : '#f9fafb')+'; border:1px solid '+(checked ? '#bbf7d0' : '#e5e7eb')+'; border-radius:10px; margin-bottom:6px; cursor:pointer;" onclick="app.toggleGrowthStrategy(\''+key+'\')">' +
                 '<input type="checkbox" '+(checked ? 'checked' : '')+' style="margin-top:2px; accent-color:#00C805; pointer-events:none;" />' +
@@ -1673,25 +1651,21 @@ const app = {
                     '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Projected Value</div>' +
                     '<div style="font-size:28px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
                 '</div>' +
-                projRow('Starting balance ($'+EXISTING_SAVINGS.toLocaleString()+' savings + $'+CHECKING_BALANCE.toLocaleString()+' checking)', EXISTING_SAVINGS + CHECKING_BALANCE, '#374151', false) +
-                projRow('Savings deposits ($'+MONTHLY_SAVINGS+'/mo × '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
-                projRow('Interest at '+(s.savingsToUsdc ? (RATES.goldSweep*100).toFixed(2) : (RATES.savings*100).toFixed(2))+'%', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
-                projRow('Checking yield at '+(s.checkingToUsdc ? (RATES.usdc*100).toFixed(1) : (RATES.checking*100).toFixed(2))+'%', Math.round(chkBal - CHECKING_BALANCE), '#059669', false) +
+                projRow('Starting savings (at bank)', EXISTING_SAVINGS, '#374151', false) +
+                projRow('Deposits ($'+MONTHLY_SAVINGS+'/mo x '+months+'mo)', MONTHLY_SAVINGS * months, '#374151', false) +
+                projRow('Interest at '+(s.savingsToUsdc ? (RATES.goldSweep*100).toFixed(2) : (RATES.savings*100).toFixed(2))+'% APY', Math.round(savBal - EXISTING_SAVINGS - MONTHLY_SAVINGS*months - (s.goldCard ? monthlyCashback*months : 0)), '#059669', false) +
                 (s.goldCard ? projRow('Gold Card cashback ($'+monthlyCashback+'/mo)', deltaGoldCard, '#1d4ed8', false) : '') +
                 projRow('Total', total, anyActive ? '#166534' : '#374151', true) +
-                (gain > 0 ? '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' more than doing nothing</span></div>' : '') +
+                (gain > 0 ? '<div style="text-align:center; margin-top:6px;"><span style="font-size:10px; font-weight:600; color:#059669;">+$'+gain.toLocaleString()+' more than leaving at bank</span></div>' : '') +
             '</div>' +
 
-            // Strategy checkboxes with individual deltas
+            // Strategy checkboxes
             '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
             chk('savingsToUsdc', 'Gold Cash Sweep — FDIC insured',
-                (RATES.goldSweep*100).toFixed(2)+'% APY on $'+EXISTING_SAVINGS.toLocaleString()+' + $'+MONTHLY_SAVINGS+'/mo · Insured up to $2.5M',
+                'Move your $'+EXISTING_SAVINGS.toLocaleString()+' from bank → Robinhood. Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY instead of 0.40%. FDIC insured up to $2.5M via partner banks.',
                 deltaSavings, s.savingsToUsdc) +
-            chk('checkingToUsdc', 'Free USDC — accelerate fun goals',
-                (RATES.usdc*100).toFixed(1)+'% APY on idle checking · Great for short-term goals · Not FDIC insured',
-                deltaChecking, s.checkingToUsdc) +
-            chk('goldCard', 'Gold Card — 3% cashback on all spending',
-                '$'+monthlyCashback+'/mo cashback auto-invested',
+            chk('goldCard', 'Gold Card — 3% cashback credit card',
+                'Earn 3% back on every purchase ($'+monthlyCashback+'/mo est.). Cashback auto-invested into your portfolio — turns spending into saving.',
                 deltaGoldCard, s.goldCard);
     },
 
@@ -1724,9 +1698,7 @@ const app = {
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Gold Card rewards → auto-invest</div><div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Round-ups → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Spare change into free USDC for goals</div></div>' +
-            '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
-            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → USDC</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, sweep to fun goals</div></div>' +
+            '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Dining savings → Gold Sweep</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">If dining under $250, auto-sweep surplus</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Weekly BTC DCA ($50)</div><div style="font-size:11px; color:#9ca3af; margin-top:2px;">Every Friday, buy $50 BTC</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
@@ -1741,12 +1713,11 @@ const app = {
             ).join('');
 
         document.getElementById('rules-activity').innerHTML =
-            [{date:'Mar 27',desc:'Round-up: $0.50 + $0.80 + $0.70 → USDC',color:'#f97316'},
-             {date:'Mar 27',desc:'Swept $48 to USDC (dining under budget — fun goals)',color:'#00C805'},
-             {date:'Mar 26',desc:'RH Card rewards: $49.05 → auto-invested',color:'#3b82f6'},
-             {date:'Mar 26',desc:'Round-up: $0.01 + $1.00 + $0.50 → USDC goals',color:'#f97316'},
+            [{date:'Mar 27',desc:'Swept $48 surplus → Gold Sweep (dining under budget)',color:'#00C805'},
+             {date:'Mar 26',desc:'Gold Card rewards: $49.05 → auto-invested',color:'#3b82f6'},
+             {date:'Mar 24',desc:'Auto-save $95 → Gold Sweep',color:'#00C805'},
              {date:'Mar 21',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
-             {date:'Mar 18',desc:'Swept $112 to USDC (dining under budget)',color:'#00C805'},
+             {date:'Mar 18',desc:'Swept $112 surplus → Gold Sweep (under budget)',color:'#00C805'},
              {date:'Mar 14',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'},
              {date:'Mar 7',desc:'Bought $50 BTC (weekly DCA)',color:'#f97316'}
             ].map(a => '<div class="activity-item"><div class="activity-date">'+a.date+'</div><div class="activity-desc"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+a.color+';margin-right:6px;"></span>'+a.desc+'</div></div>').join('');
