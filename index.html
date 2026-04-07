@@ -599,6 +599,29 @@
             line-height: 1.4;
         }
 
+        /* Expandable source/assumption notes */
+        .src-note { display: inline; position: relative; }
+        .src-note summary {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 15px; height: 15px; border-radius: 50%;
+            background: rgba(0,82,255,0.08); color: #0052FF;
+            font-size: 10px; font-weight: 700; cursor: pointer;
+            vertical-align: middle; margin-left: 3px;
+            list-style: none; user-select: none;
+            transition: background 0.15s;
+        }
+        .src-note summary::-webkit-details-marker { display: none; }
+        .src-note summary::marker { display: none; content: ''; }
+        .src-note[open] summary { background: rgba(0,82,255,0.2); }
+        .src-note .src-body {
+            display: block; margin-top: 6px; padding: 8px 12px;
+            background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12);
+            border-radius: 8px; font-size: 0.82em; line-height: 1.5;
+            color: rgba(26,26,46,0.65); font-weight: 400; font-style: normal;
+        }
+        .src-note .src-body a { color: #0052FF; text-decoration: underline; font-weight: 500; }
+        .src-note .src-body strong { color: rgba(26,26,46,0.85); }
+
         /* Timeline */
         .timeline {
             position: relative;
@@ -2925,7 +2948,7 @@
 
                     <!-- Title block -->
                     <div style="font-size: 1.2em; color: #0052FF; font-weight: 600; letter-spacing: 0.15em; text-align: center; animation: fadeInUp 0.5s ease 0.3s forwards; opacity: 0; animation-fill-mode: both;">TIKTOK</div>
-                    <div class="slide-subtitle coral animate-stagger" style="animation-delay: 0.35s; font-size: 1.1em; letter-spacing: 0.1em; margin-bottom: 4px; text-align: center;">FAMILY PAIRING · BLOCK CONTROL</div>
+                    <div class="slide-subtitle coral animate-stagger" style="animation-delay: 0.35s; font-size: 1.1em; letter-spacing: 0.1em; margin-bottom: 4px; text-align: center;">FAMILY PAIRING</div>
                     <h1 class="slide-title animate-stagger" style="animation-delay: 0.4s; margin-bottom: 0; font-size: 2.8em; text-align: center;">Manage Blocked Accounts</h1>
 
                     <!-- Gradient divider -->
@@ -2994,28 +3017,28 @@
                 <div class="slide-content" style="justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;" class="animate-stagger">10X PRODUCT SCALE DEMO</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 8px;">Turn Robinhood Into a Daily<br>Financial Companion</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Zero non-trading reason to open the app today — spending &amp; savings insights change that, converting 14M dormant accounts into active, revenue-generating relationships</div>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Zero non-trading reason to open the app today — spending &amp; savings insights change that, converting ~16M dormant accounts into active, revenue-generating Gold relationships</div>
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px;">
                         <div class="card animate-stagger" style="animation-delay: 0.2s; border-top: 3px solid #e8445a; padding: 24px 18px; text-align: center;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #e8445a; margin-bottom: 8px;">14M</div>
-                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Dormant Accounts</div>
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #e8445a; margin-bottom: 8px;">~16M</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Dormant Accounts<details class="src-note"><summary>+</summary><div class="src-body"><strong>27M funded customers</strong> (Q4 2025) minus ~11M MAU (Q3 2024). Robinhood does not report dormant accounts directly — this is the gap between funded &amp; monthly active. <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">Source: Robinhood Q4 2025 earnings</a></div></details></div>
                             <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Funded accounts with zero engagement between trades — $0 CAC to reactivate</div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.3s; border-top: 3px solid #0052FF; padding: 24px 18px; text-align: center;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #0052FF; margin-bottom: 8px;">7.5–8×</div>
-                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Yield Advantage</div>
-                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Bank at 0.40% → Free USDC 3.0% for goals · Gold Sweep 3.35% FDIC-insured for savings</div>
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #0052FF; margin-bottom: 8px;">8.4×</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Yield Advantage<details class="src-note"><summary>+</summary><div class="src-body"><strong>0.40%</strong> = FDIC national average savings rate (Mar 2026). <strong>3.35%</strong> = Robinhood Gold Sweep APY, FDIC-insured up to $2.5M via partner banks. Ratio: 3.35 / 0.40 = 8.4&times;. <a href="https://www.fdic.gov/national-rates-and-rate-caps" target="_blank">FDIC rates</a> · <a href="https://robinhood.com/us/en/support/articles/cash-sweep-program-interest-rate/" target="_blank">RH Sweep rate</a></div></details></div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Bank avg 0.40% APY → Gold Sweep 3.35% FDIC-insured — same safety, 8× the return</div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.4s; border-top: 3px solid #059669; padding: 24px 18px; text-align: center;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #059669; margin-bottom: 8px;">5–8×</div>
-                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Revenue Potential</div>
-                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">$1.9B → $5–8B via user growth, ARPU expansion, and bear-market resilience</div>
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #059669; margin-bottom: 8px;">+$3–7B</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Incremental Revenue<details class="src-note"><summary>+</summary><div class="src-body"><strong>Assumptions:</strong> Reactivate 5–10M dormant into Gold at $500–700/yr avg non-trading revenue (Gold sub $50 + sweep NII ~$225 + card interchange ~$250). Current revenue: <strong>$4.47B</strong> (FY 2025). <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">Source: Robinhood Q4 2025 earnings</a></div></details></div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">On top of $4.5B today — from non-trading Gold relationships that survive bear markets</div>
                         </div>
                     </div>
 
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 16px 24px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
-                        <div style="font-size: 0.9em; line-height: 1.5; opacity: 0.7;"><strong style="color: #0052FF; opacity: 1;">The thesis:</strong> Give users Mint-style spending visibility → surface savings insights → offer a free on-ramp via USDC for short-term goals, then convert to Gold Sweep (FDIC-insured), Gold Card, and deeper engagement. <strong style="opacity: 1;">Every insight leads to an action. Every action generates revenue.</strong></div>
+                        <div style="font-size: 0.9em; line-height: 1.5; opacity: 0.7;"><strong style="color: #0052FF; opacity: 1;">The thesis:</strong> Give users free Mint-style spending visibility → surface savings insights → convert to Gold Sweep (3.35% FDIC-insured) and Gold Card (3% back) for users who want to <em>act</em> on those insights. <strong style="opacity: 1;">Insights are free. Action requires Gold. Every action generates revenue.</strong></div>
                     </div>
 
                     <div class="animate-stagger" style="animation-delay: 0.6s; margin-top: 16px; text-align: center;">
@@ -3043,9 +3066,9 @@
                         <div class="animate-stagger" style="animation-delay: 0.3s; flex: 1; padding: 14px; background: rgba(5,150,105,0.03); border: 1px solid rgba(5,150,105,0.15); border-radius: 10px;">
                             <div style="font-weight: 700; color: #059669; font-size: 0.92em; margin-bottom: 6px;">Play 2: Savings Insights</div>
                             <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.5; margin-bottom: 8px;"><em>"Your savings are dying at 0.40%"</em></div>
-                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Show what their balance could be at 3%+. Two tiers: free USDC for short-term fun goals, Gold Sweep (FDIC-insured) for serious savings.</div>
-                            <div style="margin-top: 8px; font-size: 0.75em; font-weight: 600; color: #059669;">Converts to:</div>
-                            <div style="font-size: 0.75em; opacity: 0.5; line-height: 1.5;">Free: USDC 3.0% for goals · Gold: Sweep 3.35% FDIC-insured · Savings rules</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Show what their balance could be at 3.35%. Free insights for everyone — but you can only <strong style="opacity:1;">act</strong> on them with Gold.</div>
+                            <div style="margin-top: 8px; font-size: 0.75em; font-weight: 600; color: #059669;">Gold converts to:</div>
+                            <div style="font-size: 0.75em; opacity: 0.5; line-height: 1.5;">Gold Sweep 3.35% FDIC-insured · Gold Card 3% back · Savings rules</div>
                         </div>
                     </div>
 
@@ -3059,21 +3082,21 @@
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 10px;">
                         <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Who We're Going After</div>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(232,68,90,0.04); border: 1px solid rgba(232,68,90,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #e8445a;">14M</div>
+                            <div style="flex: 1; min-width: 110px; padding: 8px; background: rgba(232,68,90,0.04); border: 1px solid rgba(232,68,90,0.12); border-radius: 8px; text-align: center;">
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #e8445a;">~16M<details class="src-note"><summary>+</summary><div class="src-body">27M funded (Q4 2025) minus ~11M MAU. <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a></div></details></div>
                                 <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Dormant RH<br>$0 CAC</div>
                             </div>
-                            <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #0052FF;">11M</div>
-                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Active RH<br>deepen wallet</div>
+                            <div style="flex: 1; min-width: 110px; padding: 8px; background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12); border-radius: 8px; text-align: center;">
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #0052FF;">~11M<details class="src-note"><summary>+</summary><div class="src-body">11.0M MAU (Q3 2024). Metric since deprecated by RH. <a href="https://www.businessofapps.com/data/robinhood-statistics/" target="_blank">Business of Apps</a></div></details></div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Active RH<br>deepen Gold</div>
                             </div>
-                            <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(240,165,0,0.04); border: 1px solid rgba(240,165,0,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #f0a500;">3.6M</div>
-                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Post-Mint<br>orphaned users</div>
+                            <div style="flex: 1; min-width: 110px; padding: 8px; background: rgba(240,165,0,0.04); border: 1px solid rgba(240,165,0,0.12); border-radius: 8px; text-align: center;">
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #f0a500;">3.6M<details class="src-note"><summary>+</summary><div class="src-body">Mint shut down Mar 2024. 3.6M monthly active users at closure. Monarch ($850M valuation) is emerging but paid ($10-15/mo) and insight-only — can't take action. <a href="https://www.bloomberg.com/news/articles/2023-11-01/intuit-winds-down-personal-finance-app-mint-shifts-users-to-credit-karma" target="_blank">Bloomberg</a></div></details></div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Post-Mint<br>insight-only, no action</div>
                             </div>
-                            <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #059669;">80M+</div>
-                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Bank savers<br>earning &lt;1%</div>
+                            <div style="flex: 1; min-width: 110px; padding: 8px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.12); border-radius: 8px; text-align: center;">
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #059669;">80M+<details class="src-note"><summary>+</summary><div class="src-body"><strong>US bank savers.</strong> ~131M banked US households (FDIC 2023); ~80% use standard savings at 0.01–0.40% APY. Only ~20% use high-yield accounts. <a href="https://www.bankrate.com/banking/savings/average-savings-interest-rates/" target="_blank">Bankrate</a></div></details></div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">US bank savers<br>earning &lt;1%</div>
                             </div>
                         </div>
                     </div>
@@ -3084,53 +3107,57 @@
             <div class="slide fade-enter" data-slide="16" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Business Case</div>
-                    <h1 class="slide-title animate-stagger" style="margin-bottom: 12px;">10X the Product → 5–8X Revenue</h1>
+                    <h1 class="slide-title animate-stagger" style="margin-bottom: 12px;">Unlock Non-Trading Revenue at $0 CAC</h1>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <!-- User value -->
+                        <!-- Current state -->
                         <div class="animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; background: linear-gradient(90deg, #f0f7ff, #f0fdf8); border: 1px solid #d1e3f8; border-radius: 10px;">
-                            <div style="font-weight: 700; color: #0052FF; font-size: 0.92em; margin-bottom: 4px;">10X for the User</div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.5;">Bank savings: <strong style="color: #dc2626; opacity: 1;">0.40%</strong> → Free USDC: <strong style="color: #059669; opacity: 1;">3.0%</strong> for fun goals · Gold Sweep: <strong style="color: #059669; opacity: 1;">3.35% FDIC-insured</strong> for serious savings. Plus spending insights they've never had. <strong style="opacity: 1;">A non-trading reason to move savings + daily spend to RH.</strong></div>
+                            <div style="font-weight: 700; color: #0052FF; font-size: 0.92em; margin-bottom: 4px;">Where Robinhood Is Today<details class="src-note"><summary>+</summary><div class="src-body">FY 2025: $4.47B revenue, 27M funded customers, ~$164 ARPU (annualized). Revenue is heavily trading-dependent — dropped ~25-43% in 2022 bear market. <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025 earnings</a></div></details></div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.5;"><strong style="color: #059669; opacity: 1;">$4.5B revenue · $164 ARPU · 27M funded</strong> — but 60% of accounts are dormant, and revenue crashes in bear markets. <strong style="opacity: 1;">The problem isn't user count — it's activation and bear-market resilience.</strong></div>
                         </div>
 
-                        <!-- Revenue stacking -->
+                        <!-- The activation opportunity -->
                         <div class="animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; background: rgba(5,150,105,0.03); border: 1px solid rgba(5,150,105,0.15); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #059669; font-size: 0.92em; margin-bottom: 6px;">2–2.5× More Users</div>
+                            <div style="font-weight: 700; color: #059669; font-size: 0.92em; margin-bottom: 6px;">Activate Dormant Users Into Gold (Non-Trading Revenue)</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6; margin-bottom: 8px;">These users won't necessarily trade — but Gold-only revenue is still highly attractive:</div>
                             <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                                <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
-                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">2–3M</div>
-                                    <div style="font-size: 0.58em; opacity: 0.5;">dormant<br>reactivated</div>
+                                <div style="flex: 1; text-align: center; padding: 6px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
+                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">$50/yr</div>
+                                    <div style="font-size: 0.58em; opacity: 0.5;">Gold sub<br>($5/mo)</div>
                                 </div>
-                                <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
-                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">2–4M</div>
-                                    <div style="font-size: 0.58em; opacity: 0.5;">bank + Mint +<br>micro-invest</div>
+                                <div style="flex: 1; text-align: center; padding: 6px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
+                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">~$225/yr<details class="src-note"><summary>+</summary><div class="src-body"><strong>Sweep NII:</strong> Avg $15K swept. RH earns ~1.5% spread (pays 3.35%, earns ~4.85% from partner banks). $15K &times; 1.5% = $225/yr. Actual spread depends on Fed Funds rate and RH's bank program terms.</div></details></div>
+                                    <div style="font-size: 0.58em; opacity: 0.5;">Sweep NII<br>(on avg $15K bal)</div>
                                 </div>
-                                <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
-                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">2–3M</div>
-                                    <div style="font-size: 0.58em; opacity: 0.5;">net-new<br>Gen Z</div>
+                                <div style="flex: 1; text-align: center; padding: 6px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
+                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">~$250/yr<details class="src-note"><summary>+</summary><div class="src-body"><strong>Gold Card interchange:</strong> 3% cashback to user on all purchases. On ~$18K annual card spend (avg US household), merchant interchange ~2.5%. RH retains the margin net of rewards funding. Conservative estimate: ~$250/yr net card revenue per active cardholder. <a href="https://robinhood.com/creditcard/" target="_blank">RH Gold Card</a></div></details></div>
+                                    <div style="font-size: 0.58em; opacity: 0.5;">Card interchange<br>(on ~$18K spend)</div>
                                 </div>
                             </div>
-                            <div style="font-size: 0.78em; opacity: 0.5; text-align: center;">11M MAU → 19–22M over 5yr. Dormant users at $0 CAC.</div>
+                            <div style="font-size: 0.82em; font-weight: 600; color: #059669; text-align: center;">= ~$525/yr per Gold-only user · no trading required</div>
                         </div>
 
-                        <!-- ARPU expansion -->
+                        <!-- Scale it -->
                         <div class="animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; background: rgba(155,89,182,0.03); border: 1px solid rgba(155,89,182,0.12); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.92em; margin-bottom: 6px;">2–3× Revenue Per User</div>
-                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Today: $68 ARPU (trading only). Full stack adds:</div>
-                            <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold Card +$54–72</span>
-                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Sweep/USDC yield +$10–13</span>
-                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold sub +$9–12</span>
-                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">More trading +$24</span>
+                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.92em; margin-bottom: 6px;">Scale: 16M Dormant + External Acquisition</div>
+                            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                                <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(155,89,182,0.06); border-radius: 6px;">
+                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #9b59b6;">5–10M</div>
+                                    <div style="font-size: 0.58em; opacity: 0.5;">dormant<br>reactivated ($0 CAC)</div>
+                                </div>
+                                <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(155,89,182,0.06); border-radius: 6px;">
+                                    <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #9b59b6;">2–4M</div>
+                                    <div style="font-size: 0.58em; opacity: 0.5;">post-Mint +<br>bank switchers</div>
+                                </div>
                             </div>
-                            <div style="font-size: 0.78em; opacity: 0.5; margin-top: 6px;"><strong style="opacity: 0.8;">$68 → $165–190 blended ARPU.</strong> Dormant users go from $0 → $50–150. Fully converted users worth $500+.</div>
+                            <div style="font-size: 0.78em; opacity: 0.5; text-align: center;">7–14M new Gold users × ~$525/yr avg = <strong style="opacity: 0.8;">$3.7–7.4B incremental annual revenue</strong></div>
                         </div>
                     </div>
 
                     <!-- Bottom line -->
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 10px; padding: 10px 14px; background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12); border-radius: 10px; text-align: center;">
-                        <div style="font-size: 0.88em; font-weight: 700; color: #0052FF;">2× users × 2.5× ARPU = 5× revenue</div>
-                        <div style="font-size: 0.78em; opacity: 0.5; margin-top: 2px;">Conservative: ~$5B. Aggressive (2.5× users, 3× ARPU): ~$8B. From $1.9B today.</div>
+                        <div style="font-size: 0.88em; font-weight: 700; color: #0052FF;">$4.5B today + $3–7B incremental = $7.5–11.5B<details class="src-note"><summary>+</summary><div class="src-body"><strong>Key assumption:</strong> These users join Gold for savings/card — they may not trade. Revenue estimate is non-trading only (sub + sweep NII + card interchange). Any trading upside is bonus. Bear-market resilient because none of this revenue depends on trading volume or market conditions.</div></details></div>
+                        <div style="font-size: 0.78em; opacity: 0.5; margin-top: 2px;">Non-trading revenue that doesn't crash in bear markets. Insights are free — action requires Gold.</div>
                     </div>
                 </div>
             </div>
@@ -3146,9 +3173,9 @@
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; border-left: 4px solid #059669;">
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                                 <div style="width: 26px; height: 26px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">1</div>
-                                <div style="font-weight: 700; font-size: 0.88em;">Mint is Dead</div>
+                                <div style="font-weight: 700; font-size: 0.88em;">Mint is Dead — and Successors Can't Act<details class="src-note"><summary>+</summary><div class="src-body">Mint shut down Mar 2024 with 3.6M MAU (<a href="https://www.bloomberg.com/news/articles/2023-11-01/intuit-winds-down-personal-finance-app-mint-shifts-users-to-credit-karma" target="_blank">Bloomberg</a>). Monarch Money is the closest successor ($75M raised, $850M valuation) but is paid ($10-15/mo) and <strong>insight-only</strong> — users still can't sweep savings or earn cashback directly. Robinhood's edge: insights + action in one place.</div></details></div>
                             </div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">3.6M users lost their budgeting tool overnight. No clear successor has emerged — the market is wide open for an insight→action product.</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">3.6M users lost their budgeting tool. Alternatives like Monarch are insight-only — they can't take action. Robinhood can: see the leak → sweep to Gold → earn 3% back.</div>
                         </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; border-left: 4px solid #3b78dc;">
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -3160,51 +3187,31 @@
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; border-left: 4px solid #f0a500;">
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                                 <div style="width: 26px; height: 26px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">3</div>
-                                <div style="font-weight: 700; font-size: 0.88em;">No Non-Trading Reason to Stay</div>
+                                <div style="font-weight: 700; font-size: 0.88em;">~16M Dormant — No Reason to Open the App<details class="src-note"><summary>+</summary><div class="src-body">27M funded customers (Q4 2025) minus ~11M MAU. Revenue dropped 25% full-year and up to 43% quarter-on-quarter during 2022 bear market. <a href="https://www.macrotrends.net/stocks/charts/HOOD/robinhood-markets/revenue" target="_blank">MacroTrends</a></div></details></div>
                             </div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">14M dormant accounts with nothing to do between trades. No spending insights, no savings tools, no reason to open the app. Revenue drops 38% in bear markets because of it.</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">~16M dormant accounts with nothing to do between trades. No spending insights, no savings tools, no reason to open the app. Revenue dropped 25–43% in the 2022 bear market because of it.</div>
                         </div>
                     </div>
 
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 12px; padding: 10px 14px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.15); border-radius: 8px;">
-                        <div style="font-size: 0.85em; line-height: 1.5; opacity: 0.7;"><strong style="color: #059669; opacity: 1;">$0 customer acquisition cost</strong> — 14M funded accounts already exist. Free spending insights is the hook, not paid marketing.</div>
+                        <div style="font-size: 0.85em; line-height: 1.5; opacity: 0.7;"><strong style="color: #059669; opacity: 1;">$0 customer acquisition cost</strong> — ~16M funded accounts already exist. Free spending insights is the hook, not paid marketing. Gold is the upsell.</div>
                     </div>
                 </div>
             </div>
 
-            <!-- DEMO SLIDE 4: The Problem -->
-            <div class="slide fade-enter" data-slide="18" data-section="Demo">
-                <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div class="animate-stagger" style="font-size: 0.75em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;">10X Product Strategy — Crypto Growth</div>
-                    <h1 class="slide-title animate-stagger" style="margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
-                    <div class="animate-stagger" style="animation-delay: 0.15s; font-size: 0.85em; line-height: 1.6; max-width: 520px; margin-bottom: 16px;">
-                        <strong style="color: #1a1a2e;">Robinhood doesn't have an acquisition problem — it has an activation problem.</strong>
-                        <span style="opacity: 0.6;"> 14M funded accounts sit dormant with no non-trading reason to come back. Spending insights change that.</span>
-                    </div>
+            <!-- CLOSING: Thank You -->
+            <div class="slide zoom-enter" data-slide="18" data-section="Demo">
+                <div class="slide-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
 
-                    <!-- Compact problem stats inline -->
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
-                        <div class="animate-stagger" style="animation-delay: 0.25s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #e8445a; background: rgba(232,68,90,0.03); border-radius: 0 8px 8px 0;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #e8445a;">14M</div>
-                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Dormant funded accounts<br>58% of 24M total</div>
-                        </div>
-                        <div class="animate-stagger" style="animation-delay: 0.35s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #f0a500; background: rgba(240,165,0,0.03); border-radius: 0 8px 8px 0;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #f0a500;">-38%</div>
-                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Revenue drop in bear markets<br>No non-crypto engagement</div>
-                        </div>
-                        <div class="animate-stagger" style="animation-delay: 0.45s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #0052FF; background: rgba(0,82,255,0.03); border-radius: 0 8px 8px 0;">
-                            <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #0052FF;">3.6M</div>
-                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Post-Mint users displaced<br>No successor product</div>
-                        </div>
-                    </div>
+                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px; opacity: 0; animation: fadeInUp 0.5s ease 0.3s forwards;" class="animate-stagger">10X ROBINHOOD</div>
 
-                    <div class="animate-stagger" style="animation-delay: 0.55s; padding: 10px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-                        <div style="font-size: 1em; flex-shrink: 0;">🔍</div>
-                        <div style="font-size: 0.85em; line-height: 1.4; opacity: 0.7;"><strong style="opacity: 1;">Insight apps</strong> can't invest. <strong style="opacity: 1;">Brokerages</strong> can't track spending. <strong style="opacity: 1;">No product bridges the gap.</strong></div>
-                    </div>
+                    <div style="width: 120px; height: 2px; background: linear-gradient(90deg, transparent, #0052FF, transparent); margin: 8px auto 24px; opacity: 0; animation: fadeInUp 0.6s ease 0.5s forwards;"></div>
 
-                    <div class="animate-stagger" style="animation-delay: 0.65s; margin-top: 12px; font-size: 0.82em; opacity: 0.35;">
-                        ← Live demo: spending insights driving the reactivation funnel
+                    <div style="text-align: center; opacity: 0; animation: fadeInUp 0.8s ease 0.8s forwards;">
+                        <div style="font-size: 3em; font-weight: 300; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.02em; margin-bottom: 14px; background: linear-gradient(135deg, #1a1a2e, #0052FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Thank You</div>
+                        <div style="width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #0052FF, transparent); margin: 0 auto 14px;"></div>
+                        <div style="font-size: 1.15em; font-weight: 600; letter-spacing: 0.01em;">James Jones</div>
+                        <div style="font-size: 0.9em; opacity: 0.55; margin-top: 4px;">Lead PM, User Privacy &bull; TikTok</div>
                     </div>
                 </div>
             </div>
@@ -3212,7 +3219,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v2.4</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v2.5</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
