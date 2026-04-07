@@ -504,12 +504,6 @@
                     <!-- SAVINGS (combines Yields + What If) -->
                     <div class="tab-content hidden" id="savings-content">
                         <div id="savings-balance-area" style="margin-bottom:12px;"></div>
-                        <div style="font-size:12px; font-weight:600; color:#9ca3af; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:10px;">MODEL YOUR GROWTH</div>
-                        <div style="display:flex; gap:8px; margin-bottom:12px;">
-                            <button class="time-pill" data-wperiod="1">1 Year</button>
-                            <button class="time-pill" data-wperiod="3">3 Years</button>
-                            <button class="time-pill active" data-wperiod="5">5 Years</button>
-                        </div>
                         <div id="savings-model"></div>
                     </div>
 
@@ -573,7 +567,7 @@ const app = {
         highlightedCategory: null,
         colIncome: 5500, colRent: 2100,
         breakdownOpen: false,
-            growthStrategies: { savingsToUsdc: false, goldCard: false },
+            growthStrategies: { savingsToUsdc: true, goldCard: true },
             allocations: { safe: 85, moderate: 0, growth: 15 },
         categories: [
             { name: 'Dining',        color: '#FF6B35', amount: 280, count: 23, change: 23 },
@@ -696,16 +690,7 @@ const app = {
     },
 
     initWhatIfPeriods() {
-        document.querySelectorAll('[data-wperiod]').forEach(pill => {
-            pill.addEventListener('click', () => {
-                document.querySelectorAll('[data-wperiod]').forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                this.state.whatIfPeriod = parseInt(pill.dataset.wperiod);
-                this.updateSavingsProjections();
-                this.updateAmountDisplay();
-                this.drawChart();
-            });
-        });
+        // Now handled by switchFeatureTab pill-swapping logic
     },
 
     // ===== CHART HOVER =====
@@ -773,7 +758,8 @@ const app = {
             const s = this.state.growthStrategies;
             const anyActive = s.savingsToUsdc || s.goldCard;
             const years = this.state.whatIfPeriod;
-            const months = years * 12;
+            const months = Math.round(years * 12);
+            const periodLabel = years < 1 ? months + '-month' : years + '-year';
             const monthlySpend = this.getMonthlyRate();
             const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
             const cashbackRate = s.goldCard ? 0.03 : 0;
@@ -792,9 +778,9 @@ const app = {
             if (s.goldCard) stratNames.push('Gold Card');
             mainEl.innerHTML = '<span style="font-size:14px;font-weight:500;color:#6b7280;letter-spacing:0.5px;">FORECAST </span>$' + projected.toLocaleString();
             if (anyActive && gain > 0) {
-                changeEl.textContent = years + '-year projected · +$' + gain.toLocaleString() + ' with ' + stratNames.join(' + ');
+                changeEl.textContent = periodLabel + ' projected · +$' + gain.toLocaleString() + ' with ' + stratNames.join(' + ');
             } else {
-                changeEl.textContent = years + '-year projected · Current path (bank 0.40%)';
+                changeEl.textContent = periodLabel + ' projected · Current path (bank 0.40%)';
             }
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
@@ -811,6 +797,33 @@ const app = {
         document.querySelectorAll('.feature-tab').forEach(t => t.classList.toggle('active', t.dataset.feature === feature));
         this.state.activeTab = feature;
         this.state.highlightedCategory = null;
+
+        // Swap time pills for Grow tab (projection periods)
+        const pillsContainer = document.querySelector('.time-pills');
+        if (feature === 'savings') {
+            if (!this._originalPills) this._originalPills = pillsContainer.innerHTML;
+            const periods = [{v:0.25,l:'3M'},{v:1,l:'1Y'},{v:2,l:'2Y'},{v:3,l:'3Y'},{v:5,l:'5Y'}];
+            pillsContainer.innerHTML = periods.map(p =>
+                '<button class="time-pill'+(this.state.whatIfPeriod===p.v?' active':'')+'" data-gperiod="'+p.v+'">'+p.l+'</button>'
+            ).join('');
+            pillsContainer.querySelectorAll('[data-gperiod]').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    pillsContainer.querySelectorAll('[data-gperiod]').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    this.state.whatIfPeriod = parseFloat(pill.dataset.gperiod);
+                    this.updateSavingsProjections();
+                    this.updateAmountDisplay();
+                    this.drawChart();
+                });
+            });
+        } else if (this._originalPills) {
+            pillsContainer.innerHTML = this._originalPills;
+            this.initPeriods();
+            pillsContainer.querySelectorAll('[data-period]').forEach(p =>
+                p.classList.toggle('active', p.dataset.period === this.state.activePeriod)
+            );
+        }
+
         if (feature === 'overview') this.renderOverviewTab();
         else if (feature === 'budget') this.renderBudgetTab();
         else if (feature === 'savings') this.renderSavingsTab();
@@ -1087,7 +1100,7 @@ const app = {
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
         const forecastYears = this.state.whatIfPeriod;
-        const forecastMonths = forecastYears * 12;
+        const forecastMonths = Math.round(forecastYears * 12);
         const anyActive = s.savingsToUsdc || s.goldCard;
 
         // --- Historical: 6 months of real savings growth ---
@@ -1647,7 +1660,7 @@ const app = {
             // Projection card with breakdown
             '<div style="background:'+(anyActive ? 'linear-gradient(135deg, #f0fdf4, #eff6ff)' : '#f9fafb')+'; border:1px solid '+(anyActive ? '#bbf7d0' : '#e5e7eb')+'; border-radius:12px; padding:14px; margin-bottom:12px;">' +
                 '<div style="text-align:center; margin-bottom:8px;">' +
-                    '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+years+'-Year Projected Value</div>' +
+                    '<div style="font-size:9px; font-weight:600; color:'+(anyActive ? '#059669' : '#9ca3af')+'; text-transform:uppercase; letter-spacing:0.5px;">'+(years < 1 ? Math.round(years*12)+'-Month' : years+'-Year')+' Projected Value</div>' +
                     '<div style="font-size:28px; font-weight:700; color:'+(anyActive ? '#166534' : '#374151')+'; margin:4px 0;">$'+total.toLocaleString()+'</div>' +
                 '</div>' +
                 projRow('Starting savings (at bank)', EXISTING_SAVINGS, '#374151', false) +
