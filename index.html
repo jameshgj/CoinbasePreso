@@ -599,20 +599,9 @@
             line-height: 1.4;
         }
 
-        /* Expandable source/assumption notes */
+        /* Expandable source/assumption notes — hidden individually, toggled by slide-level pill */
         .src-note { display: inline; position: relative; }
-        .src-note summary {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 15px; height: 15px; border-radius: 50%;
-            background: rgba(0,82,255,0.08); color: #0052FF;
-            font-size: 10px; font-weight: 700; cursor: pointer;
-            vertical-align: middle; margin-left: 3px;
-            list-style: none; user-select: none;
-            transition: background 0.15s;
-        }
-        .src-note summary::-webkit-details-marker { display: none; }
-        .src-note summary::marker { display: none; content: ''; }
-        .src-note[open] summary { background: rgba(0,82,255,0.2); }
+        .src-note summary { display: none; } /* hide individual + buttons */
         .src-note .src-body {
             display: block; margin-top: 6px; padding: 8px 12px;
             background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12);
@@ -621,6 +610,22 @@
         }
         .src-note .src-body a { color: #0052FF; text-decoration: underline; font-weight: 500; }
         .src-note .src-body strong { color: rgba(26,26,46,0.85); }
+
+        /* Slide-level +Details toggle pill */
+        .details-toggle {
+            position: absolute; top: 18px; right: 24px; z-index: 10;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 12px; border-radius: 20px;
+            background: rgba(0,82,255,0.06); border: 1px solid rgba(0,82,255,0.15);
+            color: #0052FF; font-size: 11px; font-weight: 600;
+            cursor: pointer; user-select: none;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .details-toggle:hover { background: rgba(0,82,255,0.12); }
+        .details-toggle.open { background: rgba(0,82,255,0.15); border-color: rgba(0,82,255,0.3); }
+        .details-toggle .dt-icon { font-size: 13px; font-weight: 700; transition: transform 0.2s; }
+        .details-toggle.open .dt-icon { transform: rotate(45deg); }
 
         /* Timeline */
         .timeline {
@@ -3014,7 +3019,8 @@
 
             <!-- DEMO INTRO: 10X Product Scale -->
             <div class="slide fade-enter" data-slide="14" data-section="Demo">
-                <div class="slide-content" style="justify-content: center;">
+                <div class="slide-content" style="justify-content: center; position: relative;">
+                    <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;" class="animate-stagger">10X PRODUCT SCALE DEMO</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 8px;">Turn Robinhood Into a Daily<br>Financial Companion</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Zero non-trading reason to open the app today — spending &amp; savings insights change that, converting ~16M dormant accounts into active, revenue-generating Gold relationships</div>
@@ -3049,7 +3055,8 @@
 
             <!-- DEMO SLIDE 1: The Strategy -->
             <div class="slide fade-enter" data-slide="15" data-section="Demo">
-                <div class="slide-content" style="justify-content: center;">
+                <div class="slide-content" style="justify-content: center; position: relative;">
+                    <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;" class="animate-stagger">The Strategy</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 4px;">Insights Are the Drawbridge</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Today there is zero non-trading, non-crypto reason to open Robinhood. Insights change that.</div>
@@ -3105,7 +3112,8 @@
 
             <!-- DEMO SLIDE 2: The Business Case -->
             <div class="slide fade-enter" data-slide="16" data-section="Demo">
-                <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center; position: relative;">
+                    <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Business Case</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 12px;">Unlock Non-Trading Revenue at $0 CAC</h1>
 
@@ -3164,7 +3172,8 @@
 
             <!-- DEMO SLIDE 3: Why Now -->
             <div class="slide fade-enter" data-slide="17" data-section="Demo">
-                <div class="slide-content" style="justify-content: center;">
+                <div class="slide-content" style="justify-content: center; position: relative;">
+                    <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
                     <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Three tailwinds converging — and zero non-trading reason to stay on the platform today</div>
@@ -3548,12 +3557,14 @@
                 }
             });
 
-            // Click Navigation — skip if clicking screenshots, overlay, or reveal cards
+            // Click Navigation — skip if clicking screenshots, overlay, reveal cards, or details
             document.querySelector('.presentation-container').addEventListener('click', (e) => {
                 if (e.target.closest('a[href]')) return;
                 if (e.target.classList.contains('screenshot-expandable')) return;
                 if (e.target.closest('.screenshot-overlay')) return;
                 if (e.target.closest('#demo-carousel')) return;
+                if (e.target.closest('.details-toggle')) return;
+                if (e.target.closest('.src-note')) return;
                 if (document.getElementById('screenshot-overlay').classList.contains('active')) return;
                 if (overlayJustClosed) return;
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -3620,6 +3631,19 @@
             if (!slide) return;
             slide.querySelectorAll('.reveal-card.revealed').forEach(c => c.classList.remove('revealed'));
 
+        }
+
+        // Toggle all source details on a slide
+        function toggleSlideDetails(btn, e) {
+            e.stopPropagation();
+            const slide = btn.closest('.slide');
+            const notes = slide.querySelectorAll('.src-note');
+            const isOpen = btn.classList.contains('open');
+            notes.forEach(n => { if (isOpen) n.removeAttribute('open'); else n.setAttribute('open', ''); });
+            btn.classList.toggle('open');
+            btn.innerHTML = isOpen
+                ? '<span class="dt-icon">+</span> Details'
+                : '<span class="dt-icon">+</span> Hide';
         }
 
         function nextSlide() {
