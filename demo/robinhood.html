@@ -752,12 +752,15 @@ const app = {
             }
         } else if (tab === 'budget') {
             const pl = { '1w': 'this week', '1m': 'this month', '3m': 'this quarter', 'ytd': 'year to date', '1y': 'this year', 'all': 'all time' }[this.state.activePeriod] || 'this month';
-            mainEl.textContent = '$' + EXISTING_SAVINGS.toLocaleString();
+            const ps = { '1w': 0.25, '1m': 1, '3m': 3, 'ytd': 3, '1y': 12, 'all': 1 }[this.state.activePeriod] || 1;
+            const isAll = this.state.activePeriod === 'all';
+            const periodSaved = isAll ? EXISTING_SAVINGS : Math.round(MONTHLY_SAVINGS * ps);
+            mainEl.textContent = '$' + periodSaved.toLocaleString();
             const lastYearMonthly = 1820;
             const monthlySpend = this.getMonthlyRate();
             const reduction = ((lastYearMonthly - monthlySpend) / lastYearMonthly * 100).toFixed(1);
             const onTrack = monthlySpend <= Math.round(lastYearMonthly * 0.95);
-            changeEl.textContent = 'Total savings · Spending ' + (onTrack ? '↓'+reduction+'% ' + pl : '↑ off track ' + pl);
+            changeEl.textContent = (isAll ? 'Total savings' : 'Saved ' + pl) + ' · Spending ' + (onTrack ? '↓'+reduction+'% ' + pl : '↑ off track ' + pl);
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
             const totalMonthly = MONTHLY_SAVINGS + MONTHLY_ROUNDUPS;
