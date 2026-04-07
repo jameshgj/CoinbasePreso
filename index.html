@@ -1932,10 +1932,10 @@
             display: block;
         }
         /* Demo slides: content pushed right to make room for persistent phone */
-        .slide[data-slide="14"] .slide-content,
         .slide[data-slide="15"] .slide-content,
         .slide[data-slide="16"] .slide-content,
-        .slide[data-slide="17"] .slide-content {
+        .slide[data-slide="17"] .slide-content,
+        .slide[data-slide="18"] .slide-content {
             margin-left: 420px;
             justify-content: flex-start !important;
             padding-top: 10vh !important;
@@ -3006,56 +3006,91 @@
                 </div>
             </div>
 
-            <!-- DEMO SLIDE 1: The Strategy -->
+            <!-- DEMO INTRO: 10X Product Scale -->
             <div class="slide fade-enter" data-slide="14" data-section="Demo">
                 <div class="slide-content" style="justify-content: center;">
-                    <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;" class="animate-stagger">The Strategy</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.7em; margin-bottom: 4px;">Insights Are the Drawbridge</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.82em;">Today there is zero non-trading, non-crypto reason to open Robinhood. Insights change that.</div>
+                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;" class="animate-stagger">10X PRODUCT SCALE DEMO</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 2.2em; margin-bottom: 8px;">Turn Robinhood Into a Daily<br>Financial Companion</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Zero non-trading reason to open the app today — spending &amp; savings insights change that, converting 14M dormant accounts into active, revenue-generating relationships</div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px;">
+                        <div class="card animate-stagger" style="animation-delay: 0.2s; border-top: 3px solid #e8445a; padding: 24px 18px; text-align: center;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #e8445a; margin-bottom: 8px;">14M</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Dormant Accounts</div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Funded accounts with zero engagement between trades — $0 CAC to reactivate</div>
+                        </div>
+                        <div class="card animate-stagger" style="animation-delay: 0.3s; border-top: 3px solid #0052FF; padding: 24px 18px; text-align: center;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #0052FF; margin-bottom: 8px;">7.5×</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Yield Advantage</div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Bank savings at 0.40% → USDC at 3.0% — a compelling reason to move money</div>
+                        </div>
+                        <div class="card animate-stagger" style="animation-delay: 0.4s; border-top: 3px solid #059669; padding: 24px 18px; text-align: center;">
+                            <div style="font-family: 'Space Grotesk', monospace; font-size: 2.4em; font-weight: 700; color: #059669; margin-bottom: 8px;">5–8×</div>
+                            <div style="font-weight: 700; font-size: 1em; color: #1a1a2e; margin-bottom: 6px;">Revenue Potential</div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">$1.9B → $5–8B via user growth, ARPU expansion, and bear-market resilience</div>
+                        </div>
+                    </div>
+
+                    <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 16px 24px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
+                        <div style="font-size: 0.9em; line-height: 1.5; opacity: 0.7;"><strong style="color: #0052FF; opacity: 1;">The thesis:</strong> Give users Mint-style spending visibility → surface savings insights → convert to USDC yield, Gold Card, and deeper crypto engagement. <strong style="opacity: 1;">Every insight leads to an action. Every action generates revenue.</strong></div>
+                    </div>
+
+                    <div class="animate-stagger" style="animation-delay: 0.6s; margin-top: 16px; text-align: center;">
+                        <div style="font-size: 0.85em; opacity: 0.4;">Next: Interactive prototype walkthrough →</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEMO SLIDE 1: The Strategy -->
+            <div class="slide fade-enter" data-slide="15" data-section="Demo">
+                <div class="slide-content" style="justify-content: center;">
+                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;" class="animate-stagger">The Strategy</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 4px;">Insights Are the Drawbridge</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.92em;">Today there is zero non-trading, non-crypto reason to open Robinhood. Insights change that.</div>
 
                     <!-- Two plays side by side -->
                     <div style="display: flex; gap: 10px; margin-top: 14px;">
                         <div class="animate-stagger" style="animation-delay: 0.2s; flex: 1; padding: 14px; background: rgba(232,68,90,0.03); border: 1px solid rgba(232,68,90,0.15); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #e8445a; font-size: 0.82em; margin-bottom: 6px;">Play 1: Spending Insights</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.5; margin-bottom: 8px;"><em>"Your money is leaking"</em></div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.6;">Show where they overspend. Show what that wasted spend could become.</div>
-                            <div style="margin-top: 8px; font-size: 0.68em; font-weight: 600; color: #e8445a;">Converts to:</div>
-                            <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.5;">Gold Card (3% back) · Budget rules · Auto-sweep surplus</div>
+                            <div style="font-weight: 700; color: #e8445a; font-size: 0.92em; margin-bottom: 6px;">Play 1: Spending Insights</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.5; margin-bottom: 8px;"><em>"Your money is leaking"</em></div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Show where they overspend. Show what that wasted spend could become.</div>
+                            <div style="margin-top: 8px; font-size: 0.75em; font-weight: 600; color: #e8445a;">Converts to:</div>
+                            <div style="font-size: 0.75em; opacity: 0.5; line-height: 1.5;">Gold Card (3% back) · Budget rules · Auto-sweep surplus</div>
                         </div>
                         <div class="animate-stagger" style="animation-delay: 0.3s; flex: 1; padding: 14px; background: rgba(5,150,105,0.03); border: 1px solid rgba(5,150,105,0.15); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #059669; font-size: 0.82em; margin-bottom: 6px;">Play 2: Savings Insights</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.5; margin-bottom: 8px;"><em>"Your savings are dying at 0.40%"</em></div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.6;">Show what their balance would be at 3%+ yield. Make the cost of inaction visible.</div>
-                            <div style="margin-top: 8px; font-size: 0.68em; font-weight: 600; color: #059669;">Converts to:</div>
-                            <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.5;">USDC auto-sweep · Yield strategies · Savings goals</div>
+                            <div style="font-weight: 700; color: #059669; font-size: 0.92em; margin-bottom: 6px;">Play 2: Savings Insights</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.5; margin-bottom: 8px;"><em>"Your savings are dying at 0.40%"</em></div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Show what their balance would be at 3%+ yield. Make the cost of inaction visible.</div>
+                            <div style="margin-top: 8px; font-size: 0.75em; font-weight: 600; color: #059669;">Converts to:</div>
+                            <div style="font-size: 0.75em; opacity: 0.5; line-height: 1.5;">USDC auto-sweep · Yield strategies · Savings goals</div>
                         </div>
                     </div>
 
                     <!-- Flywheel -->
                     <div class="animate-stagger" style="animation-delay: 0.4s; margin-top: 10px; padding: 12px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
-                        <div style="font-weight: 700; color: #0052FF; font-size: 0.78em; margin-bottom: 4px;">The Flywheel</div>
-                        <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.5;">Both plays reinforce each other: the more you save on spending, the more you have to grow. The more you see savings growing, the more you optimize spending. <strong style="opacity: 1;">Every insight leads to an action. Every action deepens the relationship.</strong></div>
+                        <div style="font-weight: 700; color: #0052FF; font-size: 0.88em; margin-bottom: 4px;">The Flywheel</div>
+                        <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.5;">Both plays reinforce each other: the more you save on spending, the more you have to grow. The more you see savings growing, the more you optimize spending. <strong style="opacity: 1;">Every insight leads to an action. Every action deepens the relationship.</strong></div>
                     </div>
 
                     <!-- Customer cohorts -->
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 10px;">
-                        <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Who We're Going After</div>
+                        <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px;">Who We're Going After</div>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                             <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(232,68,90,0.04); border: 1px solid rgba(232,68,90,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.9em; color: #e8445a;">14M</div>
-                                <div style="font-size: 0.6em; opacity: 0.5; line-height: 1.2;">Dormant RH<br>$0 CAC</div>
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #e8445a;">14M</div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Dormant RH<br>$0 CAC</div>
                             </div>
                             <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.9em; color: #0052FF;">11M</div>
-                                <div style="font-size: 0.6em; opacity: 0.5; line-height: 1.2;">Active RH<br>deepen wallet</div>
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #0052FF;">11M</div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Active RH<br>deepen wallet</div>
                             </div>
                             <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(240,165,0,0.04); border: 1px solid rgba(240,165,0,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.9em; color: #f0a500;">3.6M</div>
-                                <div style="font-size: 0.6em; opacity: 0.5; line-height: 1.2;">Post-Mint<br>orphaned users</div>
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #f0a500;">3.6M</div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Post-Mint<br>orphaned users</div>
                             </div>
                             <div style="flex: 1; min-width: 90px; padding: 8px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.12); border-radius: 8px; text-align: center;">
-                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.9em; color: #059669;">80M+</div>
-                                <div style="font-size: 0.6em; opacity: 0.5; line-height: 1.2;">Bank savers<br>earning &lt;1%</div>
+                                <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 1.0em; color: #059669;">80M+</div>
+                                <div style="font-size: 0.68em; opacity: 0.5; line-height: 1.2;">Bank savers<br>earning &lt;1%</div>
                             </div>
                         </div>
                     </div>
@@ -3063,21 +3098,21 @@
             </div>
 
             <!-- DEMO SLIDE 2: The Business Case -->
-            <div class="slide fade-enter" data-slide="15" data-section="Demo">
+            <div class="slide fade-enter" data-slide="16" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Business Case</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.7em; margin-bottom: 12px;">10X the Product → 5–8X Revenue</h1>
+                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Business Case</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 12px;">10X the Product → 5–8X Revenue</h1>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <!-- User value -->
                         <div class="animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; background: linear-gradient(90deg, #f0f7ff, #f0fdf8); border: 1px solid #d1e3f8; border-radius: 10px;">
-                            <div style="font-weight: 700; color: #0052FF; font-size: 0.82em; margin-bottom: 4px;">10X for the User</div>
-                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.5;">Bank savings: <strong style="color: #dc2626; opacity: 1;">0.40%</strong> → USDC: <strong style="color: #059669; opacity: 1;">3.0%</strong> = <strong style="color: #0052FF; opacity: 1;">7.5× yield</strong>. Plus spending insights they've never had. <strong style="opacity: 1;">A non-trading reason to move savings + daily spend to RH.</strong></div>
+                            <div style="font-weight: 700; color: #0052FF; font-size: 0.92em; margin-bottom: 4px;">10X for the User</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.5;">Bank savings: <strong style="color: #dc2626; opacity: 1;">0.40%</strong> → USDC: <strong style="color: #059669; opacity: 1;">3.0%</strong> = <strong style="color: #0052FF; opacity: 1;">7.5× yield</strong>. Plus spending insights they've never had. <strong style="opacity: 1;">A non-trading reason to move savings + daily spend to RH.</strong></div>
                         </div>
 
                         <!-- Revenue stacking -->
                         <div class="animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; background: rgba(5,150,105,0.03); border: 1px solid rgba(5,150,105,0.15); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #059669; font-size: 0.82em; margin-bottom: 6px;">2–2.5× More Users</div>
+                            <div style="font-weight: 700; color: #059669; font-size: 0.92em; margin-bottom: 6px;">2–2.5× More Users</div>
                             <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                                 <div style="flex: 1; text-align: center; padding: 5px 3px; background: rgba(5,150,105,0.06); border-radius: 6px;">
                                     <div style="font-family: 'Space Grotesk', monospace; font-weight: 700; font-size: 0.85em; color: #059669;">2–3M</div>
@@ -3092,37 +3127,37 @@
                                     <div style="font-size: 0.58em; opacity: 0.5;">net-new<br>Gen Z</div>
                                 </div>
                             </div>
-                            <div style="font-size: 0.68em; opacity: 0.5; text-align: center;">11M MAU → 19–22M over 5yr. Dormant users at $0 CAC.</div>
+                            <div style="font-size: 0.78em; opacity: 0.5; text-align: center;">11M MAU → 19–22M over 5yr. Dormant users at $0 CAC.</div>
                         </div>
 
                         <!-- ARPU expansion -->
                         <div class="animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; background: rgba(155,89,182,0.03); border: 1px solid rgba(155,89,182,0.12); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.82em; margin-bottom: 6px;">2–3× Revenue Per User</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.6;">Today: $68 ARPU (trading only). Full stack adds:</div>
+                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.92em; margin-bottom: 6px;">2–3× Revenue Per User</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.6;">Today: $68 ARPU (trading only). Full stack adds:</div>
                             <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 0.62em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold Card +$54–72</span>
-                                <span style="font-size: 0.62em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">USDC spread +$10–13</span>
-                                <span style="font-size: 0.62em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold sub +$9–12</span>
-                                <span style="font-size: 0.62em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">More trading +$24</span>
+                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold Card +$54–72</span>
+                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">USDC spread +$10–13</span>
+                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">Gold sub +$9–12</span>
+                                <span style="font-size: 0.72em; padding: 3px 8px; background: rgba(155,89,182,0.08); border-radius: 12px; color: #7c3aed; font-weight: 600;">More trading +$24</span>
                             </div>
-                            <div style="font-size: 0.68em; opacity: 0.5; margin-top: 6px;"><strong style="opacity: 0.8;">$68 → $165–190 blended ARPU.</strong> Dormant users go from $0 → $50–150. Fully converted users worth $500+.</div>
+                            <div style="font-size: 0.78em; opacity: 0.5; margin-top: 6px;"><strong style="opacity: 0.8;">$68 → $165–190 blended ARPU.</strong> Dormant users go from $0 → $50–150. Fully converted users worth $500+.</div>
                         </div>
                     </div>
 
                     <!-- Bottom line -->
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 10px; padding: 10px 14px; background: rgba(0,82,255,0.04); border: 1px solid rgba(0,82,255,0.12); border-radius: 10px; text-align: center;">
-                        <div style="font-size: 0.78em; font-weight: 700; color: #0052FF;">2× users × 2.5× ARPU = 5× revenue</div>
-                        <div style="font-size: 0.68em; opacity: 0.5; margin-top: 2px;">Conservative: ~$5B. Aggressive (2.5× users, 3× ARPU): ~$8B. From $1.9B today.</div>
+                        <div style="font-size: 0.88em; font-weight: 700; color: #0052FF;">2× users × 2.5× ARPU = 5× revenue</div>
+                        <div style="font-size: 0.78em; opacity: 0.5; margin-top: 2px;">Conservative: ~$5B. Aggressive (2.5× users, 3× ARPU): ~$8B. From $1.9B today.</div>
                     </div>
                 </div>
             </div>
 
             <!-- DEMO SLIDE 3: Why Now -->
-            <div class="slide fade-enter" data-slide="16" data-section="Demo">
+            <div class="slide fade-enter" data-slide="17" data-section="Demo">
                 <div class="slide-content" style="justify-content: center;">
-                    <div style="font-size: 0.68em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.8em; margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.82em;">Three tailwinds converging — and zero non-trading reason to stay on the platform today</div>
+                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 0.92em;">Three tailwinds converging — and zero non-trading reason to stay on the platform today</div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; border-left: 4px solid #059669;">
@@ -3130,35 +3165,35 @@
                                 <div style="width: 26px; height: 26px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">1</div>
                                 <div style="font-weight: 700; font-size: 0.88em;">Mint is Dead</div>
                             </div>
-                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">3.6M users lost their budgeting tool overnight. No clear successor has emerged — the market is wide open for an insight→action product.</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">3.6M users lost their budgeting tool overnight. No clear successor has emerged — the market is wide open for an insight→action product.</div>
                         </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; border-left: 4px solid #3b78dc;">
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                                 <div style="width: 26px; height: 26px; border-radius: 50%; background: #dbeafe; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">2</div>
                                 <div style="font-weight: 700; font-size: 0.88em;">Plaid Infrastructure Ready</div>
                             </div>
-                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">Open banking APIs make multi-account aggregation trivial. Spending data from any bank, surfaced inside Robinhood — no new KYC needed.</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">Open banking APIs make multi-account aggregation trivial. Spending data from any bank, surfaced inside Robinhood — no new KYC needed.</div>
                         </div>
                         <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; border-left: 4px solid #f0a500;">
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                                 <div style="width: 26px; height: 26px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">3</div>
                                 <div style="font-weight: 700; font-size: 0.88em;">No Non-Trading Reason to Stay</div>
                             </div>
-                            <div style="font-size: 0.75em; opacity: 0.6; line-height: 1.4;">14M dormant accounts with nothing to do between trades. No spending insights, no savings tools, no reason to open the app. Revenue drops 38% in bear markets because of it.</div>
+                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">14M dormant accounts with nothing to do between trades. No spending insights, no savings tools, no reason to open the app. Revenue drops 38% in bear markets because of it.</div>
                         </div>
                     </div>
 
                     <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 12px; padding: 10px 14px; background: rgba(5,150,105,0.04); border: 1px solid rgba(5,150,105,0.15); border-radius: 8px;">
-                        <div style="font-size: 0.75em; line-height: 1.5; opacity: 0.7;"><strong style="color: #059669; opacity: 1;">$0 customer acquisition cost</strong> — 14M funded accounts already exist. Free spending insights is the hook, not paid marketing.</div>
+                        <div style="font-size: 0.85em; line-height: 1.5; opacity: 0.7;"><strong style="color: #059669; opacity: 1;">$0 customer acquisition cost</strong> — 14M funded accounts already exist. Free spending insights is the hook, not paid marketing.</div>
                     </div>
                 </div>
             </div>
 
             <!-- DEMO SLIDE 4: The Problem -->
-            <div class="slide fade-enter" data-slide="17" data-section="Demo">
+            <div class="slide fade-enter" data-slide="18" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div class="animate-stagger" style="font-size: 0.68em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;">10X Product Strategy — Crypto Growth</div>
-                    <h1 class="slide-title animate-stagger" style="font-size: 1.9em; margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
+                    <div class="animate-stagger" style="font-size: 0.75em; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #0052FF; margin-bottom: 6px;">10X Product Strategy — Crypto Growth</div>
+                    <h1 class="slide-title animate-stagger" style="font-size: 2.0em; margin-bottom: 6px;">Money Insights as the<br>Reactivation Engine</h1>
                     <div class="animate-stagger" style="animation-delay: 0.15s; font-size: 0.85em; line-height: 1.6; max-width: 520px; margin-bottom: 16px;">
                         <strong style="color: #1a1a2e;">Robinhood doesn't have an acquisition problem — it has an activation problem.</strong>
                         <span style="opacity: 0.6;"> 14M funded accounts sit dormant with no non-trading reason to come back. Spending insights change that.</span>
@@ -3168,24 +3203,24 @@
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
                         <div class="animate-stagger" style="animation-delay: 0.25s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #e8445a; background: rgba(232,68,90,0.03); border-radius: 0 8px 8px 0;">
                             <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #e8445a;">14M</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">Dormant funded accounts<br>58% of 24M total</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Dormant funded accounts<br>58% of 24M total</div>
                         </div>
                         <div class="animate-stagger" style="animation-delay: 0.35s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #f0a500; background: rgba(240,165,0,0.03); border-radius: 0 8px 8px 0;">
                             <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #f0a500;">-38%</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">Revenue drop in bear markets<br>No non-crypto engagement</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Revenue drop in bear markets<br>No non-crypto engagement</div>
                         </div>
                         <div class="animate-stagger" style="animation-delay: 0.45s; flex: 1; min-width: 140px; padding: 12px 14px; border-left: 3px solid #0052FF; background: rgba(0,82,255,0.03); border-radius: 0 8px 8px 0;">
                             <div style="font-family: 'Space Grotesk', monospace; font-size: 1.6em; font-weight: 700; color: #0052FF;">3.6M</div>
-                            <div style="font-size: 0.72em; opacity: 0.6; line-height: 1.3;">Post-Mint users displaced<br>No successor product</div>
+                            <div style="font-size: 0.82em; opacity: 0.6; line-height: 1.3;">Post-Mint users displaced<br>No successor product</div>
                         </div>
                     </div>
 
                     <div class="animate-stagger" style="animation-delay: 0.55s; padding: 10px 14px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 8px; display: flex; align-items: center; gap: 10px;">
                         <div style="font-size: 1em; flex-shrink: 0;">🔍</div>
-                        <div style="font-size: 0.75em; line-height: 1.4; opacity: 0.7;"><strong style="opacity: 1;">Insight apps</strong> can't invest. <strong style="opacity: 1;">Brokerages</strong> can't track spending. <strong style="opacity: 1;">No product bridges the gap.</strong></div>
+                        <div style="font-size: 0.85em; line-height: 1.4; opacity: 0.7;"><strong style="opacity: 1;">Insight apps</strong> can't invest. <strong style="opacity: 1;">Brokerages</strong> can't track spending. <strong style="opacity: 1;">No product bridges the gap.</strong></div>
                     </div>
 
-                    <div class="animate-stagger" style="animation-delay: 0.65s; margin-top: 12px; font-size: 0.72em; opacity: 0.35;">
+                    <div class="animate-stagger" style="animation-delay: 0.65s; margin-top: 12px; font-size: 0.82em; opacity: 0.35;">
                         ← Live demo: spending insights driving the reactivation funnel
                     </div>
                 </div>
@@ -3194,7 +3229,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v1.7</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v1.8</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
@@ -3245,7 +3280,7 @@
             { name: 'Product', slides: [6, 7], abbr: 'Product' },
             { name: 'Execution', slides: [8, 9, 10, 11], abbr: 'Execution' },
             { name: 'Impact', slides: [12, 13], abbr: 'Impact' },
-            { name: '10X Demo', slides: [14, 15, 16, 17], abbr: '10X' },
+            { name: '10X Demo', slides: [14, 15, 16, 17, 18], abbr: '10X' },
         ];
 
         // Initialize
@@ -3400,7 +3435,7 @@
             // Toggle persistent demo phone visibility
             const demoPhone = document.getElementById('demo-phone-persistent');
             if (demoPhone) {
-                if (currentSlide >= 14 && currentSlide <= 17) {
+                if (currentSlide >= 15 && currentSlide <= 18) {
                     demoPhone.classList.add('visible');
                 } else {
                     demoPhone.classList.remove('visible');
