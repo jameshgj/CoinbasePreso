@@ -1271,7 +1271,10 @@ const app = {
     },
 
     handleCategoryClick(name) {
-        if (this.state.highlightedCategory === name) this.openCategoryDrill(name);
+        if (this.state.highlightedCategory === name) {
+            this.state.highlightedCategory = null; // deselect — show all categories
+            this.renderOverviewTab(); this.drawOverviewChart();
+        }
         else { this.state.highlightedCategory = name; this.renderOverviewTab(); this.drawOverviewChart(); }
     },
 
