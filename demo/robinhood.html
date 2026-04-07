@@ -1265,7 +1265,9 @@ const app = {
             catRows +=
                 '<div class="category-row'+(hl === cat.name ? ' highlighted' : '')+'" onclick="app.handleCategoryClick(\''+cat.name+'\')">' +
                 '<div class="category-left"><div class="category-dot" style="background:'+cat.color+'"></div><div class="category-info"><div class="category-name">'+cat.name+budgetTag+'</div><div class="category-count">'+txnCount+' '+cl+'</div></div></div>' +
-                '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div></div></div>';
+                '<div class="category-right"><div class="category-amount">$'+cat.amount.toFixed(2)+'</div><div class="category-change '+cc+'">'+ct+'</div>' +
+                '<div onclick="event.stopPropagation(); app.openCategoryDrill(\''+cat.name+'\')" style="margin-left:6px; width:20px; height:20px; border-radius:50%; background:rgba(0,82,255,0.06); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 20 20"><path d="M7 4l6 6-6 6" fill="none" stroke="#0052FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+                '</div></div>';
         });
         container.innerHTML = catRows;
     },
