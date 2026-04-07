@@ -773,9 +773,35 @@ const app = {
             changeEl.textContent = (isAll ? 'Total savings' : 'Saved ' + pl) + ' · Spending ' + (onTrack ? '↓'+reduction+'% ' + pl : '↑ off track ' + pl);
             changeEl.className = 'amount-change';
         } else if (tab === 'savings') {
-            const totalMonthly = MONTHLY_SAVINGS + MONTHLY_ROUNDUPS;
-            mainEl.textContent = '$' + totalMonthly.toLocaleString() + '/mo';
-            changeEl.textContent = 'Under-budget savings $' + MONTHLY_SAVINGS + ' · Round-ups $' + MONTHLY_ROUNDUPS;
+            const s = this.state.growthStrategies;
+            const anyActive = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
+            const years = this.state.whatIfPeriod;
+            const months = years * 12;
+            const monthlySpend = this.getMonthlyRate();
+            // Projected value with current strategies
+            const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
+            const chkRate = s.checkingToUsdc ? RATES.usdc : RATES.checking;
+            const cashbackRate = s.goldCard ? 0.03 : 0;
+            let savBal = EXISTING_SAVINGS, chkBal = CHECKING_BALANCE;
+            for (let i = 0; i < months; i++) {
+                savBal = savBal * (1 + savRate/12) + MONTHLY_SAVINGS + (monthlySpend * cashbackRate);
+                chkBal = chkBal * (1 + chkRate/12);
+            }
+            const projected = Math.round(savBal + chkBal);
+            // Baseline for comparison
+            let bSav = EXISTING_SAVINGS, bChk = CHECKING_BALANCE;
+            for (let i = 0; i < months; i++) {
+                bSav = bSav * (1 + RATES.savings/12) + MONTHLY_SAVINGS;
+                bChk = bChk * (1 + RATES.checking/12);
+            }
+            const baseline = Math.round(bSav + bChk);
+            const gain = projected - baseline;
+            mainEl.textContent = '$' + projected.toLocaleString();
+            if (anyActive && gain > 0) {
+                changeEl.textContent = years + '-year projected · +$' + gain.toLocaleString() + ' with strategies';
+            } else {
+                changeEl.textContent = years + '-year projected · Current path';
+            }
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
             const cashback = Math.round(this.getMonthlyRate() * 0.03);
@@ -1060,13 +1086,10 @@ const app = {
     },
 
     drawSavingsChart() {
-        const s = this.state.growthStrategies;
-        const anyStrat = s.savingsToUsdc || s.checkingToUsdc || s.goldCard;
-        // When no strategies selected, show same savings history chart as Savings tab
-        if (!anyStrat) return this.drawBudgetChart();
-
         const { svg, p, gw, gh } = this.dim();
         svg.innerHTML = '';
+
+        const s = this.state.growthStrategies;
         const monthlySpend = this.getMonthlyRate();
         const cashbackRate = s.goldCard ? 0.03 : 0;
         const savRate = s.savingsToUsdc ? RATES.goldSweep : RATES.savings;
@@ -1172,8 +1195,12 @@ const app = {
 
         // Legend
         const legendItems = ['<div class="legend-item"><div class="legend-dot" style="background:#00C805"></div>Actual</div>'];
-        if (anyActive) legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #00C805;"></div>With strategies</div>');
-        legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Do nothing</div>');
+        if (anyActive) {
+            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #00C805;"></div>With strategies</div>');
+            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Do nothing</div>');
+        } else {
+            legendItems.push('<div class="legend-item"><div class="legend-dot" style="background:none; border:1.5px dashed #9ca3af;"></div>Projected</div>');
+        }
         document.getElementById('chartLegend').innerHTML = legendItems.join('');
     },
 
