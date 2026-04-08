@@ -3062,7 +3062,7 @@
                     <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px;" class="animate-stagger">THE IDEA</div>
                     <h1 class="slide-title animate-stagger" style="margin-bottom: 8px;">Build Bear-Market Resilience<br>With Spending &amp; Savings Insights</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 1.05em; line-height: 1.6;"><strong>One idea:</strong> Give crypto users a free reason to open Robinhood every day — even when markets are red. Spending &amp; savings insights create daily utility that keeps users engaged, converts them to Gold Sweep, and grows the one revenue line that doesn't crash.</div>
+                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s; font-size: 1.05em; line-height: 1.6;"><strong>One idea:</strong> Give existing Robinhood users and new users a free reason to open the app every day &mdash; even when markets are red and stocks and crypto are down. Spending &amp; savings insights create daily utility that keeps users engaged, converts them to Gold, and grows the one revenue line that doesn't crash.</div>
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px;">
                         <div class="card animate-stagger" style="animation-delay: 0.2s; border-top: 3px solid #e8445a; padding: 24px 18px; text-align: center;">
@@ -3215,10 +3215,6 @@
                         </div>
                     </div>
 
-                    <!-- Growth note -->
-                    <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 10px; text-align: center;">
-                        <div style="font-size: 0.8em; opacity: 0.45; line-height: 1.5; max-width: 600px; margin: 0 auto;">The bear market creates urgency &mdash; but insights drive growth in any market. Bull runs mean more trading, more spending to track, more reasons to act on Gold.</div>
-                    </div>
                 </div>
             </div>
 
@@ -3258,7 +3254,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v3.3</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v3.4</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
@@ -3464,10 +3460,22 @@
             // Toggle persistent demo phone visibility
             const demoPhone = document.getElementById('demo-phone-persistent');
             if (demoPhone) {
-                if (currentSlide >= 15 && currentSlide <= 18) {
+                if (currentSlide >= 15 && currentSlide <= 17) {
                     demoPhone.classList.add('visible');
                 } else {
                     demoPhone.classList.remove('visible');
+                }
+
+                // Auto-switch demo to Grow tab and scroll to Growth Strategies on Business Case slide
+                if (currentSlide === 16) {
+                    const iframe = demoPhone.querySelector('iframe');
+                    if (iframe && iframe.contentWindow && iframe.contentWindow.app) {
+                        iframe.contentWindow.app.switchFeatureTab('savings');
+                        setTimeout(() => {
+                            const tabContent = iframe.contentDocument && iframe.contentDocument.querySelector('.tab-content');
+                            if (tabContent) tabContent.scrollTop = tabContent.scrollHeight;
+                        }, 300);
+                    }
                 }
             }
 
