@@ -3466,16 +3466,34 @@
                     demoPhone.classList.remove('visible');
                 }
 
-                // Auto-switch demo to Grow tab and scroll to Growth Strategies on Business Case slide
+                // Auto-switch demo tabs based on current slide
+                const iframe = demoPhone.querySelector('iframe');
+                const tryDemoTab = (tab, scrollBottom) => {
+                    const attempt = () => {
+                        try {
+                            const demoApp = iframe && iframe.contentWindow && iframe.contentWindow.app;
+                            if (demoApp && demoApp.switchFeatureTab) {
+                                demoApp.switchFeatureTab(tab);
+                                if (scrollBottom) {
+                                    setTimeout(() => {
+                                        const tabContent = iframe.contentDocument && iframe.contentDocument.querySelector('.tab-content');
+                                        if (tabContent) tabContent.scrollTop = tabContent.scrollHeight;
+                                    }, 200);
+                                }
+                                return true;
+                            }
+                        } catch(e) {}
+                        return false;
+                    };
+                    if (!attempt()) setTimeout(attempt, 500);
+                };
+
                 if (currentSlide === 16) {
-                    const iframe = demoPhone.querySelector('iframe');
-                    if (iframe && iframe.contentWindow && iframe.contentWindow.app) {
-                        iframe.contentWindow.app.switchFeatureTab('savings');
-                        setTimeout(() => {
-                            const tabContent = iframe.contentDocument && iframe.contentDocument.querySelector('.tab-content');
-                            if (tabContent) tabContent.scrollTop = tabContent.scrollHeight;
-                        }, 300);
-                    }
+                    // Business Case: show Grow tab, scroll to Growth Strategies
+                    tryDemoTab('savings', true);
+                } else if (currentSlide >= 15 && currentSlide <= 17) {
+                    // Other demo slides: default to Spending tab
+                    tryDemoTab('overview', false);
                 }
             }
 

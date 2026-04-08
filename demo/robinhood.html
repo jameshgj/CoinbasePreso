@@ -1759,6 +1759,7 @@ const app = {
     }
 };
 
+window.app = app; // expose for parent iframe control
 document.addEventListener('DOMContentLoaded', () => app.init());
 </script>
 </body>
