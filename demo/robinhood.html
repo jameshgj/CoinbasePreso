@@ -1711,6 +1711,10 @@ const app = {
             '</div>';
 
         document.getElementById('rules-suggested').innerHTML =
+            '<div style="background:linear-gradient(90deg, rgba(0,200,5,0.05), rgba(0,82,255,0.05)); border:1px solid rgba(0,200,5,0.12); border-radius:8px; padding:8px 12px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">' +
+            '<div style="font-size:10px; font-weight:600; color:#059669;">💡 Free insights for everyone</div>' +
+            '<div style="font-size:10px; font-weight:600; color:#0052FF;">⭐ Take action with Gold</div>' +
+            '</div>' +
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SPENDING INSIGHTS</div>' +
             (potentialSavings > 0 ? insightCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
             insightCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → Gold Sweep', 'Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY (FDIC insured) on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
@@ -1723,7 +1727,8 @@ const app = {
             insightCard('#f0fdf4','#bbf7d0','#166534','📈','Lock in your crypto gains', 'Your crypto is up $2,840 this month but your spending rose $280. Sweep realized gains to FDIC-insured savings before the next dip.', "alert('Sweep gains to Gold Sweep')", 'Sweep') +
             insightCard('#faf5ff','#e9d5ff','#6b21a8','⚖️','High crypto concentration', '82% of your portfolio is in crypto. Moving some to Gold Sweep (3.35% FDIC) reduces drawdown risk without leaving Robinhood.', "alert('Move $3,000 to Gold Sweep')", 'Rebalance') +
             insightCard('#fff7ed','#fed7aa','#9a3412','💰','Spending leak detected', 'Dining is up 23% this month (+$52). At your current rate, that\'s $624/yr — enough to fund a weekly $12 BTC DCA.', "alert('Set dining budget + auto-invest rule')", 'Fix it') +
-            '<button class="cta-btn primary" style="margin-top:12px;" onclick="alert(\'Gold Sweep activated — 3.35% APY on all idle cash, FDIC insured up to $2.5M\')">Activate Gold Sweep — Earn 3.35% APY</button>' +
+            '<div style="font-size:10px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">✦ TAKE ACTION WITH GOLD</div>' +
+            '<button class="cta-btn primary" style="margin-top:0;" onclick="alert(\'Gold Sweep activated — 3.35% APY on all idle cash, FDIC insured up to $2.5M\')">Activate Gold Sweep — Earn 3.35% APY</button>' +
             '<button class="cta-btn outline" style="margin-top:8px;" onclick="alert(\'Gold Card application started — 3% cashback on everything\')">Apply for Gold Card — 3% Back</button>';
     },
 
