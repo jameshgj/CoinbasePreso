@@ -2012,8 +2012,7 @@
         /* Demo slides: content pushed right to make room for persistent phone */
         .slide[data-slide="15"] .slide-content,
         .slide[data-slide="16"] .slide-content,
-        .slide[data-slide="17"] .slide-content,
-        .slide[data-slide="18"] .slide-content {
+        .slide[data-slide="17"] .slide-content {
             margin-left: 420px;
             justify-content: flex-start !important;
             padding-top: 10vh !important;
@@ -2921,7 +2920,7 @@
                             <div style="font-weight: 700; font-size: 0.88em; color: #3a7bd5;">Resolved Teen Unlinking</div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.45s; border-top: 3px solid #6c5ce7; padding: 20px 14px; background: rgba(108,92,231,0.04); text-align: center; display: flex; flex-direction: column; align-items: center;">
-                            <svg width="44" height="44" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 10px;"><circle cx="24" cy="24" r="21" fill="rgba(108,92,231,0.1)" stroke="#6c5ce7" stroke-width="2"/><path d="M10 30l7-6 5 4 5-4 5 4 6-3" stroke="#6c5ce7" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><circle r="3" fill="#6c5ce7"><animate attributeName="cx" values="10;17;22;27;32;38" dur="3s" repeatCount="1" fill="freeze"/><animate attributeName="cy" values="30;24;28;24;28;25" dur="3s" repeatCount="1" fill="freeze"/></circle></svg>
+                            <svg width="44" height="44" viewBox="0 0 48 48" style="flex-shrink: 0; margin-bottom: 10px;"><circle cx="24" cy="24" r="21" fill="rgba(108,92,231,0.1)" stroke="#6c5ce7" stroke-width="2"/><path d="M10 30l7-6 5 4 5-4 5 4 6-3" stroke="#6c5ce7" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><circle r="3" fill="#6c5ce7"><animate attributeName="cx" values="10;17;22;27;32;38" dur="3s" repeatCount="1" fill="freeze" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/><animate attributeName="cy" values="30;24;28;24;28;25" dur="3s" repeatCount="1" fill="freeze" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/></circle></svg>
                             <div style="font-weight: 700; font-size: 0.88em; color: #6c5ce7;">Success Metrics Met</div>
                         </div>
                         <div class="card animate-stagger" style="animation-delay: 0.5s; border-top: 3px solid #9b59b6; padding: 20px 14px; background: rgba(155,89,182,0.04); text-align: center; display: flex; flex-direction: column; align-items: center;">
@@ -3083,8 +3082,19 @@
                         </div>
                     </div>
 
-                    <div class="animate-stagger" style="animation-delay: 0.5s; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 16px 24px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
-                        <div style="font-size: 1em; line-height: 1.5; text-align: center;"><strong style="color: #0052FF;">Insights → Daily opens → Gold conversion → Sweep deposits → Bear-proof revenue</strong><br><span style="opacity: 0.55; font-size: 0.85em;">One flywheel. One product bet. Grows the $1.5B stable line while protecting the $2.6B trading line.</span></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                        <div class="card animate-stagger" style="animation-delay: 0.5s; border-top: 3px solid #059669; padding: 20px 18px;">
+                            <div style="font-weight: 700; font-size: 1em; color: #059669; margin-bottom: 6px;">$0 CAC + Built Infrastructure<details class="src-note"><summary>+</summary><div class="src-body"><strong>No other crypto platform has this:</strong> Gold Sweep (3.35% FDIC-insured, $32.8B deposits), Gold Card (3% cashback), Plaid-ready banking APIs, 27M KYC'd funded accounts. Coinbase has crypto but no savings/spending products. Robinhood can do insight &rarr; action in one app. (<a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a>)</div></details></div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Gold Sweep, Gold Card, Plaid APIs, 27M KYC'd accounts. No other crypto platform has savings + spending + trading in one app. Insight &rarr; action with zero friction.</div>
+                        </div>
+                        <div class="card animate-stagger" style="animation-delay: 0.6s; border-top: 3px solid #0052FF; padding: 20px 18px;">
+                            <div style="font-weight: 700; font-size: 1em; color: #0052FF; margin-bottom: 6px;">CEO Priority: Diversify Beyond Trading<details class="src-note"><summary>+</summary><div class="src-body"><strong>Vlad Tenev, Q1 2025 earnings:</strong> &ldquo;We&rsquo;re diversifying the business outside of the crypto business, which will make us less reliant on crypto transaction volumes.&rdquo; RH now has 11 business lines each exceeding $100M annualized revenue &mdash; but Sweep &amp; Interest ($1.5B) is the largest non-trading line by far. (<a href="https://fortune.com/crypto/2025/04/30/robinhood-ceo-diversifying-crypto-revenue-q1-earnings/" target="_blank">Fortune</a> &middot; <a href="https://investors.robinhood.com/static-files/7bdf75f3-f83e-4b77-ace7-945e3578f9f4" target="_blank">RH Q4 2025</a>)</div></details></div>
+                            <div style="font-size: 0.85em; opacity: 0.55; line-height: 1.4;">Tenev: <em>&ldquo;We&rsquo;re diversifying&hellip;which will make us less reliant on crypto transaction volumes.&rdquo;</em> Insights directly grow the $1.5B Sweep &amp; Interest line.</div>
+                        </div>
+                    </div>
+
+                    <div class="animate-stagger" style="animation-delay: 0.7s; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 14px 24px; background: rgba(0,82,255,0.03); border: 1px solid rgba(0,82,255,0.1); border-radius: 10px;">
+                        <div style="font-size: 0.95em; line-height: 1.5; text-align: center;"><strong style="color: #0052FF;">Insights → Daily opens → Gold conversion → Sweep deposits → Bear-proof revenue</strong><br><span style="opacity: 0.55; font-size: 0.85em;">One flywheel. One product bet. Grows the $1.5B stable line while protecting the $2.6B trading line.</span></div>
                     </div>
 
                 </div>
@@ -3180,7 +3190,7 @@
 
                         <!-- User activation scenarios -->
                         <div class="animate-stagger" style="animation-delay: 0.4s; padding: 10px 14px; background: rgba(155,89,182,0.03); border: 1px solid rgba(155,89,182,0.12); border-radius: 10px;">
-                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.88em; margin-bottom: 2px;">User Activation Scenarios &mdash; dormant pool only (by Year 3)<details class="src-note"><summary>+</summary><div class="src-body"><strong>Gold today:</strong> 4.2M / 27M funded = 15.6% adoption (Q4 2025, grew 58% YoY). Among active users (~11M MAU): ~38%. <strong>Scenario rates applied to ~16M dormant pool:</strong> Conservative ~6% (well below current adoption). Moderate ~15% (matches current overall rate). Aggressive ~28% (approaching active-user rate). <strong>Sweep & Interest per Gold user:</strong> $32.8B total sweep / 4.2M Gold = ~$7,800 avg balance &times; ~1.5% spread = ~$117/yr sweep interest + $50/yr sub = $167/yr non-trading floor. Reactivated users also trade (active ARPU ~$409). <strong>Fintech benchmarks:</strong> Monzo ~8% paid conversion (<a href="https://www.businessofapps.com/data/monzo-statistics/" target="_blank">Business of Apps</a>). Revolut paid tiers grew 45% in 2025 (<a href="https://www.emarketer.com/content/revolut--subscriptions-helped-achieve-record-annual-profits" target="_blank">eMarketer</a>). <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a></div></details></div>
+                            <div style="font-weight: 700; color: #9b59b6; font-size: 0.88em; margin-bottom: 2px;">User Activation Scenarios &mdash; dormant pool only (by Year 3)<details class="src-note"><summary>+</summary><div class="src-body"><strong>Gold today:</strong> 4.2M / 27M funded = 15.6% adoption (Q4 2025, grew 58% YoY). Among active users (~11M MAU): ~38%. <strong>Scenario rates applied to ~16M dormant pool:</strong> Conservative ~6% (well below current adoption). Moderate ~15% (matches current overall rate). Aggressive ~28% (approaching active-user rate). <strong>Sweep & Interest per Gold user:</strong> $32.8B total sweep / 4.2M Gold = ~$7,800 avg balance &times; ~1% net spread (difference between partner bank rate ~4.5% and Gold user rate ~3.5%) = ~$107/yr sweep interest + $60/yr subscription ($5/mo) = ~$167/yr non-trading floor. This is a modeled estimate &mdash; Robinhood does not disclose per-user sweep spread publicly. Realistic range: ~$140&ndash;185/yr depending on assumptions about the spread and average balances. Reactivated users also trade (active ARPU ~$409). <strong>Fintech benchmarks:</strong> Monzo ~8% paid conversion (<a href="https://www.businessofapps.com/data/monzo-statistics/" target="_blank">Business of Apps</a>). Revolut paid tiers grew 45% in 2025 (<a href="https://www.emarketer.com/content/revolut--subscriptions-helped-achieve-record-annual-profits" target="_blank">eMarketer</a>). <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a></div></details></div>
                             <div style="font-size: 0.75em; opacity: 0.55; line-height: 1.3; margin-bottom: 6px;">Gold today: <strong style="opacity: 1;">4.2M / 27M = 15.6%</strong>. Each new Gold user adds ~$167/yr to the Sweep & Interest line (sub + sweep) — <strong style="opacity: 1;">before they trade a dollar.</strong> <em>Based on ~16M dormant pool only; excludes Mint refugees &amp; general bank population.</em></div>
                             <div style="display: flex; gap: 6px;">
                                 <div style="flex: 1; text-align: center; padding: 6px 4px; background: rgba(107,114,128,0.06); border: 1px solid rgba(107,114,128,0.15); border-radius: 8px;">
@@ -3216,43 +3226,8 @@
                 </div>
             </div>
 
-            <!-- DEMO SLIDE 3: Why Now -->
-            <div class="slide fade-enter" data-slide="17" data-section="Demo">
-                <div class="slide-content" style="justify-content: center; position: relative;">
-                    <div class="details-toggle" onclick="toggleSlideDetails(this, event)"><span class="dt-icon">+</span> Details</div>
-                    <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #059669; margin-bottom: 6px;" class="animate-stagger">The Opportunity</div>
-                    <h1 class="slide-title animate-stagger" style="margin-bottom: 4px;">Why Now — and Why Robinhood</h1>
-                    <div class="slide-subtitle animate-stagger" style="animation-delay: 0.1s;">Why Robinhood is uniquely positioned to solve it</div>
-
-                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.2s; padding: 14px 16px; border-left: 4px solid #f59e0b;">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">1</div>
-                                <div style="font-weight: 700; font-size: 0.88em;">It's Happening Again — Right Now<details class="src-note"><summary>+</summary><div class="src-body"><strong>2025–26 cycle:</strong> Crypto rev surged to $358M (Q4 2024), then crashed: $252M (Q1 2025, –30%), $160M (Q2 2025, –55% from peak). Q4 2025 = $221M (–38% YoY). Oct 2025 saw a $19B liquidation — largest in crypto history. HOOD stock down 52% from Oct 2025 high. Jan 2026: crypto DARTs –44% YoY. This is the same 2022 pattern repeating. (<a href="https://www.dlnews.com/articles/markets/robinhood-reports-record-revenue-as-crypto-prices-slide/" target="_blank">DL News</a> · <a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a>)</div></details></div>
-                            </div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">Crypto rev: $358M → $160M in 6 months (2024–25). Jan 2026: crypto DARTs –44%. HOOD stock –52%. This isn't 2022 history — it's happening now. Insights break the cycle.</div>
-                        </div>
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.3s; padding: 14px 16px; border-left: 4px solid #059669;">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #d1fae5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">2</div>
-                                <div style="font-weight: 700; font-size: 0.88em;">RH Already Has the Financial Infrastructure<details class="src-note"><summary>+</summary><div class="src-body"><strong>No other crypto platform has this:</strong> Gold Sweep (3.35% FDIC-insured, $32.8B deposits), Gold Card (3% cashback), Plaid-ready banking APIs, 27M KYC'd funded accounts. Coinbase has crypto but no savings/spending products. Robinhood can do insight → action in one app. (<a href="https://investors.robinhood.com/news-releases/news-release-details/robinhood-reports-fourth-quarter-and-full-year-2025-results" target="_blank">RH Q4 2025</a>)</div></details></div>
-                            </div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">Gold Sweep, Gold Card, Plaid APIs, 27M KYC'd accounts. No other crypto platform has savings + spending + trading in one app. Insight → action with zero friction.</div>
-                        </div>
-                        <div class="card card-deal animate-stagger" style="animation-delay: 0.4s; padding: 14px 16px; border-left: 4px solid #0052FF;">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                                <div style="width: 26px; height: 26px; border-radius: 50%; background: #dbeafe; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75em; flex-shrink: 0;">3</div>
-                                <div style="font-weight: 700; font-size: 0.88em;">CEO Priority: Diversify Beyond Trading<details class="src-note"><summary>+</summary><div class="src-body"><strong>Vlad Tenev, Q1 2025 earnings:</strong> &ldquo;We&rsquo;re diversifying the business outside of the crypto business, which will make us less reliant on crypto transaction volumes.&rdquo; RH now has 11 business lines each exceeding $100M annualized revenue &mdash; but Sweep &amp; Interest ($1.5B) is the largest non-trading line by far. (<a href="https://fortune.com/crypto/2025/04/30/robinhood-ceo-diversifying-crypto-revenue-q1-earnings/" target="_blank">Fortune</a> &middot; <a href="https://investors.robinhood.com/static-files/7bdf75f3-f83e-4b77-ace7-945e3578f9f4" target="_blank">RH Q4 2025</a>)</div></details></div>
-                            </div>
-                            <div style="font-size: 0.85em; opacity: 0.6; line-height: 1.4;">Tenev: <em>&ldquo;We&rsquo;re diversifying&hellip;which will make us less reliant on crypto transaction volumes.&rdquo;</em> Insights directly grow the $1.5B Sweep &amp; Interest line &mdash; the largest non-trading revenue and the CEO&rsquo;s stated priority.</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
             <!-- CLOSING: Thank You -->
-            <div class="slide zoom-enter" data-slide="18" data-section="Demo">
+            <div class="slide zoom-enter" data-slide="17" data-section="Demo">
                 <div class="slide-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
 
                     <div style="font-size: 0.75em; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0052FF; margin-bottom: 8px; opacity: 0; animation: fadeInUp 0.5s ease 0.3s forwards;" class="animate-stagger">ROBINHOOD INSIGHTS</div>
@@ -3286,7 +3261,7 @@
         </div>
     </div>
 
-        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v3.0</div>
+        <div style="position: fixed; bottom: 20px; left: 40px; font-size: 0.7em; opacity: 0.2; font-family: 'Space Grotesk', monospace; z-index: 50; color: inherit;">v3.2</div>
 
 <!-- Progress Bar -->
     <div class="progress-bar">
@@ -3333,11 +3308,11 @@
         // Chapter definitions for breadcrumb groups
         const chapters = [
             { name: 'Intro', slides: [0, 1, 2], abbr: 'Intro' },
-            { name: 'Strategy', slides: [3, 4, 5], abbr: 'Strategy' },
-            { name: 'Product', slides: [6, 7], abbr: 'Product' },
+            { name: 'Strategy', slides: [3, 4, 5, 6], abbr: 'Strategy' },
+            { name: 'Product', slides: [7], abbr: 'Product' },
             { name: 'Execution', slides: [8, 9, 10, 11], abbr: 'Execution' },
             { name: 'Impact', slides: [12, 13], abbr: 'Impact' },
-            { name: '10X Demo', slides: [14, 15, 16, 17, 18], abbr: '10X' },
+            { name: '10X Demo', slides: [14, 15, 16, 17], abbr: '10X' },
         ];
 
         // Initialize
