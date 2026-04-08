@@ -468,7 +468,7 @@
                         <button class="feature-tab" data-feature="budget">Savings</button>
                         <button class="feature-tab" data-feature="savings">Grow</button>
                         <button class="feature-tab" data-feature="rules"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></button>
-                        <button class="feature-tab" data-feature="auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg></button>
+                        <button class="feature-tab" data-feature="auto">Auto</button>
                     </div>
                     </div><!-- /sticky-chart-area -->
 
@@ -1653,12 +1653,13 @@ const app = {
         const anyActive = s.savingsToUsdc || s.goldCard;
 
         // Checkbox UI
-        const chk = (key, title, desc, delta, checked) =>
+        const chk = (key, title, desc, delta, checked, ctaLabel) =>
             '<div style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:'+(checked ? '#f0fdf4' : '#f9fafb')+'; border:1px solid '+(checked ? '#bbf7d0' : '#e5e7eb')+'; border-radius:10px; margin-bottom:6px; cursor:pointer;" onclick="app.toggleGrowthStrategy(\''+key+'\')">' +
                 '<input type="checkbox" '+(checked ? 'checked' : '')+' style="margin-top:2px; accent-color:#00C805; pointer-events:none;" />' +
                 '<div style="flex:1;"><div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-size:11px; font-weight:600; color:'+(checked ? '#166534' : '#374151')+';">'+title+'</div>' +
-                '<div style="font-size:10px; font-weight:700; color:'+(checked ? '#059669' : '#9ca3af')+';">+$'+delta.toLocaleString()+'</div></div>' +
-                '<div style="font-size:10px; color:#6b7280; margin-top:1px;">'+desc+'</div></div>' +
+                '<button onclick="event.stopPropagation(); alert(\''+title+' activated!\')" style="flex-shrink:0; font-size:10px; color:'+(checked ? '#059669' : '#0052ff')+'; background:none; border:1px solid '+(checked ? '#bbf7d0' : '#bfdbfe')+'; border-radius:6px; padding:3px 8px; cursor:pointer; font-weight:600;">'+(checked ? '✓ Active' : ctaLabel)+'</button></div>' +
+                '<div style="font-size:10px; color:#6b7280; margin-top:1px;">'+desc+'</div>' +
+                '<div style="font-size:10px; font-weight:700; color:'+(checked ? '#059669' : '#9ca3af')+'; margin-top:3px;">+$'+delta.toLocaleString()+' over '+years+' '+(years===1?'year':'years')+'</div></div>' +
             '</div>';
 
         // Projection breakdown rows
@@ -1687,10 +1688,10 @@ const app = {
             '<div style="font-size:10px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Growth Strategies</div>' +
             chk('savingsToUsdc', 'Gold Cash Sweep — FDIC insured',
                 'Move your $'+EXISTING_SAVINGS.toLocaleString()+' from bank → Robinhood. Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY instead of 0.40%. FDIC insured up to $2.5M via partner banks.',
-                deltaSavings, s.savingsToUsdc) +
+                deltaSavings, s.savingsToUsdc, 'Enable') +
             chk('goldCard', 'Gold Card — 3% cashback credit card',
                 'Earn 3% back on every purchase ($'+monthlyCashback+'/mo est.). Cashback auto-invested into your portfolio — turns spending into saving.',
-                deltaGoldCard, s.goldCard);
+                deltaGoldCard, s.goldCard, 'Apply');
     },
 
     // ===== RULES =====
@@ -1718,10 +1719,10 @@ const app = {
         // Crypto Insights section
         document.getElementById('rules-crypto').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:10px;">CRYPTO INSIGHTS</div>' +
-            insightCard('#fef3c7','#fde68a','#92400e','🛡','Safe yield vs DeFi risk', 'You\'re earning 0% on idle cash. Gold Sweep pays 3.35% APY, FDIC-insured — no smart contract risk, no impermanent loss.', "alert('Move to Gold Sweep — 3.35% FDIC insured')", 'Sweep') +
-            insightCard('#f0fdf4','#bbf7d0','#166534','📈','Crypto gains capture', 'Your portfolio is up $2,840 this month. Your spending also rose $280. Sweep the difference to lock in gains at 3.35%.', "alert('Sweep $2,560 to Gold Sweep')", 'Capture') +
-            insightCard('#faf5ff','#e9d5ff','#6b21a8','⚖️','Portfolio balance check', '82% of your holdings are in crypto. Consider diversifying — sweep to FDIC-insured savings to reduce volatility risk.', "alert('Rebalance: move $3,000 to Gold Sweep')", 'Rebalance') +
-            insightCard('#fff7ed','#fed7aa','#9a3412','⛏','Idle crypto could earn', 'You hold 1.2 ETH doing nothing. Stake for ~3.8% APY, or sweep equivalent value to Gold Sweep at 3.35% (FDIC insured).', "alert('Explore staking options')", 'Explore') +
+            insightCard('#fef3c7','#fde68a','#92400e','🛡','Your idle cash earns 0%', 'You have $3,200 uninvested cash in Robinhood. Gold Sweep pays 3.35% APY, FDIC-insured — that\'s $107/yr vs $0 today.', "alert('Enable Gold Sweep — 3.35% FDIC insured')", 'Enable') +
+            insightCard('#f0fdf4','#bbf7d0','#166534','📈','Lock in your crypto gains', 'Your crypto is up $2,840 this month but your spending rose $280. Sweep realized gains to FDIC-insured savings before the next dip.', "alert('Sweep gains to Gold Sweep')", 'Sweep') +
+            insightCard('#faf5ff','#e9d5ff','#6b21a8','⚖️','High crypto concentration', '82% of your portfolio is in crypto. Moving some to Gold Sweep (3.35% FDIC) reduces drawdown risk without leaving Robinhood.', "alert('Move $3,000 to Gold Sweep')", 'Rebalance') +
+            insightCard('#fff7ed','#fed7aa','#9a3412','💰','Spending leak detected', 'Dining is up 23% this month (+$52). At your current rate, that\'s $624/yr — enough to fund a weekly $12 BTC DCA.', "alert('Set dining budget + auto-invest rule')", 'Fix it') +
             '<button class="cta-btn primary" style="margin-top:12px;" onclick="alert(\'Gold Sweep activated — 3.35% APY on all idle cash, FDIC insured up to $2.5M\')">Activate Gold Sweep — Earn 3.35% APY</button>' +
             '<button class="cta-btn outline" style="margin-top:8px;" onclick="alert(\'Gold Card application started — 3% cashback on everything\')">Apply for Gold Card — 3% Back</button>';
     },
