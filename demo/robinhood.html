@@ -468,6 +468,7 @@
                         <button class="feature-tab" data-feature="budget">Savings</button>
                         <button class="feature-tab" data-feature="savings">Grow</button>
                         <button class="feature-tab" data-feature="rules"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg></button>
+                        <button class="feature-tab" data-feature="auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:2px;"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg></button>
                     </div>
                     </div><!-- /sticky-chart-area -->
 
@@ -507,9 +508,14 @@
                         <div id="savings-model"></div>
                     </div>
 
-                    <!-- RULES -->
+                    <!-- INSIGHTS -->
                     <div class="tab-content hidden" id="rules-content">
                         <div id="rules-suggested"></div>
+                        <div id="rules-crypto"></div>
+                    </div>
+
+                    <!-- AUTO -->
+                    <div class="tab-content hidden" id="auto-content">
                         <div id="rules-active"></div>
                         <div id="rules-templates"></div>
                         <div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:12px;">RECENT ACTIVITY</div>
@@ -784,6 +790,10 @@ const app = {
             }
             changeEl.className = 'amount-change';
         } else if (tab === 'rules') {
+            mainEl.textContent = 'Insights';
+            changeEl.textContent = 'Spending + Crypto ideas for you';
+            changeEl.className = 'amount-change';
+        } else if (tab === 'auto') {
             const cashback = Math.round(this.getMonthlyRate() * 0.03);
             mainEl.textContent = '$' + (MONTHLY_SAVINGS + cashback).toLocaleString() + '/mo';
             changeEl.textContent = '$' + MONTHLY_SAVINGS + ' auto-save · $' + cashback + ' Gold Card cashback';
@@ -828,6 +838,7 @@ const app = {
         else if (feature === 'budget') this.renderBudgetTab();
         else if (feature === 'savings') this.renderSavingsTab();
         else if (feature === 'rules') this.renderRulesTab();
+        else if (feature === 'auto') this.renderAutoTab();
         this.updateAmountDisplay();
         this.drawChart();
         document.querySelector('.phone-content').scrollTop = 0;
@@ -842,6 +853,7 @@ const app = {
         else if (t === 'budget') this.drawBudgetChart();
         else if (t === 'savings') this.drawSavingsChart();
         else if (t === 'rules') this.drawRulesChart();
+        else if (t === 'auto') this.drawRulesChart();
     },
 
     dim() {
@@ -1683,12 +1695,12 @@ const app = {
 
     // ===== RULES =====
     renderRulesTab() {
-        // Suggested section — actionable save-more ideas
+        // Suggested section — actionable spending insights
         const budgets = this.getBudgetData();
         const overBudgetCats = budgets.filter(b => b.spent > b.limit);
         const potentialSavings = overBudgetCats.reduce((s,b) => s + (b.spent - b.limit), 0);
 
-        const suggestedCard = (bg, border, color, icon, title, desc, action, actionLabel) =>
+        const insightCard = (bg, border, color, icon, title, desc, action, actionLabel) =>
             '<div style="background:'+bg+'; border:1px solid '+border+'; border-radius:10px; padding:10px; margin-bottom:6px;">' +
                 '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
                     '<div style="flex:1;"><div style="font-size:11px; color:'+color+';"><strong>'+icon+' '+title+'</strong></div>' +
@@ -1698,14 +1710,26 @@ const app = {
             '</div>';
 
         document.getElementById('rules-suggested').innerHTML =
-            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">INSIGHTS FOR GOLD MEMBERS</div>' +
-            (potentialSavings > 0 ? suggestedCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
-            suggestedCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → Gold Sweep', 'Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY (FDIC insured) on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
-            suggestedCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested.', "alert('Apply for Gold Card in Settings')", 'Apply');
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">SPENDING INSIGHTS</div>' +
+            (potentialSavings > 0 ? insightCard('#fff7ed','#fed7aa','#9a3412','⚠','Fix overspends: +$'+potentialSavings+'/mo', overBudgetCats.map(b=>b.name).join(' & ')+' are over budget — tighten limits to save more.', "app.switchFeatureTab('overview')", 'View') : '') +
+            insightCard('#f0fdf4','#bbf7d0','#166534','↗','Auto-sweep surplus → Gold Sweep', 'Earn '+(RATES.goldSweep*100).toFixed(2)+'% APY (FDIC insured) on under-budget savings instead of 0.40% at bank.', "alert('Auto-sweep enabled!')", 'Enable') +
+            insightCard('#eff6ff','#bfdbfe','#1e40af','💳','Gold Card cashback → auto-invest', '3% cashback on all spending auto-invested into your portfolio.', "alert('Apply for Gold Card in Settings')", 'Apply');
 
+        // Crypto Insights section
+        document.getElementById('rules-crypto').innerHTML =
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:20px; margin-bottom:10px;">CRYPTO INSIGHTS</div>' +
+            insightCard('#fef3c7','#fde68a','#92400e','🛡','Safe yield vs DeFi risk', 'You\'re earning 0% on idle cash. Gold Sweep pays 3.35% APY, FDIC-insured — no smart contract risk, no impermanent loss.', "alert('Move to Gold Sweep — 3.35% FDIC insured')", 'Sweep') +
+            insightCard('#f0fdf4','#bbf7d0','#166534','📈','Crypto gains capture', 'Your portfolio is up $2,840 this month. Your spending also rose $280. Sweep the difference to lock in gains at 3.35%.', "alert('Sweep $2,560 to Gold Sweep')", 'Capture') +
+            insightCard('#faf5ff','#e9d5ff','#6b21a8','⚖️','Portfolio balance check', '82% of your holdings are in crypto. Consider diversifying — sweep to FDIC-insured savings to reduce volatility risk.', "alert('Rebalance: move $3,000 to Gold Sweep')", 'Rebalance') +
+            insightCard('#fff7ed','#fed7aa','#9a3412','⛏','Idle crypto could earn', 'You hold 1.2 ETH doing nothing. Stake for ~3.8% APY, or sweep equivalent value to Gold Sweep at 3.35% (FDIC insured).', "alert('Explore staking options')", 'Explore') +
+            '<button class="cta-btn primary" style="margin-top:12px;" onclick="alert(\'Gold Sweep activated — 3.35% APY on all idle cash, FDIC insured up to $2.5M\')">Activate Gold Sweep — Earn 3.35% APY</button>' +
+            '<button class="cta-btn outline" style="margin-top:8px;" onclick="alert(\'Gold Card application started — 3% cashback on everything\')">Apply for Gold Card — 3% Back</button>';
+    },
+
+    renderAutoTab() {
         // Active Rules
         document.getElementById('rules-active').innerHTML =
-            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">ACTIVE RULES</div>' +
+            '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-bottom:10px;">ACTIVE RULES</div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Auto-sweep savings → Gold Sweep</div><div style="font-size:11px; color:#047857; margin-top:2px;">Under-budget savings earn '+(RATES.goldSweep*100).toFixed(2)+'% APY · FDIC insured</div></div>' +
             '<button class="toggle active" onclick="this.classList.toggle(\'active\')"><div class="toggle-knob"></div></button></div>' +
             '<div class="rule-row"><div class="rule-text"><div style="font-weight:500;">Gold Card rewards → auto-invest</div><div style="font-size:11px; color:#1d4ed8; margin-top:2px;">3% cashback auto-invested</div></div>' +
@@ -1720,7 +1744,7 @@ const app = {
         // Templates
         document.getElementById('rules-templates').innerHTML =
             '<div style="font-size:12px; font-weight:600; color:#9ca3af; margin-top:16px; margin-bottom:10px;">TEMPLATES</div>' +
-            ['If total spending < budget, sweep extra to Gold Sweep','Smart Deposit: detect extra cash, auto-invest','Paycheck split: 20% of deposit → Gold Sweep','Monthly subscription audit alert','If savings goal met, boost honeymoon fund via Gold Sweep'].map(t =>
+            ['If total spending < budget, sweep extra to Gold Sweep','Smart Deposit: detect extra cash, auto-invest','Paycheck split: 20% of deposit → Gold Sweep','Crypto gains > $500: auto-sweep 50% to savings','Monthly subscription audit alert'].map(t =>
                 '<div class="template-row"><div class="template-text">'+t+'</div><button class="template-add-btn" onclick="this.textContent=\'✓\';this.style.background=\'#065f46\';">+</button></div>'
             ).join('');
 
